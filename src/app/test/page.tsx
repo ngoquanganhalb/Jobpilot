@@ -1,0 +1,275 @@
+"use client";
+import { useState, ChangeEvent, FormEvent } from "react";
+import Head from "next/head";
+import Link from "next/link";
+import { FaFacebookF, FaEye, FaEyeSlash } from "react-icons/fa";
+import { FcGoogle } from "react-icons/fc";
+import { BsBriefcase } from "react-icons/bs";
+import { MdPerson, MdBusiness } from "react-icons/md";
+import Input from "@component/components/ui/Input";
+import ArrowIcon from "@component/components/icons/ArrowIcon";
+import BackGround from "../../assets/backgroundsignin.png";
+type AccountType = "candidate" | "employer";
+
+interface FormData {
+  fullName: string;
+  username: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  agreeToTerms: boolean;
+}
+
+export default function CreateAccount() {
+  const [accountType, setAccountType] = useState<AccountType>("candidate");
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [showConfirmPassword, setShowConfirmPassword] =
+    useState<boolean>(false);
+  const [formData, setFormData] = useState<FormData>({
+    fullName: "",
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    agreeToTerms: false,
+  });
+
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, checked } = e.target;
+    setFormData({
+      ...formData,
+      [name]: type === "checkbox" ? checked : value,
+    });
+  };
+
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    // Handle form submission here
+    console.log("Form submitted:", formData);
+  };
+
+  return (
+    <div className="flex min-h-screen bg-gray-50">
+      <Head>
+        <title>Create Account | Jobpilot</title>
+        <meta name="description" content="Create your Jobpilot account" />
+      </Head>
+
+      {/* Left Side - Form */}
+      <div className="w-full lg:w-1/2 p-6 md:p-12 flex flex-col">
+        <div className="mb-8">
+          <Link href="/">
+            <div className="flex items-center cursor-pointer">
+              <BsBriefcase className="text-blue-600 text-3xl" />
+              <span className="ml-2 text-2xl font-bold">Jobpilot</span>
+            </div>
+          </Link>
+        </div>
+
+        <div className="my-8">
+          <h1 className="text-3xl font-bold">Create account.</h1>
+          <p className="text-gray-600 mt-2">
+            Already have account?{" "}
+            <Link href="/login" className="text-blue-600 hover:underline">
+              Log In
+            </Link>
+          </p>
+        </div>
+
+        <div className="w-full max-w-md">
+          <div className="bg-white rounded-md p-4 mb-6">
+            <p className="text-center text-sm text-gray-500 mb-4">
+              CREATE ACCOUNT AS A
+            </p>
+            <div className="grid grid-cols-2 gap-4">
+              <button
+                type="button"
+                className={`flex items-center justify-center py-3 px-4 rounded-md border ${
+                  accountType === "candidate"
+                    ? "bg-gray-300 border-gray-300"
+                    : "bg-white border-gray-300 hover:bg-gray-300"
+                }`}
+                onClick={() => setAccountType("candidate")}
+              >
+                <MdPerson className="mr-2" />
+                <span>Candidate</span>
+              </button>
+              <button
+                type="button"
+                className={`flex items-center justify-center py-3 px-4 rounded-md border ${
+                  accountType === "employer"
+                    ? "bg-blue-900 text-white border-blue-900"
+                    : "bg-white border-gray-300 hover:bg-blue-900"
+                }`}
+                onClick={() => setAccountType("employer")}
+              >
+                <MdBusiness className="mr-2" />
+                <span>Employers</span>
+              </button>
+            </div>
+          </div>
+
+          <form onSubmit={handleSubmit}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <Input
+                type="text"
+                name="fullName"
+                placeholder="Full Name"
+                value={formData.fullName}
+                onChange={handleInputChange}
+                required
+              />
+              <Input
+                type="text"
+                name="username"
+                placeholder="Username"
+                value={formData.username}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+
+            <div className="mb-4">
+              <Input
+                type="email"
+                name="email"
+                placeholder="Email address"
+                value={formData.email}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+
+            <div className="mb-4 relative">
+              <Input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                placeholder="Password"
+                value={formData.password}
+                onChange={handleInputChange}
+                required
+              />
+              <button
+                type="button"
+                className="absolute right-3 top-3 text-gray-500"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </button>
+            </div>
+
+            <div className="mb-6 relative">
+              <Input
+                type={showConfirmPassword ? "text" : "password"}
+                name="confirmPassword"
+                placeholder="Confirm Password"
+                value={formData.confirmPassword}
+                onChange={handleInputChange}
+                required
+              />
+              <button
+                type="button"
+                className="absolute right-3 top-3 text-gray-500"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              >
+                {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+              </button>
+            </div>
+
+            <div className="mb-6 flex items-center">
+              <input
+                type="checkbox"
+                name="agreeToTerms"
+                id="agreeToTerms"
+                checked={formData.agreeToTerms}
+                onChange={handleInputChange}
+                required
+              />
+              <label htmlFor="agreeToTerms" className="text-sm text-gray-600">
+                I`ve read and agree with your{" "}
+                <Link href="/terms" className="text-blue-600 hover:underline">
+                  Terms of Services
+                </Link>
+              </label>
+            </div>
+
+            <button
+              type="submit"
+              className="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 flex items-center justify-center"
+            >
+              Create Account
+              <ArrowIcon className="text-white ml-5" />
+            </button>
+          </form>
+
+          <div className="my-6 flex items-center">
+            <div className="flex-1 border-t border-gray-300"></div>
+            <span className="px-4 text-gray-500 text-sm">OR</span>
+            <div className="flex-1 border-t border-gray-300"></div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <button
+              type="button"
+              className="w-full flex items-center justify-center py-3 px-4 border border-gray-300 rounded-md hover:bg-gray-300"
+            >
+              <FaFacebookF className="text-blue-600 mr-2" />
+              <span className="text-sm">Sign up with Facebook</span>
+            </button>
+            <button
+              type="button"
+              className="w-full flex items-center justify-center py-3 px-4 border border-gray-300 rounded-md hover:bg-gray-300"
+            >
+              <FcGoogle className="mr-2" />
+              <span className="text-sm">Sign up with Google</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Right Side - Image and Stats */}
+      <div
+        className="hidden lg:block lg:w-1/2 relative"
+        style={{
+          backgroundImage: `url(${BackGround.src})`,
+          backgroundRepeat: "no-repeat",
+          backgroundSize: "cover",
+          backgroundPosition: "right ",
+        }}
+      >
+        <div className="absolute inset-0 bg-black opacity-20"></div>
+        <div className="absolute inset-0 flex flex-col justify-end p-12 text-white">
+          <h2 className="text-3xl font-bold mb-4">
+            Over 1,75,324 candidates
+            <br />
+            waiting for good employees.
+          </h2>
+
+          <div className="grid grid-cols-3 gap-8 mt-8 mb-16 ">
+            <div className="flex flex-col items-center">
+              <div className="bg-cyan-600 bg-opacity-50 p-3 rounded-md mb-2">
+                <BsBriefcase className="text-white text-xl" />
+              </div>
+              <p className="text-xl font-bold">1,75,324</p>
+              <p className="text-sm opacity-75">Live Job</p>
+            </div>
+            <div className="flex flex-col items-center">
+              <div className="bg-cyan-600  bg-opacity-50 p-3 rounded-md mb-2">
+                <MdBusiness className="text-white text-xl" />
+              </div>
+              <p className="text-xl font-bold">97,354</p>
+              <p className="text-sm opacity-75">Companies</p>
+            </div>
+            <div className="flex flex-col items-center">
+              <div className="bg-cyan-600  bg-opacity-50 p-3 rounded-md mb-2">
+                <BsBriefcase className="text-white text-xl" />
+              </div>
+              <p className="text-xl font-bold">7,532</p>
+              <p className="text-sm opacity-75">New Jobs</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
