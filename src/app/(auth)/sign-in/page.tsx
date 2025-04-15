@@ -4,21 +4,24 @@
 import { useState, FormEvent, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth, db } from "../../services/firebase/firebase";
+import { auth, db } from "../../../services/firebase/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { useDispatch } from "react-redux";
-import { setUser } from "../../redux/slices/userSlice";
+import { setUser } from "../../../redux/slices/userSlice";
 import Head from "next/head";
 import Link from "next/link";
+import { toast } from "react-toastify";
+import { useSocialAuth } from "@component/hooks/useSocialAuth";
 
 import { FaFacebookF, FaEye, FaEyeSlash } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { BsBriefcase } from "react-icons/bs";
 import { MdPerson, MdBusiness } from "react-icons/md";
-import BackGround from "../../assets/backgroundsignin.png";
+// import BackGround from "/assets/backgroundsignin.png";
 import Input from "@component/components/ui/Input";
 import ArrowIcon from "@component/components/icons/ArrowIcon";
 import Spinner from "@component/components/ui/Spinner";
+import { url } from "inspector";
 
 const SignIn: React.FC = () => {
   const router = useRouter();
@@ -30,6 +33,7 @@ const SignIn: React.FC = () => {
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
+  const { handleSocialSignIn } = useSocialAuth();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -63,14 +67,32 @@ const SignIn: React.FC = () => {
           isAdmin,
         })
       );
-
       router.push("/");
     } catch (err: any) {
       setError("Invalid email or password.");
+      toast.error("Invalid email or password.");
     } finally {
       setIsLoading(false);
     }
   };
+
+  // const handleSignInWithGoogle = async () => {
+  //   try {
+  //     const result = await signInWithGoogle();
+  //     const user = result.user;
+  //     dispatch(
+  //       setUser({
+  //         id: user.uid,
+  //         name: user.displayName || "",
+  //         isAdmin: false,
+  //       })
+  //     );
+  //     toast.success("Signed in with Google!");
+  //     router.push("/");
+  //   } catch {
+  //     toast.error("Google sign-in failed");
+  //   }
+  // };
 
   return (
     <div className="flex min-h-screen bg-gray-50">
@@ -167,6 +189,7 @@ const SignIn: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <button
             type="button"
+            onClick={() => handleSocialSignIn("facebook")}
             className="w-full flex items-center justify-center py-3 px-4 border border-gray-300 rounded-md hover:bg-gray-300"
           >
             <FaFacebookF className="text-blue-600 mr-2" />
@@ -174,6 +197,7 @@ const SignIn: React.FC = () => {
           </button>
           <button
             type="button"
+            onClick={() => handleSocialSignIn("google")}
             className="w-full flex items-center justify-center py-3 px-4 border border-gray-300 rounded-md hover:bg-gray-300"
           >
             <FcGoogle className="mr-2" />
@@ -186,7 +210,7 @@ const SignIn: React.FC = () => {
       <div
         className="hidden lg:block lg:w-[60%] relative"
         style={{
-          backgroundImage: `url(${BackGround.src})`,
+          backgroundImage: "url('/images/backgroundsignin.png')",
           backgroundRepeat: "no-repeat",
           backgroundSize: "cover",
           backgroundPosition: "right ",

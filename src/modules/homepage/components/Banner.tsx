@@ -1,4 +1,6 @@
 import BannerHeader from "@component/components/icons/BannerHeaderImg";
+import CandidateIcon from "@component/components/icons/CandidateIcon";
+import CompanyIcon from "@component/components/icons/CompanyIcon";
 import JobIcon from "@component/components/icons/JobIcon";
 import Line from "@component/components/icons/Line";
 import LocationIcon from "@component/components/icons/LocationIcon";
@@ -53,15 +55,15 @@ export default function Banner() {
           className="w-full sm:w-[300px] md:w-[400px]"
         />
         <CountBox
-          count={1000}
-          title="Jobs"
-          img={<JobIcon />}
+          count={6969}
+          title="Companies"
+          img={<CompanyIcon />}
           className="w-full sm:w-[300px] md:w-[400px]"
         />
         <CountBox
-          count={1000}
+          count={666}
           title="Jobs"
-          img={<JobIcon />}
+          img={<CandidateIcon />}
           className="w-full sm:w-[300px] md:w-[400px]"
         />
       </div>

@@ -1,6 +1,6 @@
 // JobCardUploader.js
 import { collection, addDoc } from "firebase/firestore";
-import { db } from "../services/firebase";
+import { db } from "../services/firebase/firebase";
 import { Timestamp } from "firebase/firestore";
 export const createJobCard = async () => {
   const jobData = {

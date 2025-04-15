@@ -7,8 +7,10 @@ export default function CountBox({
   className = "",
 }: CountBoxProps) {
   return (
-    <button className={className}>
-      <div className="flex gap-5 p-5 rounded-[8px] bg-white">
+    <button
+      className={`cursor-pointer hover:scale-110 transition-transform duration-200  ${className}`}
+    >
+      <div className="flex gap-5 p-5 rounded-[8px] bg-white hover:bg-gray-300">
         <div
           className="rounded-[3px]
         flex items-center
@@ -18,6 +20,8 @@ export default function CountBox({
         px-[16px]
         py-[16px]
         bg-blue-50
+      
+        
        "
         >
           {" "}

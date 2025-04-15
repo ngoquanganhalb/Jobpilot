@@ -7,7 +7,7 @@ export default function HomePageModule() {
   const user = useSelector((state: RootState) => state.user);
   return (
     <div>
-      <SearchBar />
+      
       <Banner />
       {/* <div className="p-6">
         <h1>Xin chào, {user.name || "bạn"}!</h1>

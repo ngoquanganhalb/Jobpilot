@@ -18,6 +18,16 @@ export type CountBoxProps = {
   className?: string;
 } & ButtonHTMLAttributes<HTMLButtonElement>;
 
+export type AccountType = "candidate" | "employer";
+export type FormData = {
+  fullName: string;
+  username: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  agreeToTerms: boolean;
+};
+
 export type JobBoxType = {
   id?: string;
   title: string;
@@ -29,4 +39,14 @@ export type JobBoxType = {
   urgent?: boolean;
   logo?: string;
   variant?: "primary" | "secondary";
+};
+//------------------------db---------------------------------
+//users board
+export type UserModel = {
+  name: string;
+  username: string;
+  email: string;
+  accountType: AccountType;
+  isAdmin: boolean;
+  password: string;
 };

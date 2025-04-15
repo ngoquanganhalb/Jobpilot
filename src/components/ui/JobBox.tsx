@@ -2,7 +2,9 @@ import { JobBoxType } from "@component/types/types";
 import Image from "next/image";
 import EmployersLogo from "../../assets/EmployersLogo.svg";
 import AddressIconBox from "../../assets/AddressIconBox.svg";
-import BookMark from "../../assets/BookMark.svg";
+import { FaRegBookmark, FaBookmark } from "react-icons/fa";
+import { useState } from "react";
+
 export default function JobBox({
   title,
   type,
@@ -16,6 +18,12 @@ export default function JobBox({
   ...props
 }: JobBoxType) {
   let variantStyles = "";
+  const [isBookmarked, setIsBookmarked] = useState(false);
+
+  const handleBookmarkClick = () => {
+    setIsBookmarked(!isBookmarked);
+    // console.log("Bookmark clicj");
+  };
 
   // if (variant === "primary") {
   //   variantStyles =
@@ -33,7 +41,7 @@ export default function JobBox({
 
   return (
     <div
-      className={`flex flex-col w-[390px] p-[24px] border rounded-[8px]
+      className={`flex flex-col w-[390px] p-[24px] border rounded-[8px] hover:scale-105 transition-all duration-100 cursor-pointer
     ${variantStyles} ${className}`}
       {...props}
     >
@@ -70,16 +78,24 @@ export default function JobBox({
         <div className="flex flex-col flex-1">
           <div className="text-[16px] font-medium leading-6">{company}</div>
           <div className="flex flex-row ">
-            <Image src={AddressIconBox} alt="icon" />
+            <Image
+              src={AddressIconBox}
+              className="w-[18px] h-[18px]"
+              alt="icon"
+            />
             <div className="text-[14px] font-normal leading-5 text-gray-500">
               {location}
             </div>
 
             <button
-              onClick={() => console.log("Bookmark clicked")}
-              className="ml-auto cursor-pointer"
+              onClick={handleBookmarkClick}
+              className="ml-auto cursor-pointer group"
             >
-              <Image src={BookMark} alt="BookMark" />
+              {isBookmarked ? (
+                <FaBookmark className="text-amber-400 hover:scale-110 transition-transform duration-200" />
+              ) : (
+                <FaRegBookmark className=" text-gray-500 group-hover:text-amber-400 group-active:text-amber-500 group-hover:scale-110 transition-all duration-200 " />
+              )}
             </button>
           </div>
         </div>

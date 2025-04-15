@@ -2,22 +2,25 @@ import ArrowIcon from "@component/components/icons/ArrowIcon";
 import Button from "@component/components/ui/Button";
 import JobBox from "@component/components/ui/JobBox";
 import { useEffect, useState } from "react";
-import { firestore } from "../../../services/firebase";
+import { firestore } from "../../../services/firebase/firebase";
 import { collection, query, orderBy, getDocs } from "firebase/firestore";
 import { JobBoxType } from "@component/types/types";
+import Link from "next/link";
 
 export default function ListJob() {
   const [jobs, setJobs] = useState<JobBoxType[]>([]);
+  const limit = 15;
 
   useEffect(() => {
     const fetchJobs = async () => {
       const jobsRef = collection(firestore, "jobCards");
       const q = query(jobsRef, orderBy("createdAt", "desc"));
       const snapshot = await getDocs(q);
-      const jobsData = snapshot.docs.map((doc) => ({
+      let jobsData = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...(doc.data() as Omit<JobBoxType, "id">),
       }));
+      jobsData = jobsData.slice(0, limit);
       setJobs(jobsData);
     };
 
@@ -26,14 +29,16 @@ export default function ListJob() {
 
   return (
     <div className="flex flex-col gap-[50px]  md:px-[100px] md:py-[80px] lg:px-[150px] lg:py-[100px]">
-      <div className="flex justify-center flex-wrap items-center gap-4">
+      <div className="flex flex-wrap justify-between">
         <div className="text-[28px] md:text-[40px] font-medium leading-[38px] md:leading-[48px]">
           Featured job
         </div>
-        <Button className="ml-auto gap-3" variant="secondary">
-          <div>See All</div>
-          <ArrowIcon />
-        </Button>
+        <Link href="find-job">
+          <Button className="ml-auto gap-3" variant="secondary">
+            <div>See All</div>
+            <ArrowIcon />
+          </Button>
+        </Link>
       </div>
 
       <div className="flex items-center justify-center">

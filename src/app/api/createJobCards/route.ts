@@ -1,18 +1,18 @@
 // JobCardUploader.ts
 import { collection, addDoc, Timestamp } from "firebase/firestore";
-import { db } from "../../../services/firebase";
+import { db } from "../../../services/firebase/firebase";
+import { JobBoxType } from "@component/types/types";
+// type JobFormData = {
+//   company: string;
+//   location: string;
+//   title: string;
+//   type: string;
+//   salary: string;
+//   urgent: boolean;
+//   logo: string; // base64 string
+// };
 
-type JobFormData = {
-  company: string;
-  location: string;
-  title: string;
-  type: string;
-  salary: string;
-  urgent: boolean;
-  logo: string; // base64 string
-};
-
-export const createJobCard = async (jobData: JobFormData) => {
+export const createJobCard = async (jobData: JobBoxType) => {
   const fullData = {
     ...jobData,
     createdAt: Timestamp.now(),
