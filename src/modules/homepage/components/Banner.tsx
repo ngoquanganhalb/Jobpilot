@@ -1,4 +1,3 @@
-import BannerHeader from "@component/components/icons/BannerHeaderImg";
 import CandidateIcon from "@component/components/icons/CandidateIcon";
 import CompanyIcon from "@component/components/icons/CompanyIcon";
 import JobIcon from "@component/components/icons/JobIcon";
@@ -8,6 +7,7 @@ import SearchIcon from "@component/components/icons/SearchIcon";
 import Button from "@component/components/ui/Button";
 import CountBox from "@component/components/ui/CountBox";
 import Input from "@component/components/ui/Input";
+import Image from "next/image";
 
 export default function Banner() {
   return (
@@ -43,7 +43,12 @@ export default function Banner() {
           </div>
         </div>
         <div className="flex w-full lg:w-[40%] items-center justify-center">
-          <BannerHeader />
+          <Image
+            src="/images/BannerHome.png"
+            alt="Banner-Header "
+            width={1200} height={400}
+          />
+          ;
         </div>
       </div>
       {/* info */}

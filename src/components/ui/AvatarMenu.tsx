@@ -1,3 +1,4 @@
+"use client";
 import { Menu } from "@headlessui/react";
 import Image from "next/image";
 import Link from "next/link";
@@ -7,6 +8,7 @@ import { clearUser } from "../../redux/slices/userSlice";
 import { signOut } from "firebase/auth";
 import { useDispatch } from "react-redux";
 import { auth } from "../../services/firebase/firebase";
+import { deleteCookie } from "cookies-next";
 
 export default function AvatarMenu({ user }: { user: any }) {
   const dispatch = useDispatch();
@@ -14,7 +16,9 @@ export default function AvatarMenu({ user }: { user: any }) {
 
   const handleSignOut = async () => {
     try {
-      await signOut(auth);
+      await signOut(auth); // Firebase sign out
+      deleteCookie("token");
+      deleteCookie("accountType");
       dispatch(clearUser());
       toast.success("Signed out successfully");
       router.push("/");

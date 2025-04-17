@@ -3,6 +3,8 @@
 
 import { useState, FormEvent, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { setCookie } from "cookies-next";
+import { getIdToken } from "firebase/auth";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../../../services/firebase/firebase";
 import { doc, getDoc } from "firebase/firestore";
@@ -17,11 +19,11 @@ import { FaFacebookF, FaEye, FaEyeSlash } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { BsBriefcase } from "react-icons/bs";
 import { MdPerson, MdBusiness } from "react-icons/md";
-// import BackGround from "/assets/backgroundsignin.png";
 import Input from "@component/components/ui/Input";
 import ArrowIcon from "@component/components/icons/ArrowIcon";
 import Spinner from "@component/components/ui/Spinner";
 import { url } from "inspector";
+import { AccountType } from "@component/types/types";
 
 const SignIn: React.FC = () => {
   const router = useRouter();
@@ -45,18 +47,21 @@ const SignIn: React.FC = () => {
         password
       );
       const user = userCredential.user;
-
-      // Lấy thêm thông tin từ Firestore nếu có
+      const token = await getIdToken(user); // getget token
+      // console.log("token: ", token)
+      // get mỏe info from firestore
       const docRef = doc(db, "users", user.uid);
       const docSnap = await getDoc(docRef);
 
       let name = user.displayName || "";
       let isAdmin = false;
+      let accountType: AccountType = "candidate";
 
       if (docSnap.exists()) {
         const userData = docSnap.data();
         name = userData.name || name;
         isAdmin = userData.isAdmin || false;
+        accountType = userData.accountType || "candidate";
       }
 
       //save data to redux
@@ -65,8 +70,18 @@ const SignIn: React.FC = () => {
           id: user.uid,
           name,
           isAdmin,
+          accountType,
         })
       );
+
+      // Save to cookie
+      // setCookie("token", token); // 🔐 Token
+      // setCookie("accountType", accountType); // 👤 Role
+      setCookie("token", await user.getIdToken(), { maxAge: 60 * 60 * 24 }); // 1 ngày
+      setCookie("accountType", accountType, { maxAge: 60 * 60 * 24 });
+      // setCookie("token", await user.getIdToken(), { maxAge: 60  }); // 1 ngày
+      // setCookie("accountType", accountType, { maxAge: 60 });
+
       router.push("/");
     } catch (err: any) {
       setError("Invalid email or password.");

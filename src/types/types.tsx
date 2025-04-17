@@ -6,6 +6,13 @@ export type ButtonProps = {
   variant?: "primary" | "secondary";
 } & ButtonHTMLAttributes<HTMLButtonElement>;
 
+export type ButtonSlideBarProps = {
+  label: string;
+  icon: React.ReactNode;
+  isActive?: boolean;
+  onClick?: () => void;
+} & ButtonHTMLAttributes<HTMLButtonElement>;
+
 export type InputProps = {
   className?: string;
   icon?: React.ReactNode;

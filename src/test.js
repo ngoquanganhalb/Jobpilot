@@ -93,3 +93,68 @@
 //   .sort((a, b) => a - b)
 // console.log(res)
 
+users: {
+  [uid: string]: {
+    name: string;
+    email: string;
+    username: string;
+    avatarUrl?: string;
+    accountType: 'candidate' | 'employer';
+    savedJobs?: string[]; //job.id
+    createdAt: timestamp
+    profile?: {
+      resumeUrl?: string;
+      bio?: string;
+      skills?: string[];
+      location?: string;
+      phone?: string;
+    }
+    companyProfile?: {
+      name: string;
+      description?: string;
+      logoUrl?: string;
+      website?: string;
+      address?: string;
+      industry?: string;
+    }
+  }
+}
+
+
+jobs: {
+  [jobId: string]: {
+    title: string;
+    description: string;
+    requirements: string[];
+    salary: string;
+    location: string;
+    tags: string[]; 
+    category: string;
+    jobType: 'full-time' | 'part-time' | 'internship' | 'freelance';
+    postedAt: timestamp;
+    deadline: timestamp;
+    employerId: string; // user.id
+    applicants?: string[]; //candidate id
+    status: 'open' | 'closed';
+  }
+}
+
+
+applications: {
+  [applicationId: string]: {
+    jobId: string;
+    candidateId: string;
+    appliedAt: Timestamp;
+    status: 'pending' | 'reviewed' | 'interview' | 'rejected' | 'hired';
+    resumeUrl?: string;
+    note?: string;
+  }
+}
+
+savedJobs: {
+  [docId: string]: {
+    userId: string;
+    jobId: string;
+    savedAt: timestamp;
+  }
+}

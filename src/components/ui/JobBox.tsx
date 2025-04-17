@@ -1,7 +1,5 @@
 import { JobBoxType } from "@component/types/types";
 import Image from "next/image";
-import EmployersLogo from "../../assets/EmployersLogo.svg";
-import AddressIconBox from "../../assets/AddressIconBox.svg";
 import { FaRegBookmark, FaBookmark } from "react-icons/fa";
 import { useState } from "react";
 
@@ -33,20 +31,21 @@ export default function JobBox({
   // }
 
   if (urgent == true) {
-    variantStyles =
-      "bg-[linear-gradient(90deg,_#FFF6E6_0%,_#FFF_100%)] shadow-[0px_2px_18px_0px_rgba(24,25,28,0.03)]";
+    variantStyles = "bg-urgent";
   } else {
     variantStyles = "bg-white shadow-[0px_2px_18px_0px_rgba(24,25,28,0.03)]";
   }
 
   return (
     <div
-      className={`flex flex-col w-[390px] p-[24px] border rounded-[8px] hover:scale-105 transition-all duration-100 cursor-pointer
+      className={`flex flex-col w-[390px] p-[24px] border border-[#E4E5E8] shadow-[0px_2px_18px_0px_rgba(24,25,28,0.03)] rounded-[8px] hover:scale-105 transition-all duration-100 cursor-pointer
     ${variantStyles} ${className}`}
       {...props}
     >
-      <div className="text-[18px] font-medium leading-7">{title}</div>
-      <div className="flex flex-row gap-2">
+      <div className="text-[18px] font-semibold font-mono leading-7">
+        {title}
+      </div>
+      <div className="flex flex-row gap-2 pt-1">
         <div className="flex items-center px-[8px] text-[12px] font-semibold leading-3 uppercase text-green-500 bg-green-50 border rounded-[3px] justify-center  ">
           {type}
         </div>
@@ -55,7 +54,7 @@ export default function JobBox({
         </div>
       </div>
 
-      <div className="flex flex-row gap-3 items-center">
+      <div className="flex flex-row gap-3 items-center pt-4">
         {logo ? (
           <Image
             src={logo}
@@ -67,7 +66,7 @@ export default function JobBox({
           />
         ) : (
           <Image
-            src={EmployersLogo}
+            src="/images/EmployersLogo.svg"
             alt="Default Logo"
             width={40}
             height={40}
@@ -76,11 +75,12 @@ export default function JobBox({
         )}
         {/* <Image src={EmployersLogo} alt="logo" /> */}
         <div className="flex flex-col flex-1">
-          <div className="text-[16px] font-medium leading-6">{company}</div>
+          <div className="text-[16px] font-semibold leading-6 ">{company}</div>
           <div className="flex flex-row ">
             <Image
-              src={AddressIconBox}
-              className="w-[18px] h-[18px]"
+              src="/images/AddressIconBox.svg"
+              width={14}
+              height={14}
               alt="icon"
             />
             <div className="text-[14px] font-normal leading-5 text-gray-500">
