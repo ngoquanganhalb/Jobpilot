@@ -1,4 +1,4 @@
-import { JobBoxType } from "@component/types/types";
+import { JobBoxType } from "@types";
 import Image from "next/image";
 import { FaRegBookmark, FaBookmark } from "react-icons/fa";
 import { useState } from "react";
@@ -38,13 +38,11 @@ export default function JobBox({
 
   return (
     <div
-      className={`flex flex-col w-[390px] p-[24px] border border-[#E4E5E8] shadow-[0px_2px_18px_0px_rgba(24,25,28,0.03)] rounded-[8px] hover:scale-105 transition-all duration-100 cursor-pointer
+      className={`flex flex-col w-[390px] p-[24px] border-3 border-[#E4E5E8] shadow-md rounded-[8px] hover:scale-105 transition-all duration-100 cursor-pointer
     ${variantStyles} ${className}`}
       {...props}
     >
-      <div className="text-[18px] font-semibold font-mono leading-7">
-        {title}
-      </div>
+      <div className="text-[18px] font-medium leading-7">{title}</div>
       <div className="flex flex-row gap-2 pt-1">
         <div className="flex items-center px-[8px] text-[12px] font-semibold leading-3 uppercase text-green-500 bg-green-50 border rounded-[3px] justify-center  ">
           {type}

@@ -1,4 +1,4 @@
-import { InputProps } from "@component/types/types";
+import { InputProps } from "@types";
 
 export default function Input({ className = "", icon, ...props }: InputProps) {
   return (

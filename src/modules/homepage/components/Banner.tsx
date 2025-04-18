@@ -1,12 +1,12 @@
-import CandidateIcon from "@component/components/icons/CandidateIcon";
-import CompanyIcon from "@component/components/icons/CompanyIcon";
-import JobIcon from "@component/components/icons/JobIcon";
-import Line from "@component/components/icons/Line";
-import LocationIcon from "@component/components/icons/LocationIcon";
-import SearchIcon from "@component/components/icons/SearchIcon";
-import Button from "@component/components/ui/Button";
-import CountBox from "@component/components/ui/CountBox";
-import Input from "@component/components/ui/Input";
+import CandidateIcon from "@component/icons/CandidateIcon";
+import CompanyIcon from "@component/icons/CompanyIcon";
+import JobIcon from "@component/icons/JobIcon";
+import Line from "@component/icons/Line";
+import LocationIcon from "@component/icons/LocationIcon";
+import SearchIcon from "@component/icons/SearchIcon";
+import Button from "@component/ui/Button";
+import CountBox from "@component/ui/CountBox";
+import Input from "@component/ui/Input";
 import Image from "next/image";
 
 export default function Banner() {

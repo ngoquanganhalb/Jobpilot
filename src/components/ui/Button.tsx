@@ -1,17 +1,21 @@
-import { ButtonProps } from "@component/types/types";
+import { ButtonProps } from "@types";
 
-export default function Button ({ children , className ='',variant = 'primary', ...props} : ButtonProps) {
+export default function Button({
+  children,
+  className = "",
+  variant = "primary",
+  ...props
+}: ButtonProps) {
   let variantStyles = "";
 
-if (variant === "primary") {
-  variantStyles = "bg-[#0A65CC] text-white";
-} else {
-  variantStyles = "bg-white text-[#0A65CC]";
-}
-  return(
+  if (variant === "primary") {
+    variantStyles = "bg-[#0A65CC] text-white";
+  } else {
+    variantStyles = "bg-white text-[#0A65CC]";
+  }
+  return (
     <button
-      className={
-        `
+      className={`
         rounded-[3px]
         flex items-center
         text-[16px]
@@ -25,11 +29,10 @@ if (variant === "primary") {
         hover:bg-blue-300 
         ${variantStyles}
         ${className}
-        ` 
-        }
-        {...props}>
-          {children}
-        
+        `}
+      {...props}
+    >
+      {children}
     </button>
-  )
+  );
 }

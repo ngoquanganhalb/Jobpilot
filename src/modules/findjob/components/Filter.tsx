@@ -1,7 +1,7 @@
-import LocationIcon from "@component/components/icons/LocationIcon";
-import SearchIcon from "@component/components/icons/SearchIcon";
-import Button from "@component/components/ui/Button";
-import Input from "@component/components/ui/Input";
+import LocationIcon from "@component/icons/LocationIcon";
+import SearchIcon from "@component/icons/SearchIcon";
+import Button from "@component/ui/Button";
+import Input from "@component/ui/Input";
 
 export default function Filter() {
   return (

@@ -1,4 +1,4 @@
-import { CountBoxProps } from "@component/types/types";
+import { CountBoxProps } from "@types";
 
 export default function CountBox({
   count,

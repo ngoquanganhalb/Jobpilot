@@ -1,11 +1,9 @@
-import ArrowIcon from "@component/components/icons/ArrowIcon";
-import Button from "@component/components/ui/Button";
-import JobBox from "@component/components/ui/JobBox";
+import JobBox from "@component/ui/JobBox";
 import { useEffect, useState, useRef } from "react";
 import { firestore } from "../../../services/firebase/firebase";
 import { collection, query, orderBy, getDocs } from "firebase/firestore";
-import { JobBoxType } from "@component/types/types";
-import StepPagination from "@component/components/ui/StepPagination";
+import { JobBoxType } from "@types";
+import StepPagination from "@component/ui/StepPagination";
 
 export default function List() {
   const limit = 6;

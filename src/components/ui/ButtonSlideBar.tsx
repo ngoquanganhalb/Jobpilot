@@ -1,4 +1,4 @@
-import { ButtonSlideBarProps } from "@component/types/types";
+import { ButtonSlideBarProps } from "@types";
 import clsx from "clsx";
 
 export default function ButtonSlideBar({

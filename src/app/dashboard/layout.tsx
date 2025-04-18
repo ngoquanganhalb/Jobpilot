@@ -1,7 +1,7 @@
 // app/dashboard/layout.tsx
 "use client";
-import Header from "@component/components/Header";
-import SearchBar from "@component/components/SearchBar";
+import Header from "@component/Header";
+import SearchBar from "@component/SearchBar";
 import { useSelector } from "react-redux";
 
 export default function DashboardLayout({

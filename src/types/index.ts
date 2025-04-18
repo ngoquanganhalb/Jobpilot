@@ -47,6 +47,17 @@ export type JobBoxType = {
   logo?: string;
   variant?: "primary" | "secondary";
 };
+
+export type JobPosting = {
+  id: number;
+  title: string;
+  type: string;
+  timeRemaining?: string;
+  expiryDate?: string;
+  status: "Active" | "Expire";
+  applications: number;
+  urgent?: boolean;
+}
 //------------------------db---------------------------------
 //users board
 export type UserModel = {

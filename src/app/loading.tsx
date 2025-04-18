@@ -1,4 +1,4 @@
-import Spinner from "@component/components/ui/Spinner";
+import Spinner from "@component/ui/Spinner";
 
 // handle spinning ưhen <Link href>
 export default function Loading() {

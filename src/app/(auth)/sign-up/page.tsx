@@ -12,10 +12,10 @@ import { FaFacebookF, FaEye, FaEyeSlash } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { BsBriefcase } from "react-icons/bs";
 import { MdPerson, MdBusiness } from "react-icons/md";
-import Input from "@component/components/ui/Input";
-import ArrowIcon from "@component/components/icons/ArrowIcon";
-import { AccountType, FormData } from "@component/types/types";
-import Spinner from "@component/components/ui/Spinner";
+import Input from "@component/ui/Input";
+import ArrowIcon from "@component/icons/ArrowIcon";
+import { AccountType, FormData } from "@types";
+import Spinner from "@component/ui/Spinner";
 
 // type AccountType = "candidate" | "employer";
 // type FormData = {

@@ -83,6 +83,7 @@
 // }
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation"; 
 import {
   BsBriefcase,
   BsPerson,
@@ -92,23 +93,29 @@ import {
   BsCreditCard,
 } from "react-icons/bs";
 import { FiPlus } from "react-icons/fi";
-import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
-import MenuIcon from "@component/components/icons/MenuIcon";
-import ButtonSlideBar from "@component/components/ui/ButtonSlideBar";
+import {
+  Sheet,
+  SheetTrigger,
+  SheetContent,
+} from "@component/components/ui/sheet";
+import Button from "@component/ui/Button";
+import MenuIcon from "@component/icons/MenuIcon";
+import ButtonSlideBar from "@component/ui/ButtonSlideBar";
+import Paths from "@/constants/paths";
 
 export default function SideBar() {
   const [selectedMenu, setSelectedMenu] = useState("Overview");
+  const router = useRouter(); // Khai báo useRouter
 
   const menuItems = [
-    { icon: <MenuIcon />, label: "Overview" },
-    { icon: <BsPerson className="h-5 w-5 mr-3" />, label: "EmployersProfile" },
-    { icon: <FiPlus className="h-5 w-5 mr-3" />, label: "PostAJob" },
-    { icon: <BsBriefcase className="h-5 w-5 mr-3" />, label: "MyJobs" },
-    { icon: <BsBookmark className="h-5 w-5 mr-3" />, label: "SavedCandidate" },
-    { icon: <BsCreditCard className="h-5 w-5 mr-3" />, label: "Plans" },
-    { icon: <BsBuilding className="h-5 w-5 mr-3" />, label: "AllCompanies" },
-    { icon: <BsGear className="h-5 w-5 mr-3" />, label: "Settings" },
+    { icon: <MenuIcon />, label: "Overview", path: Paths.EMPLOYERS_DASHBOARD },
+    { icon: <BsPerson className="h-5 w-5 mr-3" />, label: "EmployersProfile", path: Paths.EMPLOYER_PROFILE },
+    { icon: <FiPlus className="h-5 w-5 mr-3" />, label: "PostAJob", path: Paths.POST_A_JOB },
+    { icon: <BsBriefcase className="h-5 w-5 mr-3" />, label: "MyJobs", path: Paths.MY_JOBS },
+    { icon: <BsBookmark className="h-5 w-5 mr-3" />, label: "SavedCandidate", path: Paths.SAVED_CANDIDATE },
+    { icon: <BsCreditCard className="h-5 w-5 mr-3" />, label: "Plans", path: Paths.PLANS },
+    { icon: <BsBuilding className="h-5 w-5 mr-3" />, label: "AllCompanies", path: Paths.ALL_COMPANIES },
+    { icon: <BsGear className="h-5 w-5 mr-3" />, label: "Settings", path: Paths.SETTINGS },
   ];
 
   const SidebarNav = () => (
@@ -123,7 +130,10 @@ export default function SideBar() {
             icon={item.icon}
             label={item.label.replace(/([A-Z])/g, " $1").trim()}
             isActive={selectedMenu === item.label}
-            onClick={() => setSelectedMenu(item.label)}
+            onClick={() => {
+              setSelectedMenu(item.label); 
+              router.push(item.path); 
+            }}
           />
         ))}
       </nav>
@@ -136,7 +146,7 @@ export default function SideBar() {
       <div className="md:hidden px-4 pt-4">
         <Sheet>
           <SheetTrigger asChild>
-            <Button variant="outline">Open Menu</Button>
+            <Button variant="secondary">Open Menu</Button>
           </SheetTrigger>
           <SheetContent side="left" className="p-0 w-64">
             {SidebarNav()}

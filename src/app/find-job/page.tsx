@@ -1,8 +1,8 @@
 "use client";
-import Header from "@component/components/Header";
-import SearchBar from "@component/components/SearchBar";
-import Footer from "@component/components/Footer";
-import Breadcrumb from "@component/components/Breadcrumb";
+import Header from "@component/Header";
+import SearchBar from "@component/SearchBar";
+import Footer from "@component/Footer";
+import Breadcrumb from "@component/Breadcrumb";
 import FindJobModule from "../../modules/findjob/FindJobModule";
 export default function Jobs() {
   // type Job = {

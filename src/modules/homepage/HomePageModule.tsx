@@ -1,4 +1,4 @@
-import SearchBar from "@component/components/SearchBar";
+import SearchBar from "@component/SearchBar";
 import ListJob from "./components/ListJob";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";

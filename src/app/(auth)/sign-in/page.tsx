@@ -13,17 +13,17 @@ import { setUser } from "../../../redux/slices/userSlice";
 import Head from "next/head";
 import Link from "next/link";
 import { toast } from "react-toastify";
-import { useSocialAuth } from "@component/hooks/useSocialAuth";
+import { useSocialAuth } from "@hooks/useSocialAuth";
 
 import { FaFacebookF, FaEye, FaEyeSlash } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { BsBriefcase } from "react-icons/bs";
 import { MdPerson, MdBusiness } from "react-icons/md";
-import Input from "@component/components/ui/Input";
-import ArrowIcon from "@component/components/icons/ArrowIcon";
-import Spinner from "@component/components/ui/Spinner";
+import Input from "@component/ui/Input";
+import ArrowIcon from "@component/icons/ArrowIcon";
+import Spinner from "@component/ui/Spinner";
 import { url } from "inspector";
-import { AccountType } from "@component/types/types";
+import { AccountType } from "@types";
 
 const SignIn: React.FC = () => {
   const router = useRouter();

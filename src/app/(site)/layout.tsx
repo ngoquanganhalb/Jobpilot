@@ -1,7 +1,7 @@
 "use client";
-import Footer from "@component/components/Footer";
-import Header from "@component/components/Header";
-import SearchBar from "@component/components/SearchBar";
+import Footer from "@component/Footer";
+import Header from "@component/Header";
+import SearchBar from "@component/SearchBar";
 export default function PageLayout({
   children,
 }: {

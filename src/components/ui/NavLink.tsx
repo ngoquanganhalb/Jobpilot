@@ -1,4 +1,4 @@
-import { ButtonProps } from '../../types/types'
+import { ButtonProps } from '../../types'
 import Link from 'next/link'
 export default function NavLink({ children, className = "", href= '#', ...props }: ButtonProps & { href?:string}) {
   return (
