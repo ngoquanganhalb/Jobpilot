@@ -4,11 +4,13 @@ import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage"; // lưu vào localStorage
 import exampleReducer from "./slices/exampleSlice";
 import userReducer from "./slices/userSlice";
+import searchReducer from "./slices/searchSlice"
 import { useDispatch } from "react-redux";
 
 const rootReducer = combineReducers({
   example: exampleReducer,
   user: userReducer,
+  search: searchReducer,
 });
 
 const persistConfig = {

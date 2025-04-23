@@ -1,8 +1,9 @@
+
 // 'use client'
 import Logo from "./icons/Logo";
 import SearchIcon from "./icons/SearchIcon";
-import Button from "./ui/Button";
-import Input from "./ui/Input";
+import Button from "./ui/ButtonCustom";
+import Input from "./ui/InputCustom";
 import Link from "next/link";
 import { onAuthStateChanged } from "firebase/auth";
 import { useEffect, useState } from "react";

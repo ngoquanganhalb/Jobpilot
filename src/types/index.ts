@@ -35,6 +35,20 @@ export type FormData = {
   agreeToTerms: boolean;
 };
 
+// export type JobBoxType = {
+//   id?: string;
+//   title: string;
+//   type: string;
+//   salary: string;
+//   company: string;
+//   location: string;
+//   className?: string;
+//   urgent?: boolean;
+//   logo?: string;
+//   variant?: "primary" | "secondary";
+// };
+
+//Only for JobBox.tsx 
 export type JobBoxType = {
   id?: string;
   title: string;
@@ -47,13 +61,13 @@ export type JobBoxType = {
   logo?: string;
   variant?: "primary" | "secondary";
 };
-
+//chi dung cho JobBoxEmployer.tsx
 export type JobPosting = {
-  id: number;
+  id: string;
   title: string;
   type: string;
   timeRemaining?: string;
-  expiryDate?: string;
+  expiryDate?: string|Date;
   status: "Active" | "Expire";
   applications: number;
   urgent?: boolean;

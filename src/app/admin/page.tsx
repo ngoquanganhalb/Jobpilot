@@ -1,23 +1,8 @@
-// "use client";
-// import { createJobCard } from "../../app/api/createJobCards/route";
-
-// export default function AdminPage() {
-//   const handleAdd = async () => {
-//     try {
-//       const id = await createJobCard();
-//       alert("Đã thêm JobCard với ID: " + id);
-//     } catch (err) {
-//       alert("Lỗi khi thêm JobCard!");
-//     }
-//   };
-
-//   return <button onClick={handleAdd}>Thêm JobCard</button>;
-// }
-
 "use client";
 
 import { useState } from "react";
 import { createJobCard } from "../api/createJobCards/route";
+import { toBase64 } from "@lib/convertBase64";
 
 export default function UploadJobForm() {
   const [form, setForm] = useState({
@@ -111,10 +96,10 @@ export default function UploadJobForm() {
   );
 }
 
-const toBase64 = (file: File): Promise<string> =>
-  new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = reject;
-  });
+// const toBase64 = (file: File): Promise<string> =>
+//   new Promise((resolve, reject) => {
+//     const reader = new FileReader();
+//     reader.readAsDataURL(file);
+//     reader.onload = () => resolve(reader.result as string);
+//     reader.onerror = reject;
+//   });

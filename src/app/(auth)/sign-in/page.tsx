@@ -19,7 +19,7 @@ import { FaFacebookF, FaEye, FaEyeSlash } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { BsBriefcase } from "react-icons/bs";
 import { MdPerson, MdBusiness } from "react-icons/md";
-import Input from "@component/ui/Input";
+import Input from "@component/ui/InputCustom"; 
 import ArrowIcon from "@component/icons/ArrowIcon";
 import Spinner from "@component/ui/Spinner";
 import { url } from "inspector";

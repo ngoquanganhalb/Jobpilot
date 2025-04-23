@@ -4,9 +4,9 @@ import JobIcon from "@component/icons/JobIcon";
 import Line from "@component/icons/Line";
 import LocationIcon from "@component/icons/LocationIcon";
 import SearchIcon from "@component/icons/SearchIcon";
-import Button from "@component/ui/Button";
+import Button from "@component/ui/ButtonCustom";
 import CountBox from "@component/ui/CountBox";
-import Input from "@component/ui/Input";
+import Input from "@component/ui/InputCustom";
 import Image from "next/image";
 
 export default function Banner() {

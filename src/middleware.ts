@@ -46,10 +46,10 @@ export function middleware(req: NextRequest) {
 
   return NextResponse.next();
 }
-
+//path to signin first
 export const config = {
   matcher: [
-    "/dashboard",
+    "/dashboard/:path",
     "/homepage",
     "/employer/:path*",
     "/candidate/:path*",

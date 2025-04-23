@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AccountType } from "@component/types/types";
+import { AccountType } from "@types";
 interface UserState {
   id: string | null;
   name: string | null;

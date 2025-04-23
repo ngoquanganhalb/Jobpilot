@@ -1,32 +1,46 @@
 import ArrowIcon from "@component/icons/ArrowIcon";
-import Button from "@component/ui/Button";
+import Button from "@component/ui/ButtonCustom";
 import JobBox from "@component/ui/JobBox";
-import { useEffect, useState } from "react";
-import { firestore } from "../../../services/firebase/firebase";
-import { collection, query, orderBy, getDocs } from "firebase/firestore";
-import type { JobBoxType } from "@types";
 import Link from "next/link";
+import { useFetchJobBox } from "@hooks/useFetchJobBox";
 
 export default function ListJob() {
-  const [jobs, setJobs] = useState<JobBoxType[]>([]);
-  const limit = 15;
+  // const [jobs, setJobs] = useState<JobBoxType[]>([]);
+  // const limit = 15;
 
-  useEffect(() => {
-    const fetchJobs = async () => {
-      const jobsRef = collection(firestore, "jobCards");
-      const q = query(jobsRef, orderBy("createdAt", "desc"));
-      const snapshot = await getDocs(q);
-      let jobsData = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...(doc.data() as Omit<JobBoxType, "id">),
-      }));
-      jobsData = jobsData.slice(0, limit);
-      setJobs(jobsData);
-    };
+  // useEffect(() => {
+  //   const fetchJobs = async () => {
+  //     try {
+  //       const jobsRef = collection(firestore, "jobs");
+  //       const q = query(jobsRef, orderBy("createdAt", "desc"));
+  //       const snapshot = await getDocs(q);
 
-    fetchJobs();
-  }, []);
+  //       const jobsData: JobBoxType[] = snapshot.docs.map((doc) => {
+  //         const data = doc.data();
+  //         return {
+  //           id: doc.id,
+  //           company: data.companyName || "",
+  //           location: data.location || "Viet Nam",
+  //           title: data.jobTitle || "",
+  //           type: data.type || "Full-time",
+  //           salary:
+  //             data.minSalary && data.maxSalary
+  //               ? `$${data.minSalary} - $${data.maxSalary}`
+  //               : "Negotiable",
+  //           urgent: data.isRemote,
+  //           logo: data.avatarCompany || "",
+  //         };
+  //       });
 
+  //       setJobs(jobsData.slice(0, limit));
+  //     } catch (error) {
+  //       console.error("Error fetching jobs:", error);
+  //     }
+  //   };
+
+  //   fetchJobs();
+  // }, []);
+  const { jobs } = useFetchJobBox(15);
   return (
     <div className="flex flex-col gap-[50px]  md:px-[100px] md:py-[80px] lg:px-[150px] lg:py-[100px]">
       <div className="flex flex-wrap justify-between">
@@ -45,15 +59,18 @@ export default function ListJob() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 2xl:grid-cols-3 gap-6 ">
           {jobs.map((job) => (
             <JobBox
-              key={job.id}
-              company={job.company}
-              location={job.location}
-              title={job.title}
-              type={job.type}
-              salary={job.salary}
-              urgent={job.urgent}
-              logo={job.logo}
-              // variant="primary"
+              key={job.jobId}
+              company={job.companyName ? job.companyName : "Unknowed Company"}
+              location={job.location || "Viet Nam"}
+              title={job.jobTitle}
+              type={job.jobType ? job.jobType.toUpperCase() : "FULL-TIME"}
+              salary={
+                job.minSalary && job.maxSalary
+                  ? `$${job.minSalary} - $${job.maxSalary}`
+                  : "Negotiate"
+              }
+              urgent={job.isRemote} //fix sau
+              logo={job.avatarCompany}
             />
           ))}
         </div>
