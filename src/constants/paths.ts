@@ -5,6 +5,7 @@ export const Paths = {
 
   // Employer Dashboard
   DASHBOARD_OVERVIEW: "/dashboard/overview",
+  DASHBOARD_MYJOB:"/dashboard/my-jobs",
   EMPLOYER_PROFILE: "/dashboard/employers-profile",
   POST_A_JOB: "/dashboard/post-job",
   MY_JOBS: "/dashboard/my-jobs",

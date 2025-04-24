@@ -12,7 +12,14 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
-import { collection, addDoc, Timestamp, getDoc, doc } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  Timestamp,
+  getDoc,
+  doc,
+  updateDoc,
+} from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { db } from "@services/firebase/firebase";
 import { toast } from "react-toastify";
@@ -117,51 +124,6 @@ export default function PostAJob() {
     }
   };
 
-  // const handleSubmit = async (e: React.FormEvent) => {
-  //   e.preventDefault();
-
-  //   try {
-  //     const auth = getAuth();
-  //     const user = auth.currentUser;
-  //     if (!user) {
-  //       toast.error("You must be logged in to post a job.");
-  //       return;
-  //     }
-  //     let base64Logo = "";
-  //     if (logoFile) {
-  //       base64Logo = await toBase64(logoFile);
-  //     }
-
-  //     const jobData = {
-  //       ...formData,
-  //       avatarCompany: base64Logo,
-  //       createdAt: Timestamp.now(),
-  //       userId: user.uid,
-  //     };
-
-  //     await addDoc(collection(db, "jobs"), jobData);
-  //     toast.success("Created job!");
-
-  //     // reset form
-  //     setFormData({
-  //       jobTitle: "",
-  //       tags: "",
-  //       minSalary: "",
-  //       maxSalary: "",
-  //       description: "",
-  //       type: "",
-  //       avatarCompany: "",
-  //       urgent: false,
-  //       location: "Viet Nam",
-  //       isRemote: true,
-  //       expirationDate: new Date(),
-  //     });
-  //     setLogoFile(null);
-  //   } catch (error) {
-  //     console.error("Error uploading job:", error);
-  //     toast.error("Error");
-  //   }
-  // };
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -235,12 +197,22 @@ export default function PostAJob() {
         createdAt: Timestamp.now(),
       });
 
-      // update jobId = docRef.id nếu cần
-      await addDoc(collection(db, "jobs"), {
-        ...jobData,
+      // them jobid
+      await updateDoc(doc(db, "jobs", docRef.id), {
         jobId: docRef.id,
-        createdAt: Timestamp.now(),
       });
+
+      // const docRef = await addDoc(collection(db, "jobs"), {
+      //   ...jobData,
+      //   createdAt: Timestamp.now(),
+      // });
+
+      // // update jobId = docRef.id
+      // await addDoc(collection(db, "jobs"), {
+      //   ...jobData,
+      //   jobId: docRef.id,
+      //   createdAt: Timestamp.now(),
+      // });
 
       toast.success("Created job!");
 
