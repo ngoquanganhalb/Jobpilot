@@ -42,7 +42,7 @@ import {
 } from "@/components/ui/popover";
 import Image from "next/image";
 import { toBase64 } from "@lib/convertBase64";
-import { Job, JobType } from "../../../types/db";
+import { Job, JobType, JOB_TAG_OPTIONS } from "../../../types/db";
 
 // function JobBenefitTag({
 //   children,
@@ -177,7 +177,7 @@ export default function PostAJob() {
         jobId: "",
         employerId: user.uid,
         jobTitle: formData.jobTitle,
-        tags: [],
+        tags: formData.tags,
         minSalary: formData.minSalary,
         maxSalary: formData.maxSalary,
         description: formData.description,
@@ -288,26 +288,49 @@ export default function PostAJob() {
           />
         </div>
 
-        {/* Tags & Role */}
-        {/* <div className="flex flex-col md:flex-row gap-6">
-          <div className="flex-1">
-            <label className="block mb-2 text-sm font-medium text-gray-700">
-              Tags
-            </label>
-            <Input
-              name="tags"
-              placeholder="Job keywords, tags etc."
-              value={formData.tags}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="md:w-1/3">
-            <label className="block mb-2 text-sm font-medium text-gray-700">
-              Job Role
-            </label>
-            <SelectDropdown placeholder="Select Role" />
-          </div>
-        </div> */}
+        {/* Tags*/}
+        <div>
+          <label className="block mb-2 text-sm font-medium text-gray-700">
+            Tags
+          </label>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className="w-full justify-start text-left"
+              >
+                {(formData.tags ?? []).length > 0
+                  ? (formData.tags ?? []).join(", ")
+                  : "Select job tags"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[300px] p-4">
+              <div className="flex flex-wrap gap-2">
+                {JOB_TAG_OPTIONS.map((tag) => {
+                  const isSelected = (formData.tags ?? []).includes(tag);
+                  return (
+                    <Button
+                      key={tag}
+                      type="button"
+                      variant={isSelected ? "default" : "outline"}
+                      onClick={() =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          tags: isSelected
+                            ? (prev.tags ?? []).filter((t) => t !== tag)
+                            : [...(prev.tags ?? []), tag],
+                        }))
+                      }
+                      className="text-sm rounded-full"
+                    >
+                      {tag}
+                    </Button>
+                  );
+                })}
+              </div>
+            </PopoverContent>
+          </Popover>
+        </div>
 
         {/* Salary */}
         <div>

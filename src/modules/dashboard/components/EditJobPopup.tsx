@@ -25,7 +25,7 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/services/firebase/firebase";
-import { Job } from "../../../types/db";
+import { Job, JobType, JOB_TAG_OPTIONS } from "../../../types/db";
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { FaCalendarAlt } from "react-icons/fa";
@@ -33,7 +33,7 @@ import { cn } from "@component/lib/utils";
 import Image from "next/image";
 import Spinner from "@component/ui/Spinner";
 import { toast } from "react-toastify";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { updateJob } from "@redux/slices/jobSlice";
 
 type Props = {
@@ -73,6 +73,7 @@ export default function EditJobPopup({ open, onClose, job }: Props) {
         expirationDate: formData.expirationDate ?? null,
         isRemote: formData.isRemote ?? false,
         avatarCompany: formData.avatarCompany ?? "",
+        tags: formData.tags,
       });
       onClose();
       toast.success("Success update job");
@@ -102,7 +103,7 @@ export default function EditJobPopup({ open, onClose, job }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl ">
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto ">
         <DialogHeader>
           <DialogTitle>Edit Job</DialogTitle>
         </DialogHeader>
@@ -163,6 +164,52 @@ export default function EditJobPopup({ open, onClose, job }: Props) {
                 value={formData.jobTitle}
                 onChange={handleChange}
               />
+            </div>
+
+            <div>
+              <label className="block mb-2 text-sm font-medium text-gray-700">
+                Tags
+              </label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start text-left"
+                  >
+                    {(formData.tags ?? []).length > 0
+                      ? (formData.tags ?? []).join(", ")
+                      : "Select job tags"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[300px] p-4">
+                  <div className="flex flex-wrap gap-2">
+                    {JOB_TAG_OPTIONS.map((tag) => {
+                      const isSelected = (formData.tags ?? []).includes(tag);
+                      return (
+                        <Button
+                          key={tag}
+                          type="button"
+                          variant={isSelected ? "default" : "outline"}
+                          onClick={() =>
+                            setFormData((prev) => {
+                              if (!prev) return null;
+                              return {
+                                ...prev,
+                                tags: isSelected
+                                  ? (prev.tags ?? []).filter((t) => t !== tag)
+                                  : [...(prev.tags ?? []), tag],
+                              };
+                            })
+                          }
+                          className="text-sm rounded-full"
+                        >
+                          {tag}
+                        </Button>
+                      );
+                    })}
+                  </div>
+                </PopoverContent>
+              </Popover>
             </div>
 
             <div>
