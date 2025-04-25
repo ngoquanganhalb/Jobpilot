@@ -1,4 +1,5 @@
 import { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode } from "react";
+import { JobType } from "./db";
 
 export type ButtonProps = {
   children: ReactNode;
@@ -48,7 +49,7 @@ export type FormData = {
 //   variant?: "primary" | "secondary";
 // };
 
-//Only for JobBox.tsx 
+//Only for JobBox.tsx useSearchJob
 export type JobBoxType = {
   id?: string;
   title: string;
@@ -71,6 +72,17 @@ export type JobPosting = {
   status: "Active" | "Expire";
   applications: number;
   urgent?: boolean;
+}
+
+//dung cho FilterSideBar va useFilterJob
+export type FilterFormValues = {
+  searchTerm?: string;
+  location?: string;
+  tags: string[];
+  jobTypes: JobType[];
+  minSalary: number;
+  maxSalary: number;
+  isRemote: boolean;
 }
 //------------------------db---------------------------------
 //users board

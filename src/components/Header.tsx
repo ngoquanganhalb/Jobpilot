@@ -1,3 +1,4 @@
+"use client";
 import HeaderDownIcon from "../components/icons/HeaderDownIcon";
 import Image from "next/image";
 import NavLink from "./ui/NavLink";

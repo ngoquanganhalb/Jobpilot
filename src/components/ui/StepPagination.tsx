@@ -47,7 +47,7 @@ const StepPagination: React.FC<StepPaginationProps> = ({
           onClick={() => onStepClick && onStepClick(step)}
           className={`cursor-pointer flex items-center justify-center w-12 h-12 rounded-full font-medium transition-all duration-300 ${
             currentStep === step
-              ? "bg-blue-600 text-white"
+              ? "bg-[#0A65CC] text-white"
               : "bg-gray-100 text-gray-500 hover:bg-gray-200"
           }`}
         >

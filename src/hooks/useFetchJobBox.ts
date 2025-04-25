@@ -35,6 +35,7 @@ export function useFetchJobBox(limit: number = 15) {
             expirationDate: data.expirationDate?.toDate?.() || null,
             applicants: data.applicants || [],
             status: data.status || "open",
+            tags: data.tags
           };
         });
 

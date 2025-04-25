@@ -6,13 +6,15 @@ import exampleReducer from "./slices/exampleSlice";
 import userReducer from "./slices/userSlice";
 import searchReducer from "./slices/searchSlice"
 import { useDispatch } from "react-redux";
-import jobReducer from './slices/jobSlice'
+import jobReducer from './slices/jobSlice';
+import filterReducer from './slices/filterSlice'
 
 const rootReducer = combineReducers({
   example: exampleReducer,
   user: userReducer,
   search: searchReducer,
   jobs: jobReducer,
+  filter: filterReducer,
 });
 
 const persistConfig = {

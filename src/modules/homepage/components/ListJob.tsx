@@ -60,6 +60,7 @@ export default function ListJob() {
           {jobs.map((job) => (
             <JobBox
               key={job.jobId}
+              id={job.jobId}
               company={job.companyName ? job.companyName : "Unknowed Company"}
               location={job.location || "Viet Nam"}
               title={job.jobTitle}
