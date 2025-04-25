@@ -3,11 +3,13 @@ import SearchIcon from "@component/icons/SearchIcon";
 import Button from "@component/ui/ButtonCustom";
 import Input from "@component/ui/InputCustom";
 import { useDispatch } from "react-redux";
+
 import {
   setKeyword as setKeywordRedux,
   setLocation as setLocationRedux,
 } from "@redux/slices/searchSlice";
 import { useState, useEffect } from "react";
+import FilterSidebar from "./FilterSideBar";
 
 export default function Filter() {
   const dispatch = useDispatch();
@@ -50,11 +52,17 @@ export default function Filter() {
             onChange={(e) => setLocation(e.target.value)}
           />
         </div>
-        <div className="flex flex-row justify-center gap-1 md:gap-4 w-full md:w-[20%] py-5 px-1">
-          <Button variant="secondary" className="border border-gray-300">
+        {/* <div className="flex flex-row justify-center gap-1 md:gap-4 w-full md:w-[20%] py-5 px-1"> */}
+        {/* <Button variant="secondary" className="border border-gray-300">
             Filter
-          </Button>
+          </Button> */}
+        {/* <FilterSidebar />
           <Button className="border border-gray-300">Find Job</Button>
+        </div> */}
+
+        <div className="flex flex-row justify-center py-4 w-full md:w-[15%] mr-3">
+          <FilterSidebar onApplyFilters={undefined} />
+          {/* <Button className="border border-gray-300 ">Find Job</Button> */}
         </div>
       </div>
     </div>

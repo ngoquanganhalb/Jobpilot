@@ -17,7 +17,7 @@ export default function MyJobs() {
   );
   const dispatch = useDispatch();
   const jobs = useSelector((state: RootState) => state.jobs.jobs);
-  // const [myJobs, setMyJobs] = useState<Job[]>([]);
+  // const [myJobs, setMyJobs] = useState<Job[]>([]); //fetch cho mang job Job[]
   const [loading, setLoading] = useState(true);
   //fetch job for only that employer account
   useEffect(() => {
