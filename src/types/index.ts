@@ -74,7 +74,7 @@ export type JobPosting = {
   urgent?: boolean;
 }
 
-//dung cho FilterSideBar va useFilterJob
+//dung cho FilterSideBar va useFilterJob , filterSlice
 export type FilterFormValues = {
   searchTerm?: string;
   location?: string;
@@ -82,7 +82,7 @@ export type FilterFormValues = {
   jobTypes: JobType[];
   minSalary: number;
   maxSalary: number;
-  isRemote: boolean;
+  isRemote: boolean ;
 }
 //------------------------db---------------------------------
 //users board

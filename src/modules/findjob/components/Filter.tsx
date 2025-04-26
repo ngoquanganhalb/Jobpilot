@@ -1,6 +1,5 @@
 import LocationIcon from "@component/icons/LocationIcon";
 import SearchIcon from "@component/icons/SearchIcon";
-import Button from "@component/ui/ButtonCustom";
 import Input from "@component/ui/InputCustom";
 import { useDispatch } from "react-redux";
 
@@ -61,7 +60,7 @@ export default function Filter() {
         </div> */}
 
         <div className="flex flex-row justify-center py-4 w-full md:w-[15%] mr-3">
-          <FilterSidebar onApplyFilters={undefined} />
+          <FilterSidebar />
           {/* <Button className="border border-gray-300 ">Find Job</Button> */}
         </div>
       </div>

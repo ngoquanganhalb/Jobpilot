@@ -17,33 +17,26 @@ import { Badge } from "@component/ui/badge";
 import { Button } from "@component/ui/Button";
 import { Input } from "@component/ui/Input";
 import { cn } from "@component/lib/utils";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 import { JobType, JOB_TYPE_OPTIONS, JOB_TAG_OPTIONS } from "../../../types/db";
 import { useDispatch } from "react-redux";
-import { setFilters } from "@redux/slices/filterSlice";
+import { setFilters, resetFilters } from "@redux/slices/filterSlice";
 import { FilterFormValues } from "@types";
 
-export default function FilterSideBar({ onApplyFilters }) {
+export default function FilterSideBar() {
   const [tagSearch, setTagSearch] = useState("");
 
-  const { control, watch, setValue, handleSubmit, reset } =
-    useForm<FilterFormValues>({
-      defaultValues: {
-        location: "",
-        tags: [],
-        jobTypes: [],
-        minSalary: 0,
-        maxSalary: 200000,
-        isRemote: false,
-      },
-    });
+  const { control, watch, setValue, handleSubmit } = useForm<FilterFormValues>({
+    defaultValues: {
+      location: "",
+      tags: [],
+      jobTypes: [],
+      minSalary: 0,
+      maxSalary: 200000,
+      isRemote: false,
+    },
+  });
 
   const watchAll = watch();
 
@@ -53,7 +46,8 @@ export default function FilterSideBar({ onApplyFilters }) {
     dispatch(setFilters(data));
   };
   const clearAllFilters = () => {
-    reset();
+    // reset();
+    dispatch(resetFilters());
   };
 
   const removeTag = (tag: string) => {
@@ -204,7 +198,7 @@ export default function FilterSideBar({ onApplyFilters }) {
             >
               <AccordionItem value="location">
                 <AccordionTrigger className="py-2">Location</AccordionTrigger>
-                <AccordionContent>
+                <AccordionContent className="p-2">
                   <Controller
                     name="location"
                     control={control}
@@ -222,7 +216,7 @@ export default function FilterSideBar({ onApplyFilters }) {
                 <AccordionTrigger className="py-2">
                   Job Categories
                 </AccordionTrigger>
-                <AccordionContent>
+                <AccordionContent className="p-2">
                   <Input
                     placeholder="Search categories"
                     value={tagSearch}
@@ -293,7 +287,7 @@ export default function FilterSideBar({ onApplyFilters }) {
                 <AccordionTrigger className="py-2">
                   Salary Range
                 </AccordionTrigger>
-                <AccordionContent>
+                <AccordionContent className="p-2">
                   <div className="space-y-4 px-1">
                     <Slider
                       min={0}

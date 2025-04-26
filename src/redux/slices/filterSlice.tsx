@@ -5,18 +5,18 @@ type FilterState = {
   location?: string;
   tags?: string[];
   jobTypes?: JobType[];
-  minSalary?: number;
-  maxSalary?: number;
-  isRemote?: boolean;
+  minSalary?: number | null
+  maxSalary?: number | null
+  isRemote?: boolean | null
 };
 
 const initialState: FilterState = {
   location: "",
   tags: [],
   jobTypes: [],
-  minSalary: 0,
-  maxSalary: 200000,
-  isRemote: false,
+  minSalary: null,
+  maxSalary: null,
+  isRemote: null,
 };
 
 const filterSlice = createSlice({
