@@ -25,7 +25,7 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/services/firebase/firebase";
-import { Job, JobType, JOB_TAG_OPTIONS } from "../../../types/db";
+import { Job, JOB_TAG_OPTIONS } from "../../../types/db";
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { FaCalendarAlt } from "react-icons/fa";

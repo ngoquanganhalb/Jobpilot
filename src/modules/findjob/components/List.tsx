@@ -4,7 +4,9 @@ import StepPagination from "@component/ui/StepPagination";
 import { useFetchJobBox } from "@hooks/useFetchJobBox";
 import { useSelector } from "react-redux";
 import { RootState } from "@redux/store";
-import { Job, JobType } from "../../../types/db";
+import { Job } from "../../../types/db";
+import { resetFilters } from "@redux/slices/filterSlice";
+import { useDispatch } from "react-redux";
 
 export default function List() {
   const limit = 12;
@@ -14,7 +16,7 @@ export default function List() {
   const keyword = useSelector((state: RootState) => state.search.keyword);
   const location = useSelector((state: RootState) => state.search.location);
   const filter = useSelector((state: RootState) => state.filter);
-
+  const dispatch = useDispatch();
   const { jobs } = useFetchJobBox();
   //only searchsearch
   // const searchedJobs = useMemo(() => {
@@ -67,6 +69,11 @@ export default function List() {
   //     );
   //   });
   // }, [jobs, filter]);
+
+  useEffect(() => {
+    dispatch(resetFilters());
+  }, []);
+
   const filteredJobs = useMemo(() => {
     return jobs.filter((job) => {
       const keywordMatch =
@@ -96,39 +103,23 @@ export default function List() {
         ) ??
           false);
 
-      // const min = Number(filter.minSalary);
-      // const max = Number(filter.maxSalary);
-
-      // const jobMin =
-      //   typeof job.minSalary === "number" ? job.minSalary : undefined;
-      // const jobMax =
-      //   typeof job.maxSalary === "number" ? job.maxSalary : undefined;
-
-      // const salaryMatch =
-      //   (!min || (jobMin !== undefined && jobMin >= min)) &&
-      //   (!max || (jobMax !== undefined && jobMax <= max));
-
-      // console.log(
-      //   "Min",
-      //   jobMin,
-      //   "Max",
-      //   jobMax,
-      //   "Filter Min",
-      //   min,
-      //   "Filter Max",
-      //   max,
-      //   "Match",
-      //   salaryMatch
-      // );
-
       // const remoteMatch =
       //   filter.isRemote === null || filter.isRemote === undefined
       //     ? true
       //     : job.isRemote === filter.isRemote;
 
+      const jobMin = typeof job.minSalary === "number" ? job.minSalary : null;
+      const jobMax = typeof job.maxSalary === "number" ? job.maxSalary : null;
+
+      const min = filter.minSalary ?? 0;
+      const max = filter.maxSalary ?? 0;
+
+      const salaryMatch =
+        (min === 0 || (jobMin !== null && jobMin >= min)) &&
+        (max === 0 || (jobMax !== null && jobMax <= max));
+
       return (
-        keywordMatch && locationMatch && tagMatch && jobTypeMatch
-        // remoteMatch
+        keywordMatch && locationMatch && tagMatch && jobTypeMatch && salaryMatch
       );
     });
   }, [jobs, keyword, location, filter]);
@@ -168,28 +159,30 @@ export default function List() {
 
   return (
     <div className="flex flex-col gap-[50px] md:px-[100px] md:py-[50px] lg:px-[150px]">
-      <div className="flex items-center justify-center">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 2xl:grid-cols-3 gap-6">
-          {currentJobs.map((job) => {
-            return (
+      <div className="flex items-center justify-center min-h-[200px]">
+        {currentJobs.length === 0 ? (
+          <p className="text-gray-500 text-lg font-semibold">No Job Found</p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 2xl:grid-cols-3 gap-6">
+            {currentJobs.map((job) => (
               <JobBox
                 key={job.jobId}
                 id={job.jobId}
-                company={job.companyName ? job.companyName : "Unknowed Company"}
+                company={job.companyName || "Unknown Company"}
                 location={job.location || "Viet Nam"}
                 title={job.jobTitle}
-                type={job.jobType ? job.jobType.toUpperCase() : "FULL-TIME"}
+                type={job.jobType?.toUpperCase() || "FULL-TIME"}
                 salary={
                   job.minSalary && job.maxSalary
                     ? `$${job.minSalary} - $${job.maxSalary}`
                     : "Negotiate"
                 }
-                urgent={job.isRemote} //fix sau
+                urgent={job.isRemote} // fix sau
                 logo={job.avatarCompany}
               />
-            );
-          })}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="container mx-auto px-4 py-8">
