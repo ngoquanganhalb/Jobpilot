@@ -2,9 +2,9 @@
 
 import Header from "@component/Header";
 import SearchBar from "@component/SearchBar";
-import SideBar from "@modules/dashboard/components/SideBar";
 import { useSelector } from "react-redux";
 import Head from "next/head";
+import Breadcrumb from "@component/Breadcrumb";
 
 export default function DashboardLayout({
   children,
@@ -21,16 +21,17 @@ export default function DashboardLayout({
     <div>
       <Header />
       <SearchBar />
+      <div className="px-[-100px]">
+        <Breadcrumb />
+      </div>
 
-      <div className="min-h-screen bg-gray-50 px-4 md:px-[150px]">
+      <div className="min-h-screen bg-gray-50 px-4 md:px-[100px] mt-7">
         <Head>
           <title>Dashboard | Jobpilot</title>
           <meta name="description" content="Employer Dashboard" />
         </Head>
 
         <div className="container flex flex-col md:flex-row gap-0">
-          <SideBar />
-
           <div className="flex-1">
             {accountType === "employer" && employer}
             {accountType === "candidate" && candidate}

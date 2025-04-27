@@ -18,22 +18,21 @@ import { Badge } from "@component/ui/badge";
 import { Separator } from "@component/ui/separator";
 import Image from "next/image";
 import { Timestamp } from "firebase/firestore";
-
+import JobApplicationPopup from "../client/JobApplicationPopup";
+import { useSelector } from "react-redux";
+import { RootState } from "@redux/store";
 import {
   Calendar,
   MapPin,
   Briefcase,
   BookOpen,
-  DollarSign,
   Clock,
-  Share2,
   Copy,
   Linkedin,
   Facebook,
   Twitter,
   Mail,
 } from "lucide-react";
-import Link from "next/link";
 import { Job } from "../../types/db";
 import JobBox from "@component/ui/JobBox";
 import Spinner from "@component/ui/Spinner";
@@ -108,6 +107,12 @@ export default function JobDetails() {
   const [relatedJobs, setRelatedJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [showFullDescription, setShowFullDescription] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const userId = useSelector((state: RootState) => state.user.id);
+
+  const handlePopupForm = () => {
+    setIsModalOpen(false);
+  };
 
   useEffect(() => {
     if (!jobId) return;
@@ -256,7 +261,10 @@ export default function JobDetails() {
                   </div>
                 </div>
               </div>
-              <Button className="text-lg font-semibold px-6 py-6 bg-[#0A65CC] cursor-pointer">
+              <Button
+                className="text-lg font-semibold px-6 py-6 bg-[#0A65CC] cursor-pointer"
+                onClick={() => setIsModalOpen(true)}
+              >
                 Apply Now
               </Button>
             </div>
@@ -479,6 +487,15 @@ export default function JobDetails() {
           )}
         </div>
       </div>
+
+      <JobApplicationPopup
+        jobTitle="Senior UX Designer"
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handlePopupForm}
+        jobId={jobId}
+        candidateId={userId}
+      />
     </div>
   );
 }
