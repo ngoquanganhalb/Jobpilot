@@ -78,3 +78,19 @@ export type Job = {
   status?: JobStatus;
   createdAt?: Date; 
 };
+
+
+export type Application = {
+  id:string
+  jobId: string;
+  candidateId: string;
+  appliedAt: Date; 
+  status: 'pending' | 'reviewed' | 'interview' | 'rejected' | 'hired';
+  resumeUrl?: string;
+  note?: string;
+  showCandidate?:boolean ,
+  showEmployer?:boolean,
+
+  name?: string;
+  avatar?: string;
+};

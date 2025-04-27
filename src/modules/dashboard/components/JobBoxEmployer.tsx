@@ -2,10 +2,10 @@
 
 import { BiCheckCircle, BiXCircle } from "react-icons/bi";
 import { MdGroups, MdCancel } from "react-icons/md";
-import { BsThreeDots, BsFillEyeFill } from "react-icons/bs";
+import { BsThreeDots, BsFillEyeFill, BsFillCircleFill } from "react-icons/bs";
 import { GrUpgrade } from "react-icons/gr";
 import { MdDeleteForever, MdEdit } from "react-icons/md";
-
+import { AiOutlineBell } from "react-icons/ai";
 
 import { useRef, useEffect } from "react";
 import { Button } from "@/components/ui/Button";
@@ -16,7 +16,15 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Card } from "@/components/ui/card";
-import { doc, updateDoc, deleteDoc } from "firebase/firestore";
+import {
+  doc,
+  updateDoc,
+  deleteDoc,
+  where,
+  getDocs,
+  collection,
+  query,
+} from "firebase/firestore";
 import { db } from "@/services/firebase/firebase";
 import { toast } from "react-toastify";
 import { useState } from "react";
@@ -26,12 +34,14 @@ import EditJobPopup from "./EditJobPopup";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@redux/store";
 import { updateJob, deleteJob } from "@redux/slices/jobSlice";
+import { useRouter } from "next/navigation";
+import Paths from "@/constants/paths";
+import Link from "next/link";
 
 type JobItemProps = {
   job: Job;
   jobActionDropdown: number | null;
   toggleJobActionDropdown: (jobId: number) => void;
-  // setMyJobs: React.Dispatch<React.SetStateAction<Job[]>>; //xu ly render state khi crud tranh tai lai trang
 };
 
 export default function JobBoxEmployer({
@@ -39,7 +49,9 @@ export default function JobBoxEmployer({
   toggleJobActionDropdown,
 }: JobItemProps) {
   const dropdownRef = useRef<HTMLDivElement | null>(null);
-  
+  const router = useRouter();
+  const [pendingApplicationsCount, setPendingApplicationsCount] = useState(0);
+
   // const jobs = useSelector((state: RootState) => state.jobs.jobs);
   const dispatch = useDispatch();
 
@@ -51,6 +63,21 @@ export default function JobBoxEmployer({
       : typeof job.expirationDate === "string"
       ? job.expirationDate
       : "No expiry date";
+  // Tính số lượng ứng viên với trạng thái "pending"
+  useEffect(() => {
+    const fetchPendingApplications = async () => {
+      const applicationsRef = collection(db, "applications");
+      const q = query(
+        applicationsRef,
+        where("jobId", "==", job.jobId),
+        where("status", "==", "pending")
+      );
+      const querySnapshot = await getDocs(q);
+      setPendingApplicationsCount(querySnapshot.size);
+    };
+
+    fetchPendingApplications();
+  }, [job.jobId]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -90,6 +117,9 @@ export default function JobBoxEmployer({
       toast.error("Failed to delete job.");
     }
   };
+  const handleViewDetail = (jobId: string) => {
+    router.push(`${Paths.FIND_JOB}/${jobId}`);
+  };
 
   return (
     <>
@@ -123,21 +153,35 @@ export default function JobBoxEmployer({
           )}
         </div>
 
-        <div className="col-span-3 flex items-center">
-          <MdGroups className="w-6 h-6 mr-2 text-gray-500" />
-          <span className="text-gray-500 text-sm">
-            {job.applicants?.length} Applications
-          </span>
+        <div className="col-span-3 flex items-center gap-5">
+          <div className="text-gray-500 text-sm flex items-center">
+            <span>{job.applicants?.length}</span>
+            <MdGroups className="w-6 h-6 ml-2 text-gray-500" />
+          </div>
+
+          <div className="flex items-center">
+            {pendingApplicationsCount > 0 && (
+              <Link href={`${Paths.VIEW_APPLICATION}/${job.jobId}`}>
+                <div className="mt-1 flex items-center space-x-2 bg-blue-100 rounded-xl px-3 py-1 cursor-pointer hover:bg-blue-200 transition-all">
+                  <AiOutlineBell className="w-5 h-5 text-blue-600" />
+                  <span className="text-blue-600 font-semibold text-sm">
+                    {pendingApplicationsCount} new
+                  </span>
+                </div>
+              </Link>
+            )}
+          </div>
         </div>
 
         <div
           className="col-span-2 flex justify-end gap-2 items-center"
           ref={dropdownRef}
         >
-          <Button variant="link" className="text-blue-600 px-0">
-            View Applications
+          <Button variant="link" className="text-blue-600 px-0 cursor-pointer">
+            <Link href={`${Paths.VIEW_APPLICATION}/${job.jobId}`}>
+              View Applications
+            </Link>
           </Button>
-
           <DropdownMenu>
             <DropdownMenuTrigger className="cursor-pointer" asChild>
               <Button variant="ghost" size="icon">
@@ -148,7 +192,7 @@ export default function JobBoxEmployer({
               <DropdownMenuItem>
                 <GrUpgrade className="h-4 w-4 mr-2 text-blue-600" /> Promote Job
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleViewDetail(job.jobId)}>
                 <BsFillEyeFill className="h-4 w-4 mr-2 text-green-500" /> View
                 Detail
               </DropdownMenuItem>
@@ -191,6 +235,18 @@ export default function JobBoxEmployer({
         <p className="text-sm">
           <strong>Applications:</strong> {job.applicants?.length}
         </p>
+        <div className="flex items-center">
+          {pendingApplicationsCount > 0 && (
+            <Link href={`/${Paths.VIEW_APPLICATION}/${job.jobId}`} passHref>
+              <div className="mt-1 flex items-center space-x-2 bg-blue-100 rounded-xl px-3 py-1 cursor-pointer hover:bg-blue-200 transition-all">
+                <AiOutlineBell className="w-5 h-5 text-blue-600" />
+                <span className="text-blue-600 font-semibold text-sm">
+                  {pendingApplicationsCount} new
+                </span>
+              </div>
+            </Link>
+          )}
+        </div>
         <div className="mt-3 flex justify-between items-center">
           <Button variant="link" className="text-blue-600 px-0 text-sm">
             View Applications

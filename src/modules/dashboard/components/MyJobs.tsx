@@ -50,9 +50,7 @@ export default function MyJobs() {
             expirationDate: data.expirationDate?.toDate() || null,
             urgent: data.isRemote || false,
             status: data.status || "Active",
-            applications: Array.isArray(data.applicants)
-              ? data.applicants.length
-              : 0,
+            applicants: data.applicants,
             createdAt: data.createdAt?.toDate() || new Date(0),
           };
         });
@@ -65,39 +63,36 @@ export default function MyJobs() {
         setLoading(false);
       }
     };
-
     fetchJobs();
   }, []);
 
   const toggleJobActionDropdown = (jobId: number) => {
     setJobActionDropdown(jobActionDropdown === jobId ? null : jobId);
   };
-
+  if (loading) {
+    return <Spinner />;
+  }
   return (
     <div>
       <h2 className="text-lg font-semibold mb-4">My Posted Jobs</h2>
 
-      {loading ? (
-        <Spinner />
-      ) : (
-        <ul className="space-y-4">
-          {[...jobs] //tao ban copy do jobs.sort() anh huong redux state
-            .sort((a, b) => {
-              const timeA = a.createdAt?.getTime() ?? 0;
-              const timeB = b.createdAt?.getTime() ?? 0;
-              return timeB - timeA;
-            })
-            .map((job) => (
-              <JobBoxEmployer
-                key={job.jobId}
-                job={job}
-                jobActionDropdown={jobActionDropdown}
-                toggleJobActionDropdown={toggleJobActionDropdown}
-                // setMyJobs={setMyJobs} // cap nhat state cho jobbox de xu ly render
-              />
-            ))}
-        </ul>
-      )}
+      <ul className="space-y-4">
+        {[...jobs] //tao ban copy do jobs.sort() anh huong redux state
+          .sort((a, b) => {
+            const timeA = a.createdAt?.getTime() ?? 0;
+            const timeB = b.createdAt?.getTime() ?? 0;
+            return timeB - timeA;
+          })
+          .map((job) => (
+            <JobBoxEmployer
+              key={job.jobId}
+              job={job}
+              jobActionDropdown={jobActionDropdown}
+              toggleJobActionDropdown={toggleJobActionDropdown}
+              // setMyJobs={setMyJobs} // cap nhat state cho jobbox de xu ly render
+            />
+          ))}
+      </ul>
     </div>
   );
 }

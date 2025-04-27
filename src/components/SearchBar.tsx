@@ -45,7 +45,11 @@ export default function SearchBar() {
       }
 
       try {
-        const snapshot = await getDocs(collection(db, "jobs"));
+        const q = query(
+          collection(db, "jobs"),
+          where("status", "==", "Active")
+        );
+        const snapshot = await getDocs(q);
         const allJobs = snapshot.docs.map((doc) => {
           const data = doc.data();
           return {
@@ -53,7 +57,7 @@ export default function SearchBar() {
             jobTitle: data.jobTitle || "",
             companyName: data.companyName || "",
             tags: data.tags || [],
-            avatarCompany: data.avatarCompany || "",
+            avatarCompany: data.avatarCompany || "images/default-avatar.png",
           };
         });
 

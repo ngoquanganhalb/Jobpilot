@@ -23,6 +23,7 @@ import {
 import { getAuth } from "firebase/auth";
 import { db } from "@services/firebase/firebase";
 import { toast } from "react-toastify";
+import { Upload } from "lucide-react";
 // import {
 //   Select,
 //   SelectTrigger,
@@ -255,13 +256,36 @@ export default function PostAJob() {
             <label className="block mb-2 text-sm font-medium text-gray-700">
               Company Avatar
             </label>
-            <Input
+            {/* <Input
               type="file"
               name="avatarCompany"
               accept="image/*"
               onChange={handleFileChange}
               className="focus:ring-2 focus:ring-blue-500 border-gray-300 rounded-md"
             />
+            <Upload size={16} /> */}
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() =>
+                  document.getElementById("avatar-upload")?.click()
+                }
+                className="flex items-center gap-2"
+              >
+                <Upload size={16} />
+                Upload Image
+              </Button>
+
+              <input
+                id="avatar-upload"
+                type="file"
+                name="avatarCompany"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="hidden"
+              />
+            </div>
             {formData.avatarCompany && (
               <Image
                 src={formData.avatarCompany}
