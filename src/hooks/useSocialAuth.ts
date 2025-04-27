@@ -24,8 +24,9 @@ export const useSocialAuth = () => {
           isAdmin: false,
         })
       );
-      toast.success(`Signed in with ${provider}!`);
+      toast.success(`Signed in with ${provider}!`)
       router.push("/");
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       toast.error(`${provider} sign-in failed`);
     }

@@ -4,7 +4,7 @@ import StepPagination from "@component/ui/StepPagination";
 import { useFetchJobBox } from "@hooks/useFetchJobBox";
 import { useSelector } from "react-redux";
 import { RootState } from "@redux/store";
-import { Job } from "../../../types/db";
+import { Job } from "../../../../types/db";
 import { resetFilters } from "@redux/slices/filterSlice";
 import { useDispatch } from "react-redux";
 

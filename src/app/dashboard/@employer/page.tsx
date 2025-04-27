@@ -1,11 +1,9 @@
-'use client'
+"use client";
 
-import DashboardEmployerModule from "@modules/dashboard/DashBoardEmployerModule"
+import DashboardEmployerModule from "@modules/employers/dashboard/DashBoardEmployerModule";
 
 export default function DashBoard() {
-  return (
-    <DashboardEmployerModule />
-  )
+  return <DashboardEmployerModule />;
 }
 
 // "use client";

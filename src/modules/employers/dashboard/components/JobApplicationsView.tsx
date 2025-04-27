@@ -32,7 +32,7 @@ import {
   TooltipTrigger,
   TooltipContent,
 } from "@/components/ui/tooltip";
-import { Application } from "../../../types/db";
+import { Application } from "../../../../types/db";
 import { db } from "@services/firebase/firebase";
 import {
   doc,

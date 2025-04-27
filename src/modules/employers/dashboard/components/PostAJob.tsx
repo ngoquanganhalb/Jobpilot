@@ -43,7 +43,7 @@ import {
 } from "@/components/ui/popover";
 import Image from "next/image";
 import { toBase64 } from "@lib/convertBase64";
-import { Job, JobType, JOB_TAG_OPTIONS } from "../../../types/db";
+import { Job, JobType, JOB_TAG_OPTIONS } from "../../../../types/db";
 
 // function JobBenefitTag({
 //   children,

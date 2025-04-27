@@ -19,7 +19,11 @@ import { Input } from "@component/ui/Input";
 import { cn } from "@component/lib/utils";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
-import { JobType, JOB_TYPE_OPTIONS, JOB_TAG_OPTIONS } from "../../../types/db";
+import {
+  JobType,
+  JOB_TYPE_OPTIONS,
+  JOB_TAG_OPTIONS,
+} from "../../../../types/db";
 import { useDispatch } from "react-redux";
 import { setFilters, resetFilters } from "@redux/slices/filterSlice";
 import { FilterFormValues } from "@types";

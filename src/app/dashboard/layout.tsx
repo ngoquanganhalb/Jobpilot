@@ -2,7 +2,7 @@
 
 import Header from "@component/Header";
 import SearchBar from "@component/SearchBar";
-import SideBar from "@modules/dashboard/components/SideBar";
+import SideBar from "@modules/employers/dashboard/components/SideBar";
 import { useSelector } from "react-redux";
 import Head from "next/head";
 

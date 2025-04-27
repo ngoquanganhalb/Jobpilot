@@ -8,7 +8,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogOverlay } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogOverlay,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import {
   collection,
@@ -145,6 +150,7 @@ export default function JobApplicationPopup({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogOverlay className="bg-black/50" />
       <DialogContent className="p-0 bg-white rounded-lg w-full max-w-md mx-auto">
+        <DialogTitle></DialogTitle>
         <Card className="border-0 shadow-none">
           <CardHeader className="pb-2 relative">
             {/* <button
