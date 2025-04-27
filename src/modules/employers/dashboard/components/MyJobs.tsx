@@ -6,7 +6,7 @@ import { db } from "@services/firebase/firebase";
 import { getAuth } from "firebase/auth";
 import JobBoxEmployer from "./JobBoxEmployer";
 import Spinner from "@component/ui/Spinner";
-import { Job } from "../../../types/db";
+import { Job } from "../../../../types/db";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@redux/store";
 import { setJobs } from "@redux/slices/jobSlice";

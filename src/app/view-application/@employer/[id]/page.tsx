@@ -1,5 +1,4 @@
-import JobApplicationsView from "@modules/dashboard/components/JobApplicationsView";
-
+import JobApplicationsView from "@modules/employers/dashboard/components/JobApplicationsView";
 
 export default function Page() {
   return <JobApplicationsView />;

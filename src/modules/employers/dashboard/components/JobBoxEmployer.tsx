@@ -2,7 +2,7 @@
 
 import { BiCheckCircle, BiXCircle } from "react-icons/bi";
 import { MdGroups, MdCancel } from "react-icons/md";
-import { BsThreeDots, BsFillEyeFill, BsFillCircleFill } from "react-icons/bs";
+import { BsThreeDots, BsFillEyeFill } from "react-icons/bs";
 import { GrUpgrade } from "react-icons/gr";
 import { MdDeleteForever, MdEdit } from "react-icons/md";
 import { AiOutlineBell } from "react-icons/ai";
@@ -29,10 +29,9 @@ import { db } from "@/services/firebase/firebase";
 import { toast } from "react-toastify";
 import { useState } from "react";
 
-import { Job } from "../../../types/db";
+import { Job } from "../../../../types/db";
 import EditJobPopup from "./EditJobPopup";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@redux/store";
+import { useDispatch } from "react-redux";
 import { updateJob, deleteJob } from "@redux/slices/jobSlice";
 import { useRouter } from "next/navigation";
 import Paths from "@/constants/paths";
@@ -98,7 +97,8 @@ export default function JobBoxEmployer({
         status: "Expire",
       });
       toast.success("Job marked as expired!");
-      dispatch(updateJob({ ...job, status: "Expire" })); // Cập nhật Redux state
+      dispatch(updateJob({ ...job, status: "Expire" })); // Cập nhật Redux 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       toast.error("Failed to mark job as expired.");
     }
@@ -113,6 +113,7 @@ export default function JobBoxEmployer({
       toast.success("Job deleted successfully!");
       // location.reload();
       dispatch(deleteJob(jobId)); // Update Redux state after deletion
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       toast.error("Failed to delete job.");
     }

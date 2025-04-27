@@ -3,7 +3,7 @@ import Header from "@component/Header";
 import SearchBar from "@component/SearchBar";
 import Footer from "@component/Footer";
 import Breadcrumb from "@component/Breadcrumb";
-import FindJobModule from "../../modules/findjob/FindJobModule";
+import FindJobModule from "../../modules/app/findjob/FindJobModule";
 export default function Jobs() {
   // type Job = {
   //   id: string;

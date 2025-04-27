@@ -1,4 +1,4 @@
-import PostAJob from "@modules/dashboard/components/PostAJob";
+import PostAJob from "@modules/employers/dashboard/components/PostAJob";
 
 export default function Page() {
   return <PostAJob />;

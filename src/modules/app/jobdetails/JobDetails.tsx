@@ -18,7 +18,7 @@ import { Badge } from "@component/ui/badge";
 import { Separator } from "@component/ui/separator";
 import Image from "next/image";
 import { Timestamp } from "firebase/firestore";
-import JobApplicationPopup from "../client/JobApplicationPopup";
+import JobApplicationPopup from "../../client/JobApplicationPopup";
 import { useSelector } from "react-redux";
 import { RootState } from "@redux/store";
 import {
@@ -33,7 +33,7 @@ import {
   Twitter,
   Mail,
 } from "lucide-react";
-import { Job } from "../../types/db";
+import { Job } from "../../../types/db";
 import JobBox from "@component/ui/JobBox";
 import Spinner from "@component/ui/Spinner";
 

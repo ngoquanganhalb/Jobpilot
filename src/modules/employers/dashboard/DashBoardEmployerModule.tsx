@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import OverviewEmployer from "@modules/dashboard/components/Overview";
+import OverviewEmployer from "@modules/employers/dashboard/components/Overview";
 
 export default function DashboardEmployerModule() {
   return (

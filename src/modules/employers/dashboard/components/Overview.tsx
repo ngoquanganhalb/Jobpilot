@@ -3,7 +3,7 @@
 import { getAuth } from "firebase/auth";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "@services/firebase/firebase";
-import { Job } from "../../../types/db";
+import { Job } from "../../../../types/db";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { BsBriefcase, BsArrowRight } from "react-icons/bs";

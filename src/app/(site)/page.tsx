@@ -1,5 +1,5 @@
 "use client";
-import HomePageModule from "../../modules/homepage/HomePageModule";
+import HomePageModule from "../../modules/app/homepage/HomePageModule";
 // import { useSelector } from "react-redux";
 
 export default function Home() {

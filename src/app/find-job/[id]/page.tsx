@@ -5,7 +5,7 @@ import Header from "@component/Header";
 import SearchBar from "@component/SearchBar";
 import Footer from "@component/Footer";
 import Breadcrumb from "@component/Breadcrumb";
-import JobDetails from "@modules/app/JobDetails";
+import JobDetails from "@modules/app/jobdetails/JobDetails";
 
 const Page = () => {
   return (
