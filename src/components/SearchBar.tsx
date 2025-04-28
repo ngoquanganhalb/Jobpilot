@@ -16,6 +16,8 @@ import {
   where,
   startAt,
   endAt,
+  doc,
+  getDoc,
 } from "firebase/firestore";
 import { db } from "@/services/firebase/firebase";
 import { useRouter } from "next/navigation";
@@ -24,7 +26,7 @@ import Image from "next/image";
 import Paths from "@/constants/paths";
 
 export default function SearchBar() {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<any>(null);
   const [queryText, setQueryText] = useState("");
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -32,11 +34,35 @@ export default function SearchBar() {
   const router = useRouter();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      if (currentUser) {
+        const userInfo = await fetchUserAvatar(currentUser.uid);
+        setUser(userInfo);
+      } else {
+        setUser(null);
+      }
     });
     return () => unsubscribe();
   }, []);
+
+  const fetchUserAvatar = async (uid: string) => {
+    try {
+      const userRef = doc(db, "users", uid);
+      const userSnap = await getDoc(userRef);
+      if (userSnap.exists()) {
+        const userData = userSnap.data();
+        return {
+          uid,
+          email: userData.email || "",
+          avatarUrl: userData.avatarUrl || "",
+          name: userData.name || "",
+        };
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+    return null;
+  };
 
   const fetchSuggestions = useCallback(
     debounce(async (text: string) => {

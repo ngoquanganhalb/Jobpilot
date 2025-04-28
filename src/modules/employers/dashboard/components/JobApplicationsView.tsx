@@ -5,7 +5,6 @@ import {
   MoreHorizontal,
   Trash2,
   Download,
-  UserPlus,
   Filter,
   User,
   ClipboardCheck,
@@ -86,8 +85,8 @@ export default function JobApplicationsView() {
             : "Unknown User";
 
           const useravatar = userSnap.exists()
-            ? userSnap.data().avatar
-            : "Unknown avatar";
+            ? userSnap.data().avatarUrl
+            : "/images/avatar.png";
 
           apps.push({
             id: docSnap.id,
@@ -237,8 +236,8 @@ export default function JobApplicationsView() {
               <div className="flex items-start">
                 <img
                   src={application.avatar}
-                  alt="avataravatar"
-                  className="w-10 h-10 rounded-full mr-3"
+                  alt="aa"
+                  className="w-12 h-12 rounded-full mr-3"
                 />
                 <div className="flex-1">
                   <div className="flex justify-between items-start">

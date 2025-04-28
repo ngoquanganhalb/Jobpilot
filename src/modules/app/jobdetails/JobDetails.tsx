@@ -36,6 +36,7 @@ import {
 import { Job } from "../../../types/db";
 import JobBox from "@component/ui/JobBox";
 import Spinner from "@component/ui/Spinner";
+import { toast } from "react-toastify";
 
 // Related jobs data
 // const relatedJobs = [
@@ -109,7 +110,7 @@ export default function JobDetails() {
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const userId = useSelector((state: RootState) => state.user.id);
-
+  const accountType = useSelector((state: RootState) => state.user.accountType);
   const handlePopupForm = () => {
     setIsModalOpen(false);
   };
@@ -263,7 +264,13 @@ export default function JobDetails() {
               </div>
               <Button
                 className="text-lg font-semibold px-6 py-6 bg-[#0A65CC] cursor-pointer"
-                onClick={() => setIsModalOpen(true)}
+                onClick={() => {
+                  if (accountType == "candidate") {
+                    setIsModalOpen(true);
+                  } else {
+                    toast.error("Employer can not apply for jobs");
+                  }
+                }}
               >
                 Apply Now
               </Button>
