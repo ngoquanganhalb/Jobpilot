@@ -5,6 +5,10 @@ import SearchBar from "@component/SearchBar";
 import SideBar from "@modules/employers/dashboard/components/SideBar";
 import { useSelector } from "react-redux";
 import Head from "next/head";
+import {
+  menuItemCandidate,
+  menuItemsEmployer,
+} from "@/constants/sidebarDashBoard";
 
 export default function DashboardLayout({
   children,
@@ -16,6 +20,19 @@ export default function DashboardLayout({
   candidate: React.ReactNode;
 }) {
   const accountType = useSelector((state: any) => state.user.accountType);
+
+  const renderSidebar = () => {
+    if (accountType === "employer") {
+      return (
+        <SideBar menuItems={menuItemsEmployer} title="Employers Dashboard" />
+      );
+    } else if (accountType === "candidate") {
+      return (
+        <SideBar menuItems={menuItemCandidate} title="Candidates Dashboard" />
+      );
+    }
+    return null;
+  };
 
   return (
     <div>
@@ -29,7 +46,7 @@ export default function DashboardLayout({
         </Head>
 
         <div className="container flex flex-col md:flex-row gap-0">
-          <SideBar />
+          {renderSidebar()}
 
           <div className="flex-1">
             {accountType === "employer" && employer}

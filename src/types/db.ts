@@ -94,3 +94,8 @@ export type Application = {
   name?: string;
   avatar?: string;
 };
+
+//type fetch cho user applied job
+export type ApplicationWithJob = Application & {
+  job?: Job
+};

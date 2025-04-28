@@ -17,7 +17,7 @@ import { Badge } from "@component/ui/badge";
 import { Button } from "@component/ui/Button";
 import { Input } from "@component/ui/Input";
 import { cn } from "@component/lib/utils";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 import {
   JobType,
@@ -176,6 +176,7 @@ export default function FilterSideBar() {
       </SheetTrigger>
 
       <SheetContent side="left" className="w-[350px]">
+      <SheetTitle></SheetTitle>
         <div className="w-full bg-white border-r p-4 h-full overflow-y-auto">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold">Filters</h2>

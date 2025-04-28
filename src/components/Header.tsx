@@ -17,12 +17,14 @@ export default function Header() {
         <NavLink>Candidates</NavLink> */}
         {/* <NavLink>Pricing Plans</NavLink> */}
         {/* <NavLink>Customer Supports</NavLink> */}
-        <NavLink href={Paths.DASHBOARD_OVERVIEW}>Dash Board</NavLink>
+        {/* <NavLink href={Paths.DASHBOARD_OVERVIEW}>Dash Board</NavLink> */}
         {accountType === "candidate" && (
-          <NavLink href="/candidate">can</NavLink>
+          <NavLink href={Paths.DASHBOARD_APPLIEDJOB}>Dash Board</NavLink>
         )}
 
-        {/* {accountType === "employer" && <NavLink href="/employer">em</NavLink>} */}
+        {accountType === "employer" && (
+          <NavLink href={Paths.DASHBOARD_OVERVIEW}>Dash Board</NavLink>
+        )}
       </div>
 
       {/* Right contact */}

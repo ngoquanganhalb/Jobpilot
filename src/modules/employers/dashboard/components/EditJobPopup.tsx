@@ -203,7 +203,7 @@ export default function EditJobPopup({ open, onClose, job }: Props) {
                       : "Select job tags"}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-[300px] p-4">
+                <PopoverContent className="w-[400px] p-4 max-h-[300px] overflow-y-auto">
                   <div className="flex flex-wrap gap-2">
                     {JOB_TAG_OPTIONS.map((tag) => {
                       const isSelected = (formData.tags ?? []).includes(tag);

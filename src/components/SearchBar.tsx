@@ -21,6 +21,7 @@ import { db } from "@/services/firebase/firebase";
 import { useRouter } from "next/navigation";
 import { debounce } from "lodash";
 import Image from "next/image";
+import Paths from "@/constants/paths";
 
 export default function SearchBar() {
   const [user, setUser] = useState(null);
@@ -156,7 +157,7 @@ export default function SearchBar() {
         </div>
       </div>
 
-      <div className="flex gap-[12px] mt-4 xl:mt-0">
+      <div className="flex gap-3 mt-4 xl:mt-0">
         {user ? (
           <>
             <NotificationButton />
@@ -167,9 +168,9 @@ export default function SearchBar() {
             <Link href="/sign-in" passHref>
               <Button variant="secondary">Sign In</Button>
             </Link>
-            <Link href="/post-job" passHref>
-              <Button>Post A Job</Button>
-            </Link>
+            {/* <Link href={Paths.DASHBOARD} passHref> */}
+            <Button>Post A Job</Button>
+            {/* </Link> */}
           </>
         )}
       </div>

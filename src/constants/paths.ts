@@ -15,7 +15,9 @@ export const Paths = {
   SETTINGS: "/dashboard/settings",
   DASHBOARD: '/dashboard',
   FIND_JOB: "/find-job",
-  VIEW_APPLICATION: '/view-application'
+  VIEW_APPLICATION: '/view-application',
+  DASHBOARD_APPLIEDJOB: '/dashboard/applied-job',
+  // DASHOBOARD_FAVORITEJOB:  '/dashboard/favorite-job',
 
 };
 

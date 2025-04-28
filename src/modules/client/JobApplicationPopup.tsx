@@ -26,7 +26,7 @@ import {
   arrayUnion,
   getDocs,
 } from "firebase/firestore";
-import { db, firestore } from "@/services/firebase/firebase";
+import { firestore } from "@/services/firebase/firebase";
 import { uploadToCloudinary } from "@utils/uploadToCloundinary";
 import { toast } from "react-toastify";
 
@@ -150,7 +150,8 @@ export default function JobApplicationPopup({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogOverlay className="bg-black/50" />
       <DialogContent className="p-0 bg-white rounded-lg w-full max-w-md mx-auto">
-        <DialogTitle></DialogTitle>
+        <DialogTitle> </DialogTitle>
+
         <Card className="border-0 shadow-none">
           <CardHeader className="pb-2 relative">
             {/* <button
