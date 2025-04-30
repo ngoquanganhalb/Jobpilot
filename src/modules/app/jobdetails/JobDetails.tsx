@@ -4,7 +4,7 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useParams } from "next/navigation";
-import { db } from "@services/firebase/firebase";
+import { db, firestore } from "@services/firebase/firebase";
 import {
   doc,
   getDoc,
@@ -37,6 +37,8 @@ import { Job } from "../../../types/db";
 import JobBox from "@component/ui/JobBox";
 import Spinner from "@component/ui/Spinner";
 import { toast } from "react-toastify";
+import Link from "next/link";
+import Paths from "@/constants/paths";
 
 // Related jobs data
 // const relatedJobs = [
@@ -111,6 +113,7 @@ export default function JobDetails() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const userId = useSelector((state: RootState) => state.user.id);
   const accountType = useSelector((state: RootState) => state.user.accountType);
+  const [checkApplied, setCheckApplied] = useState<boolean | null>(null);
   const handlePopupForm = () => {
     setIsModalOpen(false);
   };
@@ -183,6 +186,24 @@ export default function JobDetails() {
 
     fetchJob();
   }, [jobId]);
+
+  useEffect(() => {
+    const checkNoApplied = async () => {
+      // Check chi dang applicationapplication duoc 1 lan
+      const applicationsRef = collection(firestore, "applications");
+      const checkQuery = query(
+        applicationsRef,
+        where("jobId", "==", jobId),
+        where("candidateId", "==", userId)
+      );
+      const checkSnapshot = await getDocs(checkQuery);
+
+      if (!checkSnapshot.empty) {
+        setCheckApplied(false);
+      } else setCheckApplied(true);
+    };
+    checkNoApplied();
+  }, []);
 
   const getJobTypeBadgeColor = (type: string) => {
     switch (type.toUpperCase()) {
@@ -262,18 +283,23 @@ export default function JobDetails() {
                   </div>
                 </div>
               </div>
-              <Button
-                className="text-lg font-semibold px-6 py-6 bg-[#0A65CC] cursor-pointer"
-                onClick={() => {
-                  if (accountType == "candidate") {
-                    setIsModalOpen(true);
-                  } else {
-                    toast.error("Employer can not apply for jobs");
-                  }
-                }}
-              >
-                Apply Now
-              </Button>
+              {accountType === "candidate" ? (
+                checkApplied ? (
+                  <Button
+                    className="text-lg font-semibold px-6 py-6 bg-[#0A65CC] cursor-pointer"
+                    onClick={() => setIsModalOpen(true)}
+                  >
+                    Apply Now
+                  </Button>
+                ) : (
+                  <Button
+                    disabled
+                    className="text-lg font-semibold px-6 py-6 bg-gray-300 text-gray-600 cursor-not-allowed"
+                  >
+                    You have applied for this job
+                  </Button>
+                )
+              ) : null}
             </div>
 
             <Card className="mb-6">
@@ -333,14 +359,14 @@ export default function JobDetails() {
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-start gap-3">
+                  {/* <div className="flex items-start gap-3">
                     <Briefcase className="w-5 h-5 text-blue-500 mt-1" />
                     <div>
-                      <p className="text-gray-500 text-sm">JOB LEVEL</p>
-                      {/* <p className="font-medium">{job.experienceLevel}</p> */}
-                      <p className="font-medium">Entry Level</p>
+                      <p className="text-gray-500 text-sm">JOB LEVEL</p> */}
+                  {/* <p className="font-medium">{job.experienceLevel}</p> */}
+                  {/* <p className="font-medium">Entry Level</p>
                     </div>
-                  </div>
+                  </div> */}
                   {/* <div className="flex items-start gap-3">
                     <DollarSign className="w-5 h-5 text-blue-500 mt-1" />
                     <div>
@@ -348,14 +374,14 @@ export default function JobDetails() {
                       <p className="font-medium">{job.experience}</p>
                     </div>
                   </div> */}
-                  <div className="flex items-start gap-3">
+                  {/* <div className="flex items-start gap-3">
                     <BookOpen className="w-5 h-5 text-blue-500 mt-1" />
                     <div>
-                      <p className="text-gray-500 text-sm">EDUCATION</p>
-                      {/* <p className="font-medium">{job.education}</p> */}
-                      <p className="font-medium">Graduation</p>
+                      <p className="text-gray-500 text-sm">EDUCATION</p> */}
+                  {/* <p className="font-medium">{job.education}</p> */}
+                  {/* <p className="font-medium">Graduation</p>
                     </div>
-                  </div>
+                  </div> */}
                 </div>
 
                 <Separator className="my-6" />
@@ -403,11 +429,27 @@ export default function JobDetails() {
 
                 <h3 className="text-lg font-semibold mb-3">Job tags:</h3>
                 <div className="flex flex-wrap gap-2">
-                  {(job.tags ?? []).map((tag, index) => (
-                    <Badge key={index} variant="outline" className="px-3 py-1">
-                      {tag}
-                    </Badge>
-                  ))}
+                  {(job.tags ?? []).length > 0 ? (
+                    (job.tags ?? []).map((tag, index) => (
+                      <Link
+                        key={tag}
+                        href={{
+                          pathname: Paths.FIND_JOB,
+                          query: { tag: tag }, // đẩy tag vào URL
+                        }}
+                      >
+                        <Badge
+                          key={index}
+                          variant="outline"
+                          className="px-3 py-1 hover:bg-gray-300"
+                        >
+                          {tag}
+                        </Badge>
+                      </Link>
+                    ))
+                  ) : (
+                    <span className="text-gray-500">No job tag found</span>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -419,7 +461,9 @@ export default function JobDetails() {
               <CardContent className="p-6">
                 <h2 className="text-xl font-semibold mb-4">Salary (USD)</h2>
                 <div className="text-2xl font-bold text-green-600 mb-1">
-                  {`$${job.minSalary} - $${job.maxSalary}`}
+                  {job.minSalary === 0 && job.maxSalary === 0
+                    ? "Negotiate"
+                    : `$${job.minSalary} - $${job.maxSalary}`}
                 </div>
                 <p className="text-gray-500 text-sm">Monthly salary</p>
               </CardContent>
@@ -437,17 +481,19 @@ export default function JobDetails() {
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <Briefcase className="w-6 h-6 text-blue-500" />
-                  <div>
-                    <h2 className="text-lg font-semibold">Remote Job</h2>
-                    <p className="text-gray-600">Unknown</p>
+                {job.isRemote && (
+                  <div className="flex items-center gap-3">
+                    <Briefcase className="w-6 h-6 text-blue-500" />
+                    <div>
+                      <h2 className="text-lg font-semibold">Remote Job</h2>
+                      <p className="text-gray-600">Worldwide</p>
+                    </div>
                   </div>
-                </div>
+                )}
               </CardContent>
             </Card>
 
-            <Card>
+            {/* <Card>
               <CardContent className="p-6">
                 <h2 className="text-xl font-semibold mb-4">Job Benefits</h2>
                 <div className="flex flex-wrap gap-2">
@@ -462,7 +508,7 @@ export default function JobDetails() {
                   ))}
                 </div>
               </CardContent>
-            </Card>
+            </Card> */}
           </div>
         </div>
 
@@ -481,7 +527,9 @@ export default function JobDetails() {
                   type={job.jobType?.toUpperCase() || "FULL-TIME"}
                   salary={
                     job.minSalary && job.maxSalary
-                      ? `$${job.minSalary} - $${job.maxSalary}`
+                      ? job.minSalary != 0 && job.maxSalary != 0
+                        ? `$${job.minSalary} - $${job.maxSalary}`
+                        : "Negotiate"
                       : "Negotiate"
                   }
                   urgent={job.isRemote} // fix sau
@@ -502,6 +550,7 @@ export default function JobDetails() {
         onSubmit={handlePopupForm}
         jobId={jobId}
         candidateId={userId}
+        onApplied={() => setCheckApplied(false)} //render ui
       />
     </div>
   );

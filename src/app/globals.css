@@ -139,3 +139,25 @@
 
 }
 
+@keyframes appear {
+  0% {
+    opacity: 0;
+    transform: scale(0.5) translateX(-100px);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(0.8) translateX(-50px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateX(0);
+  }
+}
+
+.animate-appear {
+  animation: appear 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+/* dieu chinh thoi gian  (0.6s), delay (ví dụ 0.2s), hoặc easing (cubic-bezier) */
+.animate-appear-delay {
+  animation: appear 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
+}

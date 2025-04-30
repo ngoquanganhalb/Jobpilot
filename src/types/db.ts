@@ -1,3 +1,5 @@
+import { Timestamp } from "firebase/firestore";
+
 export type JobType = "full-time" | "part-time" | "intern" | "freelance";
 export type JobStatus = "Active" | "Expire";
 export const JOB_TYPE_OPTIONS: JobType[] = [
@@ -76,7 +78,7 @@ export type Job = {
   expirationDate?: Date;
   applicants?: string[]; // userid
   status?: JobStatus;
-  createdAt?: Date; 
+  createdAt?: Date | Timestamp
 };
 
 
@@ -90,6 +92,7 @@ export type Application = {
   note?: string;
   showCandidate?:boolean ,
   showEmployer?:boolean,
+  feedback?: string
 
   name?: string;
   avatar?: string;

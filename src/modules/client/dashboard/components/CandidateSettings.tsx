@@ -125,7 +125,7 @@ export default function CandidateSettings() {
   };
 
   return (
-    <div className="container mx-auto py-6">
+    <div className="container mx-auto py-6 ">
       <Card className="max-w-2xl mx-auto">
         <CardHeader>
           <CardTitle className="text-2xl">Profile Settings</CardTitle>

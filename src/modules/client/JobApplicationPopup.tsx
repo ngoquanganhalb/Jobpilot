@@ -37,6 +37,7 @@ interface JobApplicationFormProps {
   candidateId: string;
   isOpen: boolean;
   onClose: () => void;
+  onApplied: () => void;
 }
 
 // Form Data Type
@@ -52,6 +53,7 @@ export default function JobApplicationPopup({
   candidateId,
   isOpen,
   onClose,
+  onApplied,
 }: JobApplicationFormProps) {
   const [formData, setFormData] = useState<FormData>({
     resume: null,
@@ -110,6 +112,7 @@ export default function JobApplicationPopup({
         note: formData.coverLetter,
         showCandidate: true,
         showEmployer: true,
+        feedback: "",
       });
 
       // Update applicants[] trong jobs
@@ -131,6 +134,7 @@ export default function JobApplicationPopup({
       console.log("2. Ghi vào Firestore");
 
       toast.success("Application submitted successfully!");
+      onApplied();
       onClose();
     } catch (error) {
       console.error("Error submitting application:", error);
@@ -166,7 +170,7 @@ export default function JobApplicationPopup({
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit}>
-              <div className="space-y-4">
+              <div className="space-y-4 ">
                 {/* Resume Upload */}
                 <div>
                   <label className="block text-sm font-medium mb-1">

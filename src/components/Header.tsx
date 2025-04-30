@@ -23,7 +23,7 @@ export default function Header() {
         )}
 
         {accountType === "employer" && (
-          <NavLink href={Paths.DASHBOARD_OVERVIEW}>Dash Board</NavLink>
+          <NavLink href={Paths.DASHBOARD_OVERVIEW}>Dashboard</NavLink>
         )}
       </div>
 

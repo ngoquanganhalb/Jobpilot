@@ -115,7 +115,7 @@ export default function MyJobs() {
   }
 
   return (
-    <div>
+    <div className="">
       <h2 className="text-lg font-semibold mb-4">
         My Posted Jobs: {jobs.length}
       </h2>

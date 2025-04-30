@@ -54,6 +54,31 @@ export default function JobApplicationsView() {
   const jobId = params?.id as string;
   const [loading, setLoading] = useState(true);
   const [jobTitle, setJobTitle] = useState("No Title");
+  //feedback
+  const [showFeedbackPopup, setShowFeedbackPopup] = useState(false);
+  const [feedbackTarget, setFeedbackTarget] = useState<{
+    applicationId: string;
+    newStatus: Application["status"];
+    applicationName: string;
+  } | null>(null);
+  const [feedbackText, setFeedbackText] = useState("");
+
+  const isValidStatusTransition = (
+    currentStatus: Application["status"],
+    newStatus: Application["status"]
+  ): boolean => {
+    const invalidTransitions: Record<
+      Application["status"],
+      Application["status"][]
+    > = {
+      pending: [],
+      reviewed: ["pending"],
+      interview: ["pending", "reviewed"],
+      rejected: ["pending", "reviewed", "interview", "hired"],
+      hired: ["pending", "reviewed", "interview", "rejected"],
+    };
+    return !invalidTransitions[currentStatus]?.includes(newStatus);
+  };
 
   useEffect(() => {
     const fetchApplications = async () => {
@@ -100,6 +125,7 @@ export default function JobApplicationsView() {
             note: data.note,
             showEmployer: data.showEmployer,
             showCandidate: data.showCandidate,
+            feedback: data.feedback,
           });
         }
         setApplications(apps);
@@ -128,19 +154,59 @@ export default function JobApplicationsView() {
     toast.success(`Application: ${applicationName} deleted`);
   };
 
-  const handleChangeStatus = async (
+  // const handleChangeStatus = async (
+  //   applicationId: string,
+  //   newStatus: Application["status"],
+  //   applicationName: string
+  // ) => {
+  //   setApplications((prevApplications) =>
+  //     prevApplications.map((app) =>
+  //       app.id === applicationId ? { ...app, status: newStatus } : app
+  //     )
+  //   );
+  //   const applicationRef = doc(db, "applications", applicationId);
+  //   await updateDoc(applicationRef, { status: newStatus });
+  //   toast.success(`Changed candidate:"${applicationName}" to ${newStatus}`);
+  // };
+  const handleChangeStatus = (
     applicationId: string,
     newStatus: Application["status"],
     applicationName: string
   ) => {
-    setApplications((prevApplications) =>
-      prevApplications.map((app) =>
-        app.id === applicationId ? { ...app, status: newStatus } : app
+    const currentApp = applications.find((app) => app.id === applicationId);
+    if (!currentApp) return;
+
+    if (!isValidStatusTransition(currentApp.status, newStatus)) {
+      toast.error(
+        `Invalid transition from "${currentApp.status}" to "${newStatus}"`
+      );
+      return;
+    }
+
+    // Nếu là trạng thái cần nhập feedback thì mở popup
+    if (["interview", "rejected", "hired"].includes(newStatus)) {
+      setFeedbackTarget({ applicationId, newStatus, applicationName });
+      setShowFeedbackPopup(true);
+    } else {
+      // Trạng thái không cần feedback => cập nhật trực tiếp
+      updateApplicationStatus(applicationId, newStatus, "", applicationName);
+    }
+  };
+
+  const updateApplicationStatus = async (
+    applicationId: string,
+    newStatus: Application["status"],
+    feedback: string,
+    applicationName: string
+  ) => {
+    setApplications((prev) =>
+      prev.map((app) =>
+        app.id === applicationId ? { ...app, status: newStatus, feedback } : app
       )
     );
     const applicationRef = doc(db, "applications", applicationId);
-    await updateDoc(applicationRef, { status: newStatus });
-    toast.success(`Changed candidate:"${applicationName}" to ${newStatus}`);
+    await updateDoc(applicationRef, { status: newStatus, feedback });
+    toast.success(`Changed "${applicationName}" to ${newStatus}`);
   };
 
   const handleDownloadCV = (resumeUrl?: string) => {
@@ -171,6 +237,45 @@ export default function JobApplicationsView() {
     setApplications(sortedApplications);
   };
 
+  // const onDragEnd = async (result) => {
+  //   const { destination, source, draggableId } = result;
+
+  //   if (
+  //     !destination ||
+  //     (destination.droppableId === source.droppableId &&
+  //       destination.index === source.index)
+  //   ) {
+  //     return;
+  //   }
+
+  //   // Create a copy of applications
+  //   const newApplications = [...applications];
+
+  //   // find aaplication dragged
+  //   const appIndex = newApplications.findIndex((app) => app.id === draggableId);
+  //   if (appIndex === -1) return;
+
+  //   const newStatus = destination.droppableId;
+
+  //   // Update its status based on the destination droppableId
+  //   newApplications[appIndex] = {
+  //     ...newApplications[appIndex],
+  //     status: destination.droppableId,
+  //   };
+
+  //   setApplications(newApplications);
+
+  //   try {
+  //     const applicationRef = doc(db, "applications", draggableId);
+  //     await updateDoc(applicationRef, { status: newStatus });
+
+  //     toast.success(`Updated candidate status to "${newStatus}" successfully`);
+  //   } catch (error) {
+  //     console.error("Error updating status:", error);
+  //     toast.error("Failed to update status");
+  //   }
+  // };
+
   const onDragEnd = async (result) => {
     const { destination, source, draggableId } = result;
 
@@ -182,28 +287,43 @@ export default function JobApplicationsView() {
       return;
     }
 
-    // Create a copy of applications
-    const newApplications = [...applications];
-
-    // find aaplication dragged
-    const appIndex = newApplications.findIndex((app) => app.id === draggableId);
+    const appIndex = applications.findIndex((app) => app.id === draggableId);
     if (appIndex === -1) return;
 
-    const newStatus = destination.droppableId;
+    const draggedApp = applications[appIndex];
+    const newStatus = destination.droppableId as Application["status"];
+    const currentStatus = draggedApp.status;
 
-    // Update its status based on the destination droppableId
-    newApplications[appIndex] = {
-      ...newApplications[appIndex],
-      status: destination.droppableId,
-    };
+    // Validate transition
+    if (!isValidStatusTransition(currentStatus, newStatus)) {
+      toast.error(
+        `Invalid transition from "${currentStatus}" to "${newStatus}"`
+      );
+      return;
+    }
 
-    setApplications(newApplications);
+    // Nếu là trạng thái cần feedback thì bật popup (giống logic ở handleChangeStatus)
+    if (["interview", "rejected", "hired"].includes(newStatus)) {
+      setFeedbackTarget({
+        applicationId: draggedApp.id,
+        newStatus,
+        applicationName: draggedApp.name,
+      });
+      setShowFeedbackPopup(true);
+      return;
+    }
 
+    // Cập nhật trực tiếp nếu không cần feedback
     try {
+      const updatedApp = { ...draggedApp, status: newStatus };
+      const newApplications = [...applications];
+      newApplications[appIndex] = updatedApp;
+      setApplications(newApplications);
+
       const applicationRef = doc(db, "applications", draggableId);
       await updateDoc(applicationRef, { status: newStatus });
 
-      toast.success(`Updated candidate status to "${newStatus}" successfully`);
+      toast.success(`Updated "${draggedApp.name}" to "${newStatus}"`);
     } catch (error) {
       console.error("Error updating status:", error);
       toast.error("Failed to update status");
@@ -518,6 +638,76 @@ export default function JobApplicationsView() {
               <Label htmlFor="oldest">Oldest</Label>
             </div>
           </RadioGroup>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog feedback */}
+      <Dialog open={showFeedbackPopup} onOpenChange={setShowFeedbackPopup}>
+        <DialogContent className="max-w-md rounded-xl shadow-lg p-6">
+          <DialogTitle className="text-xl font-semibold mb-4">
+            Provide Feedback
+          </DialogTitle>
+
+          {feedbackTarget && (
+            <>
+              <div className="flex items-center gap-4 mb-3">
+                <img
+                  src={
+                    applications.find(
+                      (app) => app.id === feedbackTarget.applicationId
+                    )?.avatar || "/images/avatar.png"
+                  }
+                  alt="Avatar"
+                  className="w-12 h-12 rounded-full object-cover border"
+                />
+                <p className="text-sm text-gray-700">
+                  For: <strong>{feedbackTarget.applicationName}</strong>
+                </p>
+              </div>
+
+              <textarea
+                value={feedbackText}
+                onChange={(e) => setFeedbackText(e.target.value)}
+                className="w-full border border-gray-300 p-3 rounded-md text-sm focus:ring-2 focus:ring-blue-500"
+                rows={4}
+                placeholder="Write your feedback..."
+              />
+
+              <div className="flex justify-end mt-4 gap-2">
+                <Button
+                  variant="outline"
+                  className="border-gray-300 text-gray-700 hover:bg-gray-100 cursor-pointer"
+                  onClick={() => {
+                    setShowFeedbackPopup(false);
+                    setFeedbackTarget(null);
+                    setFeedbackText("");
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  className="bg-blue-600 hover:bg-blue-700 text-white cursor-pointer"
+                  onClick={async () => {
+                    if (!feedbackText.trim()) {
+                      toast.error("Feedback is required");
+                      return;
+                    }
+                    await updateApplicationStatus(
+                      feedbackTarget.applicationId,
+                      feedbackTarget.newStatus,
+                      feedbackText,
+                      feedbackTarget.applicationName
+                    );
+                    setShowFeedbackPopup(false);
+                    setFeedbackTarget(null);
+                    setFeedbackText("");
+                  }}
+                >
+                  Submit
+                </Button>
+              </div>
+            </>
+          )}
         </DialogContent>
       </Dialog>
     </div>

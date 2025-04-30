@@ -5,8 +5,10 @@ import { useFetchJobBox } from "@hooks/useFetchJobBox";
 import { useSelector } from "react-redux";
 import { RootState } from "@redux/store";
 import { Job } from "../../../../types/db";
-import { resetFilters } from "@redux/slices/filterSlice";
+import { resetFilters, setFilters } from "@redux/slices/filterSlice";
 import { useDispatch } from "react-redux";
+import { useSearchParams } from "next/navigation";
+import Spinner from "@component/ui/Spinner";
 
 export default function List() {
   const limit = 12;
@@ -18,6 +20,39 @@ export default function List() {
   const filter = useSelector((state: RootState) => state.filter);
   const dispatch = useDispatch();
   const { jobs } = useFetchJobBox();
+
+  const [isMounted, setIsMounted] = useState(false);
+  const searchParams = useSearchParams();
+  const [queryTag, setQueryTag] = useState<string | undefined>();
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (isMounted) {
+      const tag = searchParams.get("tag");
+      if (tag) {
+        setQueryTag(tag);
+      }
+    }
+  }, [isMounted, searchParams]);
+
+  // Now you can safely use queryTag
+  useEffect(() => {
+    if (queryTag) {
+      dispatch(
+        setFilters({
+          tags: [queryTag],
+          jobTypes: [],
+          minSalary: 0,
+          maxSalary: 0,
+          isRemote: null,
+        })
+      );
+    }
+  }, [queryTag]);
+
   //only searchsearch
   // const searchedJobs = useMemo(() => {
   //   return jobs.filter((job) => {
@@ -157,8 +192,12 @@ export default function List() {
     setCurrentStep(step);
   };
 
+  if (!isMounted) {
+    return <Spinner />;
+  }
+
   return (
-    <div className="flex flex-col gap-[50px] md:px-[100px] md:py-[50px] lg:px-[150px]">
+    <div className="flex flex-col gap-[50px] md:px-[100px] md:py-[50px] lg:px-[150px] ">
       <div className="flex items-center justify-center min-h-[200px]">
         {currentJobs.length === 0 ? (
           <p className="text-gray-500 text-lg font-semibold">No Job Found</p>

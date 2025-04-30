@@ -93,7 +93,7 @@ export default function OverviewEmployer() {
         <div className="bg-blue-50 rounded-lg p-6 flex justify-between items-center">
           <div>
             <h2 className="text-3xl font-bold text-gray-800">{jobs.length}</h2>
-            <p className="text-gray-600">Open Jobs</p>
+            <p className="text-gray-600">Jobs Posted</p>
           </div>
           <div className="bg-white p-4 rounded-md">
             <BsBriefcase className="text-blue-600 text-xl" />

@@ -23,6 +23,12 @@ import {
   FaTimesCircle,
   FaUserCheck,
 } from "react-icons/fa";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@component/ui/tooltip";
 
 const AppliedJob: React.FC = () => {
   const MySwal = withReactContent(Swal);
@@ -104,11 +110,12 @@ const AppliedJob: React.FC = () => {
               showCandidate: data.showCandidate,
               showEmployer: data.showEmployer,
               status: data.status,
+              feedback: data.feedback,
               appliedAt: data.appliedAt?.toDate
                 ? data.appliedAt.toDate()
                 : null,
               candidateId: data.candidateId,
-              job: jobData,
+              job: jobData || undefined,
             };
           })
         );
@@ -273,38 +280,54 @@ const AppliedJob: React.FC = () => {
 
               {/* Status */}
               <div className="col-span-2 ">
-                <div
-                  className={`flex items-center justify-center py-1 rounded-md text-sm
-                  ${
-                    applications.status === "pending"
-                      ? "bg-blue-100 text-blue-800"
-                      : applications.status === "reviewed"
-                      ? "bg-purple-100 text-purple-800"
-                      : applications.status === "interview"
-                      ? "bg-yellow-100 text-yellow-800"
-                      : applications.status === "hired"
-                      ? "bg-green-100 text-green-800"
-                      : "bg-red-100 text-red-800"
-                  }
-                  `}
-                >
-                  {applications.status === "pending" && (
-                    <FaRegClock className="text-lg mr-2" />
-                  )}
-                  {applications.status === "reviewed" && (
-                    <FaCheckCircle className="text-lg mr-2" />
-                  )}
-                  {applications.status === "interview" && (
-                    <FaRegQuestionCircle className="text-lg mr-2" />
-                  )}
-                  {applications.status === "hired" && (
-                    <FaUserCheck className="text-lg mr-2" />
-                  )}
-                  {applications.status === "rejected" && (
-                    <FaTimesCircle className="text-lg mr-2" />
-                  )}
-                  {applications.status}
-                </div>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div
+                        className={`flex items-center justify-center py-1 rounded-md text-sm cursor-help
+          ${
+            applications.status === "pending"
+              ? "bg-blue-100 text-blue-800"
+              : applications.status === "reviewed"
+              ? "bg-purple-100 text-purple-800"
+              : applications.status === "interview"
+              ? "bg-yellow-100 text-yellow-800"
+              : applications.status === "hired"
+              ? "bg-green-100 text-green-800"
+              : "bg-red-100 text-red-800"
+          }
+          `}
+                      >
+                        {applications.status === "pending" && (
+                          <FaRegClock className="text-lg mr-2" />
+                        )}
+                        {applications.status === "reviewed" && (
+                          <FaCheckCircle className="text-lg mr-2" />
+                        )}
+                        {applications.status === "interview" && (
+                          <FaRegQuestionCircle className="text-lg mr-2" />
+                        )}
+                        {applications.status === "hired" && (
+                          <FaUserCheck className="text-lg mr-2" />
+                        )}
+                        {applications.status === "rejected" && (
+                          <FaTimesCircle className="text-lg mr-2" />
+                        )}
+                        {applications.status}
+                      </div>
+                    </TooltipTrigger>
+
+                    {applications.feedback &&
+                      applications.status !== "pending" && (
+                        <TooltipContent
+                          className="bg-white text-black border border-gray-200 shadow-md rounded-lg p-4 text-sm max-w-sm"
+                          side="top"
+                        >
+                          {applications.feedback}
+                        </TooltipContent>
+                      )}
+                  </Tooltip>
+                </TooltipProvider>
               </div>
 
               {/* Actions */}

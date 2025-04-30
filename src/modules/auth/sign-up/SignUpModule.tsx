@@ -108,6 +108,7 @@ const SignUpModule = () => {
         email: formData.email,
         password: formData.password,
       });
+      toast.success("Create account sucessfull");
       router.push("/sign-in");
     } catch (error) {
       // console.log(error.message);
@@ -131,7 +132,7 @@ const SignUpModule = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-gray-50 ">
       {isLoading && <Spinner />}
       <Head>
         <title>Create Account | Jobpilot</title>
@@ -169,8 +170,8 @@ const SignUpModule = () => {
                 type="button"
                 className={`flex items-center justify-center py-3 px-4 rounded-md border ${
                   accountType === "candidate"
-                    ? "bg-gray-300 border-gray-300"
-                    : "bg-white border-gray-300 hover:bg-gray-300"
+                    ? "bg-blue-900 text-white border-blue-900"
+                    : "bg-white border-gray-300 hover:bg-blue-900"
                 }`}
                 onClick={() => setAccountType("candidate")}
               >

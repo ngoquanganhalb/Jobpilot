@@ -6,22 +6,25 @@ import Button from "@component/ui/ButtonCustom";
 import ButtonSlideBar from "@component/ui/ButtonSlideBar";
 import { JSX } from "react";
 
-type MenuItem ={
+type MenuItem = {
   label: string;
   icon: JSX.Element;
   path: string;
-}
+};
 
-type SideBarProps= {
+type SideBarProps = {
   menuItems: MenuItem[];
   title?: string;
-}
+};
 
-export default function SideBar({ menuItems, title = "DASHBOARD" }: SideBarProps) {
+export default function SideBar({
+  menuItems,
+  title = "DASHBOARD",
+}: SideBarProps) {
   const router = useRouter();
 
   const SidebarNav = () => (
-    <div className="w-64 bg-white shadow-md flex flex-col">
+    <div className="w-64 bg-white shadow-md flex flex-col ">
       <div className="p-4 border-b border-gray-200 font-medium text-gray-500">
         {title.toUpperCase()}
       </div>

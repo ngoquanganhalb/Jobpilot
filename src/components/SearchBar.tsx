@@ -12,18 +12,14 @@ import {
   collection,
   getDocs,
   query,
-  orderBy,
   where,
-  startAt,
-  endAt,
   doc,
   getDoc,
+  onSnapshot,
 } from "firebase/firestore";
 import { db } from "@/services/firebase/firebase";
 import { useRouter } from "next/navigation";
 import { debounce } from "lodash";
-import Image from "next/image";
-import Paths from "@/constants/paths";
 
 export default function SearchBar() {
   const [user, setUser] = useState<any>(null);
@@ -33,36 +29,75 @@ export default function SearchBar() {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
+  // useEffect(() => {
+  //   const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+  //     if (currentUser) {
+  //       const userInfo = await fetchUserAvatar(currentUser.uid);
+  //       setUser(userInfo);
+  //     } else {
+  //       setUser(null);
+  //     }
+  //   });
+  //   return () => unsubscribe();
+  // }, []);
+
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+    let unsubscribe: () => void;
+
+    const listenUserAvatar = (uid: string) => {
+      const userRef = doc(db, "users", uid);
+      //onSnapshot = listen realtime
+      unsubscribe = onSnapshot(
+        userRef,
+        (docSnap) => {
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            setUser({
+              uid,
+              email: data.email || "",
+              avatarUrl: data.avatarUrl || "",
+              name: data.name || "",
+            });
+          }
+        },
+        (error) => {
+          console.error("Error listening to user data:", error);
+        }
+      );
+    };
+
+    const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
-        const userInfo = await fetchUserAvatar(currentUser.uid);
-        setUser(userInfo);
+        listenUserAvatar(currentUser.uid);
       } else {
         setUser(null);
+        if (unsubscribe) unsubscribe();
       }
     });
-    return () => unsubscribe();
-  }, []);
 
-  const fetchUserAvatar = async (uid: string) => {
-    try {
-      const userRef = doc(db, "users", uid);
-      const userSnap = await getDoc(userRef);
-      if (userSnap.exists()) {
-        const userData = userSnap.data();
-        return {
-          uid,
-          email: userData.email || "",
-          avatarUrl: userData.avatarUrl || "",
-          name: userData.name || "",
-        };
-      }
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-    }
-    return null;
-  };
+    return () => {
+      unsubscribeAuth();
+      if (unsubscribe) unsubscribe();
+    };
+  }, []);
+  // const fetchUserAvatar = async (uid: string) => {
+  //   try {
+  //     const userRef = doc(db, "users", uid);
+  //     const userSnap = await getDoc(userRef);
+  //     if (userSnap.exists()) {
+  //       const userData = userSnap.data();
+  //       return {
+  //         uid,
+  //         email: userData.email || "",
+  //         avatarUrl: userData.avatarUrl || "",
+  //         name: userData.name || "",
+  //       };
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching user data:", error);
+  //   }
+  //   return null;
+  // };
 
   const fetchSuggestions = useCallback(
     debounce(async (text: string) => {
@@ -128,7 +163,7 @@ export default function SearchBar() {
   }, []);
 
   return (
-    <div className="flex flex-col gap-2 xl:flex-row justify-between items-center py-5 md:px-[150px] bg-white">
+    <div className="flex flex-col gap-2 xl:flex-row justify-between items-center py-5 md:px-[150px] bg-white ">
       <div
         className="gap-8 flex flex-col md:flex-row items-center w-full relative"
         ref={wrapperRef}

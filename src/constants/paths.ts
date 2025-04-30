@@ -17,6 +17,8 @@ export const Paths = {
   FIND_JOB: "/find-job",
   VIEW_APPLICATION: '/view-application',
   DASHBOARD_APPLIEDJOB: '/dashboard/applied-job',
+  SIGN_IN: '/sign-in',
+  SIGN_UP: '/sign-up'
   // DASHOBOARD_FAVORITEJOB:  '/dashboard/favorite-job',
 
 };
