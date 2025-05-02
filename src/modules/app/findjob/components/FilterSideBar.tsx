@@ -1,9 +1,8 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
-
-import { X } from "lucide-react";
 import { FaFilter } from "react-icons/fa";
+import { GoDotFill } from "react-icons/go";
 
 import {
   Accordion,
@@ -17,7 +16,12 @@ import { Badge } from "@component/ui/badge";
 import { Button } from "@component/ui/Button";
 import { Input } from "@component/ui/Input";
 import { cn } from "@component/lib/utils";
-import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 import {
   JobType,
@@ -30,32 +34,40 @@ import { FilterFormValues } from "@types";
 
 export default function FilterSideBar() {
   const [tagSearch, setTagSearch] = useState("");
-
-  const { control, watch, setValue, handleSubmit } = useForm<FilterFormValues>({
-    defaultValues: {
-      location: "",
-      tags: [],
-      jobTypes: [],
-      minSalary: 0,
-      maxSalary: 200000,
-      isRemote: false,
-    },
-  });
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const { control, watch, setValue, handleSubmit, reset } =
+    useForm<FilterFormValues>({
+      defaultValues: {
+        location: "",
+        tags: [],
+        jobTypes: [],
+        minSalary: 0,
+        maxSalary: 200000,
+        isRemote: false,
+      },
+    });
 
   const watchAll = watch();
 
   const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(setFilters(watchAll)); // Automatically dispatch filters whenever any form value changes
+  }, [watchAll, dispatch]);
 
   const onSubmit = (data: FilterFormValues) => {
     dispatch(setFilters(data));
+    setIsSheetOpen(false);
   };
   const clearAllFilters = () => {
-    // reset();
+    reset();
+    // setTagSearch("");
     dispatch(resetFilters());
   };
 
   const removeTag = (tag: string) => {
+    console.log("Removing tag:", tag);
     const newTags = watchAll.tags.filter((t) => t !== tag);
+
     setValue("tags", newTags);
   };
 
@@ -82,10 +94,12 @@ export default function FilterSideBar() {
           className="px-2 py-1 flex items-center gap-1"
         >
           Location: {watchAll.location}
-          <X
+          <div
             className="h-3 w-3 ml-1 cursor-pointer"
             onClick={() => setValue("location", "")}
-          />
+          >
+            X
+          </div>
         </Badge>
       );
     }
@@ -98,10 +112,12 @@ export default function FilterSideBar() {
           className="px-2 py-1 flex items-center gap-1"
         >
           {tag}
-          <X
+          <div
             className="h-3 w-3 ml-1 cursor-pointer"
             onClick={() => removeTag(tag)}
-          />
+          >
+            X
+          </div>
         </Badge>
       );
     });
@@ -114,7 +130,7 @@ export default function FilterSideBar() {
           className="px-2 py-1 flex items-center gap-1"
         >
           {type.replace("_", " ")}
-          <X
+          <div
             className="h-3 w-3 ml-1 cursor-pointer"
             onClick={() =>
               setValue(
@@ -122,7 +138,10 @@ export default function FilterSideBar() {
                 watchAll.jobTypes.filter((t) => t !== type)
               )
             }
-          />
+          >
+            {" "}
+            X
+          </div>
         </Badge>
       );
     });
@@ -136,13 +155,16 @@ export default function FilterSideBar() {
         >
           Salary: ${watchAll.minSalary.toLocaleString()} - $
           {watchAll.maxSalary.toLocaleString()}
-          <X
+          <div
             className="h-3 w-3 ml-1 cursor-pointer"
             onClick={() => {
               setValue("minSalary", 0);
               setValue("maxSalary", 200000);
             }}
-          />
+          >
+            {" "}
+            X{" "}
+          </div>
         </Badge>
       );
     }
@@ -155,28 +177,48 @@ export default function FilterSideBar() {
           className="px-2 py-1 flex items-center gap-1"
         >
           Remote Only
-          <X
+          <div
             className="h-3 w-3 ml-1 cursor-pointer"
             onClick={() => setValue("isRemote", false)}
-          />
+          >
+            X
+          </div>
         </Badge>
       );
     }
 
     return filters;
   };
+  const isFiltering = () => {
+    return (
+      watchAll.location !== "" ||
+      watchAll.tags.length > 0 ||
+      watchAll.jobTypes.length > 0 ||
+      watchAll.minSalary > 0 ||
+      watchAll.maxSalary < 200000 ||
+      watchAll.isRemote === true
+    );
+  };
 
   return (
-    <Sheet>
+    <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
       <SheetTrigger asChild>
-        <Button className="text-lg font-semibold py-6 border border-blue-100 bg-[#0A65CC] text-white hover:bg-blue-500 rounded-md flex items-center w-full">
-          <FaFilter />
-          Filter
-        </Button>
+        {isFiltering() ? (
+          <Button className="text-lg font-semibold py-6 border border-blue-100 bg-[#0A65CC] text-white hover:bg-blue-500 rounded-md flex items-center w-full">
+            <FaFilter />
+            Filter
+            <GoDotFill className="text-red-500 text-4xl" />
+          </Button>
+        ) : (
+          <Button className="text-lg font-semibold py-6 border border-blue-100 bg-[#0A65CC] text-white hover:bg-blue-500 rounded-md flex items-center w-full cursor-pointer">
+            <FaFilter />
+            Filter
+          </Button>
+        )}
       </SheetTrigger>
 
       <SheetContent side="left" className="w-[350px]">
-      <SheetTitle></SheetTitle>
+        <SheetTitle></SheetTitle>
         <div className="w-full bg-white border-r p-4 h-full overflow-y-auto">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold">Filters</h2>
@@ -201,7 +243,7 @@ export default function FilterSideBar() {
               type="multiple"
               defaultValue={["location", "jobTags", "jobTypes", "salary"]}
             >
-              <AccordionItem value="location">
+              {/* <AccordionItem value="location">
                 <AccordionTrigger className="py-2">Location</AccordionTrigger>
                 <AccordionContent className="p-2">
                   <Controller
@@ -215,7 +257,7 @@ export default function FilterSideBar() {
                     )}
                   />
                 </AccordionContent>
-              </AccordionItem>
+              </AccordionItem> */}
 
               <AccordionItem value="jobTags">
                 <AccordionTrigger className="py-2">
@@ -388,7 +430,7 @@ export default function FilterSideBar() {
               </label>
             </div>
 
-            <Button type="submit" className="w-full mt-4">
+            <Button type="submit" className="w-full mt-4 cursor-pointer">
               Apply Filters
             </Button>
           </form>

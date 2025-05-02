@@ -18,7 +18,8 @@ export const Paths = {
   VIEW_APPLICATION: '/view-application',
   DASHBOARD_APPLIEDJOB: '/dashboard/applied-job',
   SIGN_IN: '/sign-in',
-  SIGN_UP: '/sign-up'
+  SIGN_UP: '/sign-up',
+  FAVORITE_JOB: '/dashboard/favorite-job'
   // DASHOBOARD_FAVORITEJOB:  '/dashboard/favorite-job',
 
 };

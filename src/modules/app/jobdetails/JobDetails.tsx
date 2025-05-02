@@ -39,58 +39,6 @@ import Spinner from "@component/ui/Spinner";
 import { toast } from "react-toastify";
 import Link from "next/link";
 import Paths from "@/constants/paths";
-
-// Related jobs data
-// const relatedJobs = [
-//   {
-//     id: "google-support-specialist",
-//     title: "Technical Support Specialist",
-//     company: "Google Inc.",
-//     type: "PART-TIME",
-//     salary: { min: 50000, max: 70000, currency: "USD" },
-//     location: "Dhaka, Bangladesh",
-//   },
-//   {
-//     id: "google-ux-designer",
-//     title: "Senior UX Designer",
-//     company: "Google Inc.",
-//     type: "FULL-TIME",
-//     salary: { min: 80000, max: 125000, currency: "USD" },
-//     location: "Dhaka, Bangladesh",
-//   },
-//   {
-//     id: "google-marketing-officer",
-//     title: "Marketing Officer",
-//     company: "Google Inc.",
-//     type: "INTERNSHIP",
-//     salary: { min: 35000, max: 55000, currency: "USD" },
-//     location: "Dhaka, Bangladesh",
-//   },
-//   {
-//     id: "google-graphic-designer",
-//     title: "Junior Graphic Designer",
-//     company: "Google Inc.",
-//     type: "INTERNSHIP",
-//     salary: { min: 35000, max: 55000, currency: "USD" },
-//     location: "Dhaka, Bangladesh",
-//   },
-//   {
-//     id: "google-interaction-designer",
-//     title: "Interaction Designer",
-//     company: "Google Inc.",
-//     type: "FULL-TIME",
-//     salary: { min: 70000, max: 95000, currency: "USD" },
-//     location: "Dhaka, Bangladesh",
-//   },
-//   {
-//     id: "google-project-manager",
-//     title: "Project Manager",
-//     company: "Google Inc.",
-//     type: "FULL-TIME",
-//     salary: { min: 75000, max: 125000, currency: "USD" },
-//     location: "Dhaka, Bangladesh",
-//   },
-// ];
 const jobBenefits = [
   { name: "401k Salary", color: "gray" },
   { name: "Anpc", color: "green" },
@@ -474,10 +422,10 @@ export default function JobDetails() {
                 <div className="flex items-center gap-3 mb-4">
                   <MapPin className="w-6 h-6 text-blue-500" />
                   <div>
-                    <h2 className="text-lg font-semibold">Job Location</h2>
+                    <h2 className="text-lg font-semibold">Company Location</h2>
                     <p className="text-gray-600">
-                      {/* {job.location.city}, {job.location.country} */}
-                      Viet Nam
+                      {job.location?.province},{job.location?.district},{" "}
+                      {job.location?.address}
                     </p>
                   </div>
                 </div>
@@ -522,7 +470,7 @@ export default function JobDetails() {
                   key={job.jobId}
                   id={job.jobId}
                   company={job.companyName || "Unknown Company"}
-                  location={job.location || "Vietnam"}
+                  location={job.location?.province || "Unknown location"}
                   title={job.jobTitle}
                   type={job.jobType?.toUpperCase() || "FULL-TIME"}
                   salary={

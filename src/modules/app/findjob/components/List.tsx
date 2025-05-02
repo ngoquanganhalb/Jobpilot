@@ -118,7 +118,10 @@ export default function List() {
 
       const locationMatch =
         location === "" ||
-        job.location?.toLowerCase().includes(location.toLowerCase());
+        job.location?.province
+          ?.toLowerCase()
+          .includes(location.toLowerCase()) ||
+        job.location?.district?.toLowerCase().includes(location.toLowerCase());
 
       const tagMatch =
         (filter.tags?.length ?? 0) === 0 ||
@@ -208,7 +211,7 @@ export default function List() {
                 key={job.jobId}
                 id={job.jobId}
                 company={job.companyName || "Unknown Company"}
-                location={job.location || "Viet Nam"}
+                location={job.location?.province || "Unknown Location"}
                 title={job.jobTitle}
                 type={job.jobType?.toUpperCase() || "FULL-TIME"}
                 salary={

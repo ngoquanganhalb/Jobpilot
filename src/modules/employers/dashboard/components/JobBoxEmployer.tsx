@@ -196,7 +196,7 @@ export default function JobBoxEmployer({
             <div className="flex items-center mt-1 space-x-2">
               <div className="flex items-center text-xs text-gray-500">
                 <span className="inline-block mr-1">📍</span>
-                {job.location}
+                {job.location?.province || 'Unknow location'} 
               </div>
               <div className="flex items-center text-xs text-gray-500">
                 <span className="inline-block mr-1">💰</span>

@@ -19,7 +19,7 @@ export default function Header() {
         {/* <NavLink>Customer Supports</NavLink> */}
         {/* <NavLink href={Paths.DASHBOARD_OVERVIEW}>Dash Board</NavLink> */}
         {accountType === "candidate" && (
-          <NavLink href={Paths.DASHBOARD_APPLIEDJOB}>Dash Board</NavLink>
+          <NavLink href={Paths.DASHBOARD_APPLIEDJOB}>Dashboard</NavLink>
         )}
 
         {accountType === "employer" && (
@@ -39,7 +39,7 @@ export default function Header() {
           <div>+1-202-555-0178</div>
         </div>
 
-        <div className="flex items-center gap-2">
+        {/* <div className="flex items-center gap-2">
           <Image
             src="/images/Country.png"
             alt="Country"
@@ -48,7 +48,7 @@ export default function Header() {
           />
           <span>English</span>
           <HeaderDownIcon />
-        </div>
+        </div> */}
       </div>
     </div>
   );

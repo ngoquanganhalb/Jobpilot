@@ -22,7 +22,7 @@ export const menuItemCandidate = [
   {
     icon: <BsBookmark className="h-5 w-5 mr-3" />,
     label: "FavoriteJobs",
-    path: Paths.MY_JOBS,
+    path: Paths.FAVORITE_JOB,
   },
   {
     icon: <BsGear className="h-5 w-5 mr-3" />,

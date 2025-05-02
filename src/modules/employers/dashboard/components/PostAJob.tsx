@@ -1,5 +1,5 @@
 "use client";
-
+import provinces from "../../../../constants/data/location.json";
 import { useState } from "react";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/textarea";
@@ -12,13 +12,7 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
-import {
-  collection,
-  Timestamp,
-  getDoc,
-  doc,
-  setDoc,
-} from "firebase/firestore";
+import { collection, Timestamp, getDoc, doc, setDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { db } from "@services/firebase/firebase";
 import { toast } from "react-toastify";
@@ -36,6 +30,7 @@ import Image from "next/image";
 import { toBase64 } from "@lib/convertBase64";
 import { Job, JobType, JOB_TAG_OPTIONS } from "../../../../types/db";
 import { useRouter } from "next/navigation";
+import LocationSelector from "@component/ui/LocationSelector";
 
 export default function PostAJob() {
   const router = useRouter();
@@ -51,7 +46,11 @@ export default function PostAJob() {
     avatarCompany: "",
     companyName: "",
     urgent: false,
-    location: "Viet Nam",
+    location: {
+      province: "",
+      district: "",
+      address: "",
+    },
     isRemote: true,
     expirationDate: new Date(),
     applicants: [],
@@ -152,7 +151,7 @@ export default function PostAJob() {
         avatarCompany: base64Logo,
         companyName: name,
         urgent: false,
-        location: "London",
+        location: formData.location,
         isRemote: formData.isRemote,
         expirationDate: formData.expirationDate,
         applicants: [],
@@ -161,7 +160,6 @@ export default function PostAJob() {
       };
 
       await setDoc(docRef, jobData);
-
 
       setFormData(initialJobState);
       setLogoFile(null);
@@ -248,7 +246,7 @@ export default function PostAJob() {
         </div>
 
         {/* Job Title */}
-        <div>
+        <div className="">
           <label className="block mb-2 text-sm font-medium text-gray-700">
             Job Title
           </label>
@@ -258,6 +256,18 @@ export default function PostAJob() {
             placeholder="Add job title, role, vacancies etc."
             value={formData.jobTitle}
             onChange={handleChange}
+          />
+        </div>
+
+        <div className="">
+          <LocationSelector
+            value={
+              formData.location || { province: "", district: "", address: "" }
+            }
+            onChange={(loc) =>
+              setFormData((prev) => ({ ...prev, location: loc }))
+            }
+            provinces={provinces}
           />
         </div>
 

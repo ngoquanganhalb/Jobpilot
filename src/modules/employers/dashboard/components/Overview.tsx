@@ -146,7 +146,7 @@ export default function OverviewEmployer() {
               .slice(0, 5)
               .map((job) => (
                 <JobBoxEmployer
-                  key={job.jobId}
+                  key={job.jobId} 
                   job={job}
                   jobActionDropdown={jobActionDropdown}
                   toggleJobActionDropdown={toggleJobActionDropdown}

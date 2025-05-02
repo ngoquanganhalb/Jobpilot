@@ -4,6 +4,7 @@ import {
   doc,
   getDoc,
   getDocs,
+  orderBy,
   query,
   updateDoc,
   where,
@@ -93,7 +94,8 @@ const AppliedJob: React.FC = () => {
         const q = query(
           collection(db, "applications"),
           where("candidateId", "==", user.uid),
-          where("showCandidate", "==", true)
+          where("showCandidate", "==", true),
+          orderBy("appliedAt", "desc")
         );
         const querySnapshot = await getDocs(q);
 
@@ -130,7 +132,7 @@ const AppliedJob: React.FC = () => {
 
     // Cleanup auth khi component unmount
     return () => unsubscribe();
-  }, [jobApplications]);
+  }, []);
 
   const handleDelete = async (applicationId: string) => {
     MySwal.fire({
@@ -156,9 +158,7 @@ const AppliedJob: React.FC = () => {
 
           // render immediately
           SetJobApplication((prev) =>
-            prev.map((app) =>
-              app.id === applicationId ? { ...app, showCandidate: false } : app
-            )
+            prev.filter((app) => app.id !== applicationId)
           );
         } catch (error) {
           console.error("Error updating application:", error);
@@ -227,11 +227,11 @@ const AppliedJob: React.FC = () => {
           currentApplications.map((applications) => (
             <div
               key={applications.id}
-              className={`grid grid-cols-12 items-center py-4 px-4 border-b border-gray-100 hover:ring-2 hover:ring-blue-500 rounded-2xl`}
+              className={`grid grid-cols-12 items-center py-4 px-4 border-b border-gray-300 hover:ring-2 hover:ring-blue-500 rounded-2xl`}
             >
               {/* Job Info */}
               <div className="col-span-5 flex items-center space-x-3">
-                <div className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center">
+                <div className="w-12 h-12 rounded overflow-hidden flex items-center justify-center">
                   <img
                     src={
                       applications.job?.avatarCompany ||
@@ -248,7 +248,7 @@ const AppliedJob: React.FC = () => {
                   <div className="flex items-center mt-1 space-x-2">
                     <div className="flex items-center text-xs text-gray-500">
                       <span className="inline-block mr-1">📍</span>
-                      {applications.job?.location}
+                      {applications.job?.location?.province || "Unknown job"}
                     </div>
                     <div className="flex items-center text-xs text-gray-500">
                       <span className="inline-block mr-1">💰</span>
