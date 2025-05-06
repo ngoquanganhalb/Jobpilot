@@ -1,9 +1,4 @@
-// src/constants/paths.ts
-
 export const Paths = {
-  
-
-  // Employer Dashboard
   DASHBOARD_OVERVIEW: "/dashboard/overview",
   DASHBOARD_MYJOB:"/dashboard/my-jobs",
   EMPLOYER_PROFILE: "/dashboard/employers-profile",
@@ -21,7 +16,5 @@ export const Paths = {
   SIGN_UP: '/sign-up',
   FAVORITE_JOB: '/dashboard/favorite-job'
   // DASHOBOARD_FAVORITEJOB:  '/dashboard/favorite-job',
-
 };
-
 export default Paths;

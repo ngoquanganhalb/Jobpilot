@@ -29,7 +29,6 @@ export default function Banner() {
         const jobsSnapshot = await getDocs(jobsQuery);
         setJobCount(jobsSnapshot.size);
 
-        // Lấy users
         const usersSnapshot = await getDocs(collection(db, "users"));
 
         let candidates = 0;

@@ -45,10 +45,6 @@ export const Become = () => {
             <p className="text-gray-500 mb-6 ">
               Lorem ipsum dolor sit amet, consectetur adipiscing elit.
             </p>
-            {/* <button className="bg-white text-blue-600 font-semibold border border-blue-600 px-6 py-2 rounded-md hover:bg-blue-50 flex items-center gap-2 transition">
-              Register Now
-              <span className="text-lg">→</span>
-            </button> */}
             <Link href={Paths.SIGN_IN}>
               <Button variant="secondary">
                 {" "}

@@ -1,5 +1,19 @@
 import { useState, useRef } from "react";
 import { X, Upload, ArrowRight } from "lucide-react";
+import {
+  collection,
+  addDoc,
+  Timestamp,
+  updateDoc,
+  where,
+  query,
+  doc,
+  arrayUnion,
+  getDocs,
+} from "firebase/firestore";
+import { firestore } from "@/services/firebase/firebase";
+import { uploadToCloudinary } from "@utils/uploadToCloundinary";
+import { toast } from "react-toastify";
 import { Button } from "@component/ui/Button";
 import {
   Card,
@@ -15,22 +29,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  collection,
-  addDoc,
-  Timestamp,
-  updateDoc,
-  where,
-  query,
-  doc,
-  arrayUnion,
-  getDocs,
-} from "firebase/firestore";
-import { firestore } from "@/services/firebase/firebase";
-import { uploadToCloudinary } from "@utils/uploadToCloundinary";
-import { toast } from "react-toastify";
 
-// Form Props
 interface JobApplicationFormProps {
   jobTitle: string;
   jobId: string;
@@ -40,7 +39,6 @@ interface JobApplicationFormProps {
   onApplied: () => void;
 }
 
-// Form Data Type
 type FormData = {
   resume: File | null;
   resumeName: string;
@@ -84,7 +82,7 @@ export default function JobApplicationPopup({
     setIsSubmitting(true);
 
     try {
-      // Check chi dang applicationapplication duoc 1 lan
+      // Check application if had applied once
       const applicationsRef = collection(firestore, "applications");
       const checkQuery = query(
         applicationsRef,
@@ -99,9 +97,8 @@ export default function JobApplicationPopup({
         return;
       }
 
-      // Nếu chưa apply mới được tiếp tục
       const resumeUrl = await uploadToCloudinary(formData.resume);
-      console.log(" 1. Upload resume lên Cloudinary:", resumeUrl);
+      // console.log(" 1. Upload resume lên Cloudinary:", resumeUrl);
 
       await addDoc(applicationsRef, {
         jobId,
@@ -115,7 +112,7 @@ export default function JobApplicationPopup({
         feedback: "",
       });
 
-      // Update applicants[] trong jobs
+      // Update applicants[] in jobs
       const jobsRef = collection(firestore, "jobs");
       const jobQuery = query(jobsRef, where("jobId", "==", jobId));
       const jobSnapshot = await getDocs(jobQuery);
@@ -131,7 +128,7 @@ export default function JobApplicationPopup({
         console.error("Job not found!");
       }
 
-      console.log("2. Ghi vào Firestore");
+      // console.log("2. Ghi vào Firestore");
 
       toast.success("Application submitted successfully!");
       onApplied();
@@ -158,12 +155,6 @@ export default function JobApplicationPopup({
 
         <Card className="border-0 shadow-none">
           <CardHeader className="pb-2 relative">
-            {/* <button
-              onClick={onClose}
-              className="absolute top-4 right-4 h-8 w-8 rounded-full flex items-center justify-center hover:bg-gray-100"
-            >
-              <X className="h-5 w-5 text-gray-500" />
-            </button> */}
             <CardTitle className="text-xl font-semibold">
               Apply Job: {jobTitle}
             </CardTitle>

@@ -102,7 +102,7 @@ export type Application = {
   avatar?: string;
 };
 
-//type fetch cho user applied job
+//type fetch for user applied job
 export type ApplicationWithJob = Application & {
   job?: Job
 };

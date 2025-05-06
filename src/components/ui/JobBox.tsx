@@ -43,7 +43,7 @@ export default function JobBox({
     e: React.MouseEvent<HTMLButtonElement>
   ) => {
     e.stopPropagation();
-    e.preventDefault(); // Ngăn không dẫn đến trang job detail
+    e.preventDefault(); //prevent click to link
 
     if (!currentUser) {
       toast.info("Please log in to save jobs");
@@ -97,7 +97,7 @@ export default function JobBox({
       className={`relative flex flex-col w-[390px] p-[24px] border-3 border-[#E4E5E8] shadow-md rounded-[8px] hover:scale-105 transition-all duration-100 cursor-pointer ${variantStyles} ${className}`}
       {...props}
     >
-      {/* Bookmark button nằm ngoài Link */}
+      {/* Bookmark button outside Link */}
       <button
         onClick={handleToggleBookmark}
         className="absolute top-4 right-4 z-10"
@@ -108,7 +108,6 @@ export default function JobBox({
           <FaRegBookmark className="text-gray-500 hover:text-amber-400 hover:scale-110 transition-all duration-200" />
         )}
       </button>
-
 
       <Link href={`${Paths.FIND_JOB}/${id}`}>
         <div className="flex flex-col">

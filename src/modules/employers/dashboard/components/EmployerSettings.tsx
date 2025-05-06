@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { Loader2 } from "lucide-react";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { firestore } from "@services/firebase/firebase";
 import { Button } from "@component/ui/Button";
@@ -13,8 +14,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Loader2 } from "lucide-react";
 import { UserModel } from "@types";
 import { toast } from "react-toastify";
 import { getAuth, onAuthStateChanged } from "firebase/auth";

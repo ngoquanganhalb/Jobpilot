@@ -1,25 +1,25 @@
-import Logo from "./icons/Logo";
-import SearchIcon from "./icons/SearchIcon";
-import Button from "./ui/ButtonCustom";
-import Input from "./ui/InputCustom";
-import Link from "next/link";
-import { onAuthStateChanged } from "firebase/auth";
 import { useEffect, useState, useRef, useCallback } from "react";
-import { auth } from "../services/firebase/firebase";
-import NotificationButton from "./ui/NotificationButton";
-import AvatarMenu from "./ui/AvatarMenu";
 import {
   collection,
   getDocs,
   query,
   where,
   doc,
-  getDoc,
   onSnapshot,
 } from "firebase/firestore";
 import { db } from "@/services/firebase/firebase";
 import { useRouter } from "next/navigation";
 import { debounce } from "lodash";
+import Link from "next/link";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../services/firebase/firebase";
+
+import Logo from "./icons/Logo";
+import SearchIcon from "./icons/SearchIcon";
+import Button from "./ui/ButtonCustom";
+import Input from "./ui/InputCustom";
+import NotificationButton from "./ui/NotificationButton";
+import AvatarMenu from "./ui/AvatarMenu";
 
 export default function SearchBar() {
   const [user, setUser] = useState<any>(null);
@@ -28,18 +28,6 @@ export default function SearchBar() {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-
-  // useEffect(() => {
-  //   const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-  //     if (currentUser) {
-  //       const userInfo = await fetchUserAvatar(currentUser.uid);
-  //       setUser(userInfo);
-  //     } else {
-  //       setUser(null);
-  //     }
-  //   });
-  //   return () => unsubscribe();
-  // }, []);
 
   useEffect(() => {
     let unsubscribe: () => void;
@@ -80,24 +68,6 @@ export default function SearchBar() {
       if (unsubscribe) unsubscribe();
     };
   }, []);
-  // const fetchUserAvatar = async (uid: string) => {
-  //   try {
-  //     const userRef = doc(db, "users", uid);
-  //     const userSnap = await getDoc(userRef);
-  //     if (userSnap.exists()) {
-  //       const userData = userSnap.data();
-  //       return {
-  //         uid,
-  //         email: userData.email || "",
-  //         avatarUrl: userData.avatarUrl || "",
-  //         name: userData.name || "",
-  //       };
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching user data:", error);
-  //   }
-  //   return null;
-  // };
 
   const fetchSuggestions = useCallback(
     debounce(async (text: string) => {
@@ -123,7 +93,7 @@ export default function SearchBar() {
           };
         });
 
-        // Lọc bằng includes giống useMemo
+        // Filter by include same as useMemo
         const filtered = allJobs.filter((job) => {
           const lower = text.toLowerCase();
           const titleMatch = job.jobTitle.toLowerCase().includes(lower);

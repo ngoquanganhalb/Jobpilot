@@ -1,51 +1,48 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { useForm, Controller } from "react-hook-form";
+import { useDispatch } from "react-redux";
+import {
+  JobType,
+  JOB_TYPE_OPTIONS,
+  JOB_TAG_OPTIONS,
+} from "../../../../types/db";
+import { useForm } from "react-hook-form";
 import { FaFilter } from "react-icons/fa";
 import { GoDotFill } from "react-icons/go";
-
+import { setFilters, resetFilters } from "@redux/slices/filterSlice";
+import { FilterFormValues } from "@types";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Checkbox } from "@component/ui/checkbox";
-import { Slider } from "@component/ui/slider";
-import { Badge } from "@component/ui/badge";
-import { Button } from "@component/ui/Button";
-import { Input } from "@component/ui/Input";
-import { cn } from "@component/lib/utils";
 import {
   Sheet,
   SheetContent,
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-
-import {
-  JobType,
-  JOB_TYPE_OPTIONS,
-  JOB_TAG_OPTIONS,
-} from "../../../../types/db";
-import { useDispatch } from "react-redux";
-import { setFilters, resetFilters } from "@redux/slices/filterSlice";
-import { FilterFormValues } from "@types";
+import { Checkbox } from "@component/ui/checkbox";
+import { Slider } from "@component/ui/slider";
+import { Badge } from "@component/ui/badge";
+import { Button } from "@component/ui/Button";
+import { Input } from "@component/ui/Input";
+import { cn } from "@component/lib/utils";
 
 export default function FilterSideBar() {
   const [tagSearch, setTagSearch] = useState("");
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const { control, watch, setValue, handleSubmit, reset } =
-    useForm<FilterFormValues>({
-      defaultValues: {
-        location: "",
-        tags: [],
-        jobTypes: [],
-        minSalary: 0,
-        maxSalary: 200000,
-        isRemote: false,
-      },
-    });
+  const { watch, setValue, handleSubmit, reset } = useForm<FilterFormValues>({
+    defaultValues: {
+      location: "",
+      tags: [],
+      jobTypes: [],
+      minSalary: 0,
+      maxSalary: 200000,
+      isRemote: false,
+    },
+  });
 
   const watchAll = watch();
 

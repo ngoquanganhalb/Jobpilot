@@ -21,9 +21,9 @@ import {
   MdMoreHoriz,
   MdOutlineCurrencyExchange,
 } from "react-icons/md";
-import { FcAdvertising } from "react-icons/fc";
-import { JobTag } from "@/types/db";
 import Link from "next/link";
+import { FcAdvertising } from "react-icons/fc";
+import { JOB_TAG_OPTIONS, JobTag } from "../../../../types/db";
 import ArrowIcon from "@component/icons/ArrowIcon";
 import Paths from "@/constants/paths";
 import Button from "@component/ui/ButtonCustom";
@@ -63,32 +63,32 @@ const categoryIcons: Record<JobTag, JSX.Element> = {
   Others: <MdMoreHoriz className="text-gray-400 text-2xl" />,
 };
 
-const jobTags: JobTag[] = [
-  "Engineering",
-  "Design",
-  "Marketing",
-  "Sales",
-  "Finance",
-  "Human Resources",
-  "Customer Support",
-  "Software Development",
-  "Web Development",
-  "Mobile Development",
-  "UI/UX Design",
-  "Operations",
-  "Education",
-  "Healthcare",
-  "Retail",
-  "Hospitality",
-  "Manufacturing",
-  "Transportation",
-  "Entertainment",
-  "Finance & Accounting",
-  "Supply Chain & Logistics",
-  "Social Media",
-  "Sales & Business Development",
-  "Others",
-];
+// const jobTags: JobTag[] = [
+//   "Engineering",
+//   "Design",
+//   "Marketing",
+//   "Sales",
+//   "Finance",
+//   "Human Resources",
+//   "Customer Support",
+//   "Software Development",
+//   "Web Development",
+//   "Mobile Development",
+//   "UI/UX Design",
+//   "Operations",
+//   "Education",
+//   "Healthcare",
+//   "Retail",
+//   "Hospitality",
+//   "Manufacturing",
+//   "Transportation",
+//   "Entertainment",
+//   "Finance & Accounting",
+//   "Supply Chain & Logistics",
+//   "Social Media",
+//   "Sales & Business Development",
+//   "Others",
+// ];
 
 export const PopularCategory = () => {
   return (
@@ -106,12 +106,12 @@ export const PopularCategory = () => {
           </Link>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-          {jobTags.map((tag) => (
+          {JOB_TAG_OPTIONS.map((tag) => (
             <Link
               key={tag}
               href={{
                 pathname: Paths.FIND_JOB,
-                query: { tag: tag }, // đẩy tag vào URL
+                query: { tag: tag }, // push tag in URL
               }}
             >
               <div className="flex items-center space-x-1 p-3 rounded-md shadow-sm hover:shadow-md transition hover:scale-105 cursor-pointer bg-white">

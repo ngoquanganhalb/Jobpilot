@@ -1,7 +1,7 @@
 //redux persist
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import { persistStore, persistReducer } from "redux-persist";
-import storage from "redux-persist/lib/storage"; // lưu vào localStorage
+import storage from "redux-persist/lib/storage"; // save to localStorage
 import exampleReducer from "./slices/exampleSlice";
 import userReducer from "./slices/userSlice";
 import searchReducer from "./slices/searchSlice"
@@ -20,7 +20,7 @@ const rootReducer = combineReducers({
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["user"], // chỉ persist slice "user"
+  whitelist: ["user"], // only persist slice "user"
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
@@ -29,13 +29,12 @@ export const store = configureStore({
   reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      serializableCheck: false, // để tránh lỗi với redux-persist
+      serializableCheck: false, // prevent error with redux-persist
     }),
 });
 
 export const persistor = persistStore(store);
 
-// Type hỗ trợ
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
 export const useAppDispatch = () => useDispatch<AppDispatch>();

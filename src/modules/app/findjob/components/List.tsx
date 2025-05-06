@@ -171,14 +171,6 @@ export default function List() {
     setCurrentJobs(filteredJobs.slice(startIndex, endIndex));
   }, [filteredJobs, currentStep]);
 
-  // const totalSteps = Math.ceil(searchedJobs.length / limit);
-  // //page paganition
-  // useEffect(() => {
-  //   const startIndex = (currentStep - 1) * limit;
-  //   const endIndex = startIndex + limit;
-  //   setCurrentJobs(searchedJobs.slice(startIndex, endIndex));
-  // }, [searchedJobs, currentStep]);
-
   const handleNext = () => {
     if (currentStep < totalSteps) {
       setCurrentStep((prevStep) => prevStep + 1);

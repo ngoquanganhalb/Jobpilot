@@ -1,13 +1,3 @@
-// import Spinner from "@component/ui/Spinner";
-// //loading for global
-// // handle spinning ưhen <Link href>
-// export default function Loading() {
-//   return (
-//     <>
-//       <Spinner />
-//     </>
-//   );
-// }
 import Spinner from "@component/ui/Spinner";
 
 export default function Loading() {

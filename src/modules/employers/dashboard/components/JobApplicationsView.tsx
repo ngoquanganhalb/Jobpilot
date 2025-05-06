@@ -1,6 +1,18 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
+import { db } from "@services/firebase/firebase";
+import {
+  doc,
+  getDoc,
+  collection,
+  getDocs,
+  query,
+  where,
+  updateDoc,
+} from "firebase/firestore";
+import { toast } from "react-toastify";
+import Image from "next/image";
 import {
   MoreHorizontal,
   Trash2,
@@ -32,18 +44,6 @@ import {
   TooltipContent,
 } from "@/components/ui/tooltip";
 import { Application } from "../../../../types/db";
-import { db } from "@services/firebase/firebase";
-import {
-  doc,
-  getDoc,
-  collection,
-  getDocs,
-  query,
-  where,
-  updateDoc,
-} from "firebase/firestore";
-import { toast } from "react-toastify";
-import Image from "next/image";
 import Spinner from "@component/ui/Spinner";
 
 export default function JobApplicationsView() {
@@ -117,7 +117,7 @@ export default function JobApplicationsView() {
             id: docSnap.id,
             jobId: data.jobId,
             candidateId: data.candidateId,
-            name: username, // lấy username từ users
+            name: username, 
             avatar: useravatar,
             appliedAt: data.appliedAt.toDate(),
             status: data.status,
@@ -154,20 +154,6 @@ export default function JobApplicationsView() {
     toast.success(`Application: ${applicationName} deleted`);
   };
 
-  // const handleChangeStatus = async (
-  //   applicationId: string,
-  //   newStatus: Application["status"],
-  //   applicationName: string
-  // ) => {
-  //   setApplications((prevApplications) =>
-  //     prevApplications.map((app) =>
-  //       app.id === applicationId ? { ...app, status: newStatus } : app
-  //     )
-  //   );
-  //   const applicationRef = doc(db, "applications", applicationId);
-  //   await updateDoc(applicationRef, { status: newStatus });
-  //   toast.success(`Changed candidate:"${applicationName}" to ${newStatus}`);
-  // };
   const handleChangeStatus = (
     applicationId: string,
     newStatus: Application["status"],
@@ -183,12 +169,12 @@ export default function JobApplicationsView() {
       return;
     }
 
-    // Nếu là trạng thái cần nhập feedback thì mở popup
+    // if status needs feedback -> popup form
     if (["interview", "rejected", "hired"].includes(newStatus)) {
       setFeedbackTarget({ applicationId, newStatus, applicationName });
       setShowFeedbackPopup(true);
     } else {
-      // Trạng thái không cần feedback => cập nhật trực tiếp
+      // if status no need feedback => update directly
       updateApplicationStatus(applicationId, newStatus, "", applicationName);
     }
   };
@@ -237,45 +223,6 @@ export default function JobApplicationsView() {
     setApplications(sortedApplications);
   };
 
-  // const onDragEnd = async (result) => {
-  //   const { destination, source, draggableId } = result;
-
-  //   if (
-  //     !destination ||
-  //     (destination.droppableId === source.droppableId &&
-  //       destination.index === source.index)
-  //   ) {
-  //     return;
-  //   }
-
-  //   // Create a copy of applications
-  //   const newApplications = [...applications];
-
-  //   // find aaplication dragged
-  //   const appIndex = newApplications.findIndex((app) => app.id === draggableId);
-  //   if (appIndex === -1) return;
-
-  //   const newStatus = destination.droppableId;
-
-  //   // Update its status based on the destination droppableId
-  //   newApplications[appIndex] = {
-  //     ...newApplications[appIndex],
-  //     status: destination.droppableId,
-  //   };
-
-  //   setApplications(newApplications);
-
-  //   try {
-  //     const applicationRef = doc(db, "applications", draggableId);
-  //     await updateDoc(applicationRef, { status: newStatus });
-
-  //     toast.success(`Updated candidate status to "${newStatus}" successfully`);
-  //   } catch (error) {
-  //     console.error("Error updating status:", error);
-  //     toast.error("Failed to update status");
-  //   }
-  // };
-
   const onDragEnd = async (result) => {
     const { destination, source, draggableId } = result;
 
@@ -302,7 +249,7 @@ export default function JobApplicationsView() {
       return;
     }
 
-    // Nếu là trạng thái cần feedback thì bật popup (giống logic ở handleChangeStatus)
+    // if status needs feedback -> popup like handleChangStatus
     if (["interview", "rejected", "hired"].includes(newStatus)) {
       setFeedbackTarget({
         applicationId: draggedApp.id,
@@ -313,7 +260,7 @@ export default function JobApplicationsView() {
       return;
     }
 
-    // Cập nhật trực tiếp nếu không cần feedback
+    // update if no need feedback
     try {
       const updatedApp = { ...draggedApp, status: newStatus };
       const newApplications = [...applications];

@@ -1,6 +1,11 @@
-export default function CompanyIcon() {
+type CompanyIconProps = {
+  className?: string;
+
+}
+export default function CompanyIcon({ className = "" } : CompanyIconProps) {
   return (
     <svg
+      className= {className}
       xmlns="http://www.w3.org/2000/svg"
       width="40"
       height="40"

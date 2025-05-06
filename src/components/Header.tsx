@@ -1,8 +1,7 @@
 "use client";
-import HeaderDownIcon from "../components/icons/HeaderDownIcon";
+import { useSelector } from "react-redux";
 import Image from "next/image";
 import NavLink from "./ui/NavLink";
-import { useSelector } from "react-redux";
 import { Paths } from "@/constants/paths";
 
 export default function Header() {

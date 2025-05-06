@@ -10,12 +10,11 @@ export default function ButtonSlideBar({
   icon,
   onClick,
   className = "",
-  href = "", // thêm prop href vào để so sánh
+  href = "", // add props to href to compare
   ...props
 }: ButtonSlideBarProps & { href: string }) {
   const pathname = usePathname();
-  const isActive = pathname.startsWith(href); //tự động active
-
+  const isActive = pathname.startsWith(href); //auto active
 
   return (
     <button

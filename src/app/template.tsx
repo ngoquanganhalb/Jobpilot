@@ -25,20 +25,6 @@ export default function Template({ children }: { children: ReactNode }) {
       >
         {children}
       </motion.div>
-      {/* down up fade */}
-      {/* <motion.div
-        key={pathname}
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -30 }}
-        transition={{
-          duration: 0.5,
-          ease: "easeInOut",
-        }}
-        className="min-h-screen"
-      >
-        {children}
-      </motion.div> */}
     </AnimatePresence>
   );
 }

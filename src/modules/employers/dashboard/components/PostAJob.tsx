@@ -72,11 +72,11 @@ export default function PostAJob() {
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setLogoFile(file); // lưu file để convert sau
+      setLogoFile(file); // save file to convert then
       const previewURL = URL.createObjectURL(file);
       setFormData((prev) => ({
         ...prev,
-        avatarCompany: previewURL, // hiển thị preview ảnh
+        avatarCompany: previewURL, // preview img
       }));
     }
   };
@@ -137,7 +137,7 @@ export default function PostAJob() {
         base64Logo = await toBase64(logoFile);
       }
 
-      const docRef = doc(collection(db, "jobs")); // tự sinh ID
+      const docRef = doc(collection(db, "jobs")); //take id
 
       const jobData: Job = {
         jobId: docRef.id,

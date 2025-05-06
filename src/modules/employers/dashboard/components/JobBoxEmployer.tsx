@@ -1,22 +1,4 @@
 "use client";
-
-import { BiCheckCircle, BiXCircle } from "react-icons/bi";
-import { MdGroups, MdCancel } from "react-icons/md";
-import { BsThreeDots, BsFillEyeFill } from "react-icons/bs";
-import { GrUpgrade } from "react-icons/gr";
-import { MdDeleteForever, MdEdit } from "react-icons/md";
-import { AiOutlineBell } from "react-icons/ai";
-import Swal from "sweetalert2";
-
-import { useRef, useEffect } from "react";
-import { Button } from "@/components/ui/Button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Card } from "@/components/ui/card";
 import {
   doc,
   updateDoc,
@@ -29,7 +11,22 @@ import {
 import { db } from "@/services/firebase/firebase";
 import { toast } from "react-toastify";
 import { useState } from "react";
-
+import { BiCheckCircle, BiXCircle } from "react-icons/bi";
+import { MdGroups, MdCancel } from "react-icons/md";
+import { BsThreeDots, BsFillEyeFill } from "react-icons/bs";
+import { GrUpgrade } from "react-icons/gr";
+import { MdDeleteForever, MdEdit } from "react-icons/md";
+import { AiOutlineBell } from "react-icons/ai";
+import Swal from "sweetalert2";
+import { useRef, useEffect } from "react";
+import { Button } from "@/components/ui/Button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Card } from "@/components/ui/card";
 import { Job } from "../../../../types/db";
 import EditJobPopup from "./EditJobPopup";
 import { useDispatch } from "react-redux";
@@ -63,7 +60,7 @@ export default function JobBoxEmployer({
       : typeof job.expirationDate === "string"
       ? job.expirationDate
       : "No expiry date";
-  // Tính số lượng candidates với status"pending"
+  // count candidates with status"pending"
   useEffect(() => {
     const fetchPendingApplications = async () => {
       const applicationsRef = collection(db, "applications");

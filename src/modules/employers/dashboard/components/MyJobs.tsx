@@ -18,7 +18,7 @@ export default function MyJobs() {
   );
   const dispatch = useDispatch();
   const jobs = useSelector((state: RootState) => state.jobs.jobs);
-  // const [myJobs, setMyJobs] = useState<Job[]>([]); //fetch cho mang job Job[]
+  // const [myJobs, setMyJobs] = useState<Job[]>([]); 
   const [loading, setLoading] = useState(true);
   //pagnition
   const limit = 10;

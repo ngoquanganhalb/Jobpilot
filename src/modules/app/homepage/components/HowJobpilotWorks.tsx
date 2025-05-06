@@ -7,7 +7,6 @@ export const HowJobpilotWork = () => {
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="text-center">
-            {/* Replace with your icon */}
             <div className="mx-auto bg-indigo-100 text-indigo-500 rounded-full h-16 w-16 flex items-center justify-center mb-4">
               <svg
                 className="h-8 w-8"
@@ -32,7 +31,6 @@ export const HowJobpilotWork = () => {
             </p>
           </div>
           <div className="text-center">
-            {/* Replace with your icon */}
             <div className="mx-auto bg-blue-100 text-blue-500 rounded-full h-16 w-16 flex items-center justify-center mb-4">
               <svg
                 className="h-8 w-8"
@@ -63,7 +61,6 @@ export const HowJobpilotWork = () => {
             </p>
           </div>
           <div className="text-center">
-            {/* Replace with your icon */}
             <div className="mx-auto bg-green-100 text-green-500 rounded-full h-16 w-16 flex items-center justify-center mb-4">
               <svg
                 className="h-8 w-8"

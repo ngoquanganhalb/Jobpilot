@@ -1,10 +1,12 @@
 // app/jobs/[id]/page.tsx
 "use client";
-
 import { useState, useEffect } from "react";
-import { Card, CardContent } from "@/components/ui/card";
 import { useParams } from "next/navigation";
+import { useSelector } from "react-redux";
+import { RootState } from "@redux/store";
 import { db, firestore } from "@services/firebase/firebase";
+import Image from "next/image";
+import { Timestamp } from "firebase/firestore";
 import {
   doc,
   getDoc,
@@ -14,13 +16,11 @@ import {
   where,
 } from "firebase/firestore";
 import { Button } from "@component/ui/Button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@component/ui/badge";
 import { Separator } from "@component/ui/separator";
-import Image from "next/image";
-import { Timestamp } from "firebase/firestore";
 import JobApplicationPopup from "../../client/JobApplicationPopup";
-import { useSelector } from "react-redux";
-import { RootState } from "@redux/store";
+
 import {
   Calendar,
   MapPin,
@@ -37,7 +37,6 @@ import JobBox from "@component/ui/JobBox";
 import Spinner from "@component/ui/Spinner";
 import Link from "next/link";
 import Paths from "@/constants/paths";
-
 
 export default function JobDetails() {
   const params = useParams(); //take id url
