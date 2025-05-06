@@ -1,10 +1,12 @@
 // app/jobs/[id]/page.tsx
 "use client";
-
 import { useState, useEffect } from "react";
-import { Card, CardContent } from "@/components/ui/card";
 import { useParams } from "next/navigation";
-import { db } from "@services/firebase/firebase";
+import { useSelector } from "react-redux";
+import { RootState } from "@redux/store";
+import { db, firestore } from "@services/firebase/firebase";
+import Image from "next/image";
+import { Timestamp } from "firebase/firestore";
 import {
   doc,
   getDoc,
@@ -14,18 +16,15 @@ import {
   where,
 } from "firebase/firestore";
 import { Button } from "@component/ui/Button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@component/ui/badge";
 import { Separator } from "@component/ui/separator";
-import Image from "next/image";
-import { Timestamp } from "firebase/firestore";
 import JobApplicationPopup from "../../client/JobApplicationPopup";
-import { useSelector } from "react-redux";
-import { RootState } from "@redux/store";
+
 import {
   Calendar,
   MapPin,
   Briefcase,
-  BookOpen,
   Clock,
   Copy,
   Linkedin,
@@ -36,69 +35,8 @@ import {
 import { Job } from "../../../types/db";
 import JobBox from "@component/ui/JobBox";
 import Spinner from "@component/ui/Spinner";
-
-// Related jobs data
-// const relatedJobs = [
-//   {
-//     id: "google-support-specialist",
-//     title: "Technical Support Specialist",
-//     company: "Google Inc.",
-//     type: "PART-TIME",
-//     salary: { min: 50000, max: 70000, currency: "USD" },
-//     location: "Dhaka, Bangladesh",
-//   },
-//   {
-//     id: "google-ux-designer",
-//     title: "Senior UX Designer",
-//     company: "Google Inc.",
-//     type: "FULL-TIME",
-//     salary: { min: 80000, max: 125000, currency: "USD" },
-//     location: "Dhaka, Bangladesh",
-//   },
-//   {
-//     id: "google-marketing-officer",
-//     title: "Marketing Officer",
-//     company: "Google Inc.",
-//     type: "INTERNSHIP",
-//     salary: { min: 35000, max: 55000, currency: "USD" },
-//     location: "Dhaka, Bangladesh",
-//   },
-//   {
-//     id: "google-graphic-designer",
-//     title: "Junior Graphic Designer",
-//     company: "Google Inc.",
-//     type: "INTERNSHIP",
-//     salary: { min: 35000, max: 55000, currency: "USD" },
-//     location: "Dhaka, Bangladesh",
-//   },
-//   {
-//     id: "google-interaction-designer",
-//     title: "Interaction Designer",
-//     company: "Google Inc.",
-//     type: "FULL-TIME",
-//     salary: { min: 70000, max: 95000, currency: "USD" },
-//     location: "Dhaka, Bangladesh",
-//   },
-//   {
-//     id: "google-project-manager",
-//     title: "Project Manager",
-//     company: "Google Inc.",
-//     type: "FULL-TIME",
-//     salary: { min: 75000, max: 125000, currency: "USD" },
-//     location: "Dhaka, Bangladesh",
-//   },
-// ];
-const jobBenefits = [
-  { name: "401k Salary", color: "gray" },
-  { name: "Anpc", color: "green" },
-  { name: "Learning budget", color: "blue" },
-  { name: "Vision Insurance", color: "indigo" },
-  { name: "4 day workweek", color: "yellow" },
-  { name: "Profit Sharing", color: "red" },
-  { name: "Free gym membership", color: "purple" },
-  { name: "Equity Compensation", color: "sky" },
-  { name: "No politics at work", color: "pink" },
-];
+import Link from "next/link";
+import Paths from "@/constants/paths";
 
 export default function JobDetails() {
   const params = useParams(); //take id url
@@ -109,7 +47,8 @@ export default function JobDetails() {
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const userId = useSelector((state: RootState) => state.user.id);
-
+  const accountType = useSelector((state: RootState) => state.user.accountType);
+  const [checkApplied, setCheckApplied] = useState<boolean | null>(null);
   const handlePopupForm = () => {
     setIsModalOpen(false);
   };
@@ -182,6 +121,24 @@ export default function JobDetails() {
 
     fetchJob();
   }, [jobId]);
+
+  useEffect(() => {
+    const checkNoApplied = async () => {
+      // Check chi dang applicationapplication duoc 1 lan
+      const applicationsRef = collection(firestore, "applications");
+      const checkQuery = query(
+        applicationsRef,
+        where("jobId", "==", jobId),
+        where("candidateId", "==", userId)
+      );
+      const checkSnapshot = await getDocs(checkQuery);
+
+      if (!checkSnapshot.empty) {
+        setCheckApplied(false);
+      } else setCheckApplied(true);
+    };
+    checkNoApplied();
+  }, []);
 
   const getJobTypeBadgeColor = (type: string) => {
     switch (type.toUpperCase()) {
@@ -261,12 +218,23 @@ export default function JobDetails() {
                   </div>
                 </div>
               </div>
-              <Button
-                className="text-lg font-semibold px-6 py-6 bg-[#0A65CC] cursor-pointer"
-                onClick={() => setIsModalOpen(true)}
-              >
-                Apply Now
-              </Button>
+              {accountType === "candidate" ? (
+                checkApplied ? (
+                  <Button
+                    className="text-lg font-semibold px-6 py-6 bg-[#0A65CC] cursor-pointer"
+                    onClick={() => setIsModalOpen(true)}
+                  >
+                    Apply Now
+                  </Button>
+                ) : (
+                  <Button
+                    disabled
+                    className="text-lg font-semibold px-6 py-6 bg-gray-300 text-gray-600 cursor-not-allowed"
+                  >
+                    You have applied for this job
+                  </Button>
+                )
+              ) : null}
             </div>
 
             <Card className="mb-6">
@@ -312,6 +280,7 @@ export default function JobDetails() {
                     <Clock className="w-5 h-5 text-blue-500 mt-1" />
                     <div>
                       <p className="text-gray-500 text-sm">JOB EXPIRES IN</p>
+
                       <p className="font-medium">
                         {job.expirationDate
                           ? new Date(job.expirationDate).toLocaleDateString(
@@ -326,14 +295,14 @@ export default function JobDetails() {
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-start gap-3">
+                  {/* <div className="flex items-start gap-3">
                     <Briefcase className="w-5 h-5 text-blue-500 mt-1" />
                     <div>
-                      <p className="text-gray-500 text-sm">JOB LEVEL</p>
-                      {/* <p className="font-medium">{job.experienceLevel}</p> */}
-                      <p className="font-medium">Entry Level</p>
+                      <p className="text-gray-500 text-sm">JOB LEVEL</p> */}
+                  {/* <p className="font-medium">{job.experienceLevel}</p> */}
+                  {/* <p className="font-medium">Entry Level</p>
                     </div>
-                  </div>
+                  </div> */}
                   {/* <div className="flex items-start gap-3">
                     <DollarSign className="w-5 h-5 text-blue-500 mt-1" />
                     <div>
@@ -341,14 +310,14 @@ export default function JobDetails() {
                       <p className="font-medium">{job.experience}</p>
                     </div>
                   </div> */}
-                  <div className="flex items-start gap-3">
+                  {/* <div className="flex items-start gap-3">
                     <BookOpen className="w-5 h-5 text-blue-500 mt-1" />
                     <div>
-                      <p className="text-gray-500 text-sm">EDUCATION</p>
-                      {/* <p className="font-medium">{job.education}</p> */}
-                      <p className="font-medium">Graduation</p>
+                      <p className="text-gray-500 text-sm">EDUCATION</p> */}
+                  {/* <p className="font-medium">{job.education}</p> */}
+                  {/* <p className="font-medium">Graduation</p>
                     </div>
-                  </div>
+                  </div> */}
                 </div>
 
                 <Separator className="my-6" />
@@ -396,11 +365,27 @@ export default function JobDetails() {
 
                 <h3 className="text-lg font-semibold mb-3">Job tags:</h3>
                 <div className="flex flex-wrap gap-2">
-                  {(job.tags ?? []).map((tag, index) => (
-                    <Badge key={index} variant="outline" className="px-3 py-1">
-                      {tag}
-                    </Badge>
-                  ))}
+                  {(job.tags ?? []).length > 0 ? (
+                    (job.tags ?? []).map((tag, index) => (
+                      <Link
+                        key={tag}
+                        href={{
+                          pathname: Paths.FIND_JOB,
+                          query: { tag: tag }, // đẩy tag vào URL
+                        }}
+                      >
+                        <Badge
+                          key={index}
+                          variant="outline"
+                          className="px-3 py-1 hover:bg-gray-300"
+                        >
+                          {tag}
+                        </Badge>
+                      </Link>
+                    ))
+                  ) : (
+                    <span className="text-gray-500">No job tag found</span>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -412,7 +397,9 @@ export default function JobDetails() {
               <CardContent className="p-6">
                 <h2 className="text-xl font-semibold mb-4">Salary (USD)</h2>
                 <div className="text-2xl font-bold text-green-600 mb-1">
-                  {`$${job.minSalary} - $${job.maxSalary}`}
+                  {job.minSalary === 0 && job.maxSalary === 0
+                    ? "Negotiate"
+                    : `$${job.minSalary} - $${job.maxSalary}`}
                 </div>
                 <p className="text-gray-500 text-sm">Monthly salary</p>
               </CardContent>
@@ -423,24 +410,26 @@ export default function JobDetails() {
                 <div className="flex items-center gap-3 mb-4">
                   <MapPin className="w-6 h-6 text-blue-500" />
                   <div>
-                    <h2 className="text-lg font-semibold">Job Location</h2>
+                    <h2 className="text-lg font-semibold">Company Location</h2>
                     <p className="text-gray-600">
-                      {/* {job.location.city}, {job.location.country} */}
-                      Viet Nam
+                      {job.location?.province},{job.location?.district},{" "}
+                      {job.location?.address}
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <Briefcase className="w-6 h-6 text-blue-500" />
-                  <div>
-                    <h2 className="text-lg font-semibold">Remote Job</h2>
-                    <p className="text-gray-600">Unknown</p>
+                {job.isRemote && (
+                  <div className="flex items-center gap-3">
+                    <Briefcase className="w-6 h-6 text-blue-500" />
+                    <div>
+                      <h2 className="text-lg font-semibold">Remote Job</h2>
+                      <p className="text-gray-600">Worldwide</p>
+                    </div>
                   </div>
-                </div>
+                )}
               </CardContent>
             </Card>
 
-            <Card>
+            {/* <Card>
               <CardContent className="p-6">
                 <h2 className="text-xl font-semibold mb-4">Job Benefits</h2>
                 <div className="flex flex-wrap gap-2">
@@ -455,7 +444,7 @@ export default function JobDetails() {
                   ))}
                 </div>
               </CardContent>
-            </Card>
+            </Card> */}
           </div>
         </div>
 
@@ -469,12 +458,14 @@ export default function JobDetails() {
                   key={job.jobId}
                   id={job.jobId}
                   company={job.companyName || "Unknown Company"}
-                  location={job.location || "Vietnam"}
+                  location={job.location?.province || "Unknown location"}
                   title={job.jobTitle}
                   type={job.jobType?.toUpperCase() || "FULL-TIME"}
                   salary={
                     job.minSalary && job.maxSalary
-                      ? `$${job.minSalary} - $${job.maxSalary}`
+                      ? job.minSalary != 0 && job.maxSalary != 0
+                        ? `$${job.minSalary} - $${job.maxSalary}`
+                        : "Negotiate"
                       : "Negotiate"
                   }
                   urgent={job.isRemote} // fix sau
@@ -489,12 +480,13 @@ export default function JobDetails() {
       </div>
 
       <JobApplicationPopup
-        jobTitle="Senior UX Designer"
+        jobTitle={job.jobTitle}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSubmit={handlePopupForm}
         jobId={jobId}
         candidateId={userId}
+        onApplied={() => setCheckApplied(false)} //render ui
       />
     </div>
   );

@@ -9,6 +9,7 @@ import { signOut } from "firebase/auth";
 import { useDispatch } from "react-redux";
 import { auth } from "../../services/firebase/firebase";
 import { deleteCookie } from "cookies-next";
+import Paths from "@/constants/paths";
 
 export default function AvatarMenu({ user }: { user: any }) {
   const dispatch = useDispatch();
@@ -30,7 +31,7 @@ export default function AvatarMenu({ user }: { user: any }) {
     <Menu as="div" className="relative ">
       <Menu.Button className="w-12 h-12 rounded-full overflow-hidden cursor-pointer transition-transform duration-200 hover:scale-110">
         <Image
-          src={user.avatar || "/images/default-avatar.png"}
+          src={user.avatarUrl || "/images/default-avatar.png"}
           alt="avatar"
           width={48}
           height={48}
@@ -41,13 +42,13 @@ export default function AvatarMenu({ user }: { user: any }) {
       <Menu.Items className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50">
         <div className="p-2">
           <Link
-            href="/profile"
+            href={Paths.SETTINGS}
             className="block px-4 py-2 text-sm hover:bg-gray-100"
           >
             Profile
           </Link>
           <Link
-            href="/settings"
+            href={Paths.SETTINGS}
             className="block px-4 py-2 text-sm hover:bg-gray-100"
           >
             Settings

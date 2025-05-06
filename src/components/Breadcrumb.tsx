@@ -42,7 +42,7 @@ export default function Breadcrumb() {
   };
 
   return (
-    <div className="bg-gray-200 flex flex-col md:flex-row md:justify-between items-center md:px-[100px] py-7 gap-4 md:gap-0 2xl:max-h-12">
+    <div className="bg-gray-200 flex flex-col md:flex-row md:justify-between items-center md:px-[100px] py-7 gap-4 md:gap-0 2xl:max-h-12 ">
       <div className="container mx-auto px-4 md:px-8 flex justify-between items-center">
         {/* Title trái */}
         <h1 className="text-xl font-semibold text-gray-800 capitalize">

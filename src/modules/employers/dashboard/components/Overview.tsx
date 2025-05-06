@@ -53,10 +53,13 @@ export default function OverviewEmployer() {
             expirationDate: data.expirationDate?.toDate() || null,
             urgent: data.isRemote || false,
             status: data.status || "Active",
-            applications: Array.isArray(data.applicants)
-              ? data.applicants.length
-              : 0,
             createdAt: data.createdAt?.toDate() || new Date(0),
+            applicants: data.applicants,
+            location: data.location,
+            avatarCompany: data.avatarCompany,
+            minSalary: data.minSalary,
+            maxSalary: data.maxSalary,
+            jobType: data.jobType,
           };
         });
 
@@ -90,7 +93,7 @@ export default function OverviewEmployer() {
         <div className="bg-blue-50 rounded-lg p-6 flex justify-between items-center">
           <div>
             <h2 className="text-3xl font-bold text-gray-800">{jobs.length}</h2>
-            <p className="text-gray-600">Open Jobs</p>
+            <p className="text-gray-600">Jobs Posted</p>
           </div>
           <div className="bg-white p-4 rounded-md">
             <BsBriefcase className="text-blue-600 text-xl" />
@@ -98,7 +101,7 @@ export default function OverviewEmployer() {
         </div>
         <div className="bg-yellow-50 rounded-lg p-6 flex justify-between items-center">
           <div>
-            <h2 className="text-3xl font-bold text-gray-800">2,517</h2>
+            <h2 className="text-3xl font-bold text-gray-800">21</h2>
             <p className="text-gray-600">Saved Candidates</p>
           </div>
           <div className="bg-white p-4 rounded-md">
@@ -120,16 +123,21 @@ export default function OverviewEmployer() {
 
         {/* Table Header */}
         <div className="hidden md:grid grid-cols-12 bg-gray-100 py-3 px-6 text-sm font-medium text-gray-600">
-          <div className="col-span-4">JOBS</div>
-          <div className="col-span-3">STATUS</div>
+          <div className="col-span-5">JOBS</div>
+          <div className="col-span-2 ">STATUS</div>
           <div className="col-span-3">APPLICATIONS</div>
           <div className="col-span-2">ACTIONS</div>
         </div>
         {loading ? (
           <Spinner />
+        ) : jobs.length === 0 ? (
+          <div className="p-6 text-center text-gray-500">
+            <h3 className="text-lg font-semibold mb-2">No Jobs Found</h3>
+            <p>Looks like you have not posted any jobs yet.</p>
+          </div>
         ) : (
-          <ul className="space-y-4">
-            {[...jobs] //tao ban copy do jobs.sort() anh huong redux state
+          <ul className="">
+            {[...jobs] // tạo bản copy do jobs.sort() ảnh hưởng redux state
               .sort((a, b) => {
                 const timeA = a.createdAt?.getTime() ?? 0;
                 const timeB = b.createdAt?.getTime() ?? 0;
@@ -138,7 +146,7 @@ export default function OverviewEmployer() {
               .slice(0, 5)
               .map((job) => (
                 <JobBoxEmployer
-                  key={job.jobId}
+                  key={job.jobId} 
                   job={job}
                   jobActionDropdown={jobActionDropdown}
                   toggleJobActionDropdown={toggleJobActionDropdown}

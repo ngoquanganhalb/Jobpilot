@@ -1,6 +1,10 @@
-export default function CandidateIcon() {
+interface CandidateIconProps {
+  className?: string;
+}
+export default function CandidateIcon({ className = "" }: CandidateIconProps) {
   return (
     <svg
+      className={className}
       xmlns="http://www.w3.org/2000/svg"
       width="40"
       height="40"

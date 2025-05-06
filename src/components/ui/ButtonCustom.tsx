@@ -27,6 +27,7 @@ export default function Button({
         border-blue-100
         cursor-pointer
        hover:bg-blue-300
+       whitespace-nowrap
         ${variantStyles}
         ${className}
         `}

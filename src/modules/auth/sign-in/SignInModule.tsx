@@ -77,9 +77,9 @@ const SignInModule: React.FC = () => {
       // Save to cookie
       // setCookie("token", token); // Token
       // setCookie("accountType", accountType); //  Role
-      setCookie("token", await user.getIdToken(), { maxAge: 60 * 60 * 24 }); // 1 ngày
+      setCookie("token", await user.getIdToken(), { maxAge: 60 * 60 * 24 }); // 1 Day
       setCookie("accountType", accountType, { maxAge: 60 * 60 * 24 });
-      // setCookie("token", await user.getIdToken(), { maxAge: 60  }); // 1 ngày
+      // setCookie("token", await user.getIdToken(), { maxAge: 60  }); // 1 Day
       // setCookie("accountType", accountType, { maxAge: 60 });
 
       router.push("/");
@@ -91,34 +91,17 @@ const SignInModule: React.FC = () => {
     }
   };
 
-  // const handleSignInWithGoogle = async () => {
-  //   try {
-  //     const result = await signInWithGoogle();
-  //     const user = result.user;
-  //     dispatch(
-  //       setUser({
-  //         id: user.uid,
-  //         name: user.displayName || "",
-  //         isAdmin: false,
-  //       })
-  //     );
-  //     toast.success("Signed in with Google!");
-  //     router.push("/");
-  //   } catch {
-  //     toast.error("Google sign-in failed");
-  //   }
-  // };
+
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      {/* is loading true => Spinner */}
+    <div className="flex min-h-screen bg-gray-50 ">
       {isLoading && <Spinner />}
       <Head>
         <title>SignIn | Jobpilot</title>
         <meta name="description" content="SignIn your Jobpilot account" />
       </Head>
 
-      {/* Left Side - Form */}
+      {/* Left side - Form */}
       <div className="w-full lg:w-[40%] p-6 md:p-12 flex flex-col">
         <div className="mb-8">
           <Link href="/">
@@ -221,7 +204,7 @@ const SignInModule: React.FC = () => {
         </div>
       </div>
 
-      {/* Right Side - Image and Stats */}
+      {/* Right Side - img */}
       <div
         className="hidden lg:block lg:w-[60%] relative"
         style={{

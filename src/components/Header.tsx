@@ -1,8 +1,7 @@
 "use client";
-import HeaderDownIcon from "../components/icons/HeaderDownIcon";
+import { useSelector } from "react-redux";
 import Image from "next/image";
 import NavLink from "./ui/NavLink";
-import { useSelector } from "react-redux";
 import { Paths } from "@/constants/paths";
 
 export default function Header() {
@@ -17,12 +16,14 @@ export default function Header() {
         <NavLink>Candidates</NavLink> */}
         {/* <NavLink>Pricing Plans</NavLink> */}
         {/* <NavLink>Customer Supports</NavLink> */}
-        <NavLink href={Paths.DASHBOARD_OVERVIEW}>Dash Board</NavLink>
+        {/* <NavLink href={Paths.DASHBOARD_OVERVIEW}>Dash Board</NavLink> */}
         {accountType === "candidate" && (
-          <NavLink href="/candidate">can</NavLink>
+          <NavLink href={Paths.DASHBOARD_APPLIEDJOB}>Dashboard</NavLink>
         )}
 
-        {/* {accountType === "employer" && <NavLink href="/employer">em</NavLink>} */}
+        {accountType === "employer" && (
+          <NavLink href={Paths.DASHBOARD_OVERVIEW}>Dashboard</NavLink>
+        )}
       </div>
 
       {/* Right contact */}
@@ -37,7 +38,7 @@ export default function Header() {
           <div>+1-202-555-0178</div>
         </div>
 
-        <div className="flex items-center gap-2">
+        {/* <div className="flex items-center gap-2">
           <Image
             src="/images/Country.png"
             alt="Country"
@@ -46,7 +47,7 @@ export default function Header() {
           />
           <span>English</span>
           <HeaderDownIcon />
-        </div>
+        </div> */}
       </div>
     </div>
   );

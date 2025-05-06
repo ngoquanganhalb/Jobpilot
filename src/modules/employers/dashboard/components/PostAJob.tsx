@@ -1,5 +1,5 @@
 "use client";
-
+import provinces from "../../../../constants/data/location.json";
 import { useState } from "react";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/textarea";
@@ -12,28 +12,13 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
-import {
-  collection,
-  addDoc,
-  Timestamp,
-  getDoc,
-  doc,
-  updateDoc,
-} from "firebase/firestore";
+import { collection, Timestamp, getDoc, doc, setDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { db } from "@services/firebase/firebase";
 import { toast } from "react-toastify";
 import { Upload } from "lucide-react";
-// import {
-//   Select,
-//   SelectTrigger,
-//   SelectValue,
-//   SelectContent,
-//   SelectItem,
-// } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
-// import { FaChevronDown } from "react-icons/fa";
 import { FaCalendarAlt } from "react-icons/fa";
 import { cn } from "@component/lib/utils";
 import {
@@ -44,44 +29,11 @@ import {
 import Image from "next/image";
 import { toBase64 } from "@lib/convertBase64";
 import { Job, JobType, JOB_TAG_OPTIONS } from "../../../../types/db";
-
-// function JobBenefitTag({
-//   children,
-//   active = false,
-// }: {
-//   children: React.ReactNode;
-//   active?: boolean;
-// }) {
-//   return (
-//     <div
-//       className={cn(
-//         "px-3 py-1.5 text-sm rounded-md border",
-//         active
-//           ? "bg-blue-50 border-blue-300 text-blue-600"
-//           : "border-gray-200 text-gray-600"
-//       )}
-//     >
-//       {children}
-//     </div>
-//   );
-// }
-
-// function SelectDropdown({ placeholder }: { placeholder: string }) {
-//   return (
-//     <Select>
-//       <SelectTrigger className="w-full">
-//         <SelectValue placeholder={placeholder} />
-//       </SelectTrigger>
-//       <SelectContent>
-//         <SelectItem value="option1">Option 1</SelectItem>
-//         <SelectItem value="option2">Option 2</SelectItem>
-//         <SelectItem value="option3">Option 3</SelectItem>
-//       </SelectContent>
-//     </Select>
-//   );
-// }
+import { useRouter } from "next/navigation";
+import LocationSelector from "@component/ui/LocationSelector";
 
 export default function PostAJob() {
+  const router = useRouter();
   const initialJobState: Job = {
     jobId: "",
     employerId: "",
@@ -94,7 +46,11 @@ export default function PostAJob() {
     avatarCompany: "",
     companyName: "",
     urgent: false,
-    location: "Viet Nam",
+    location: {
+      province: "",
+      district: "",
+      address: "",
+    },
     isRemote: true,
     expirationDate: new Date(),
     applicants: [],
@@ -116,11 +72,11 @@ export default function PostAJob() {
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setLogoFile(file); // lưu file để convert sau
+      setLogoFile(file); // save file to convert then
       const previewURL = URL.createObjectURL(file);
       setFormData((prev) => ({
         ...prev,
-        avatarCompany: previewURL, // hiển thị preview ảnh
+        avatarCompany: previewURL, // preview img
       }));
     }
   };
@@ -151,6 +107,13 @@ export default function PostAJob() {
       }
     }
 
+    const minSalary = Number(formData.minSalary);
+    const maxSalary = Number(formData.maxSalary);
+    if (!isNaN(minSalary) && !isNaN(maxSalary) && maxSalary < minSalary) {
+      toast.error("Max Salary must be greater than or equal to Min Salary.");
+      return;
+    }
+
     try {
       const auth = getAuth();
       const user = auth.currentUser;
@@ -174,8 +137,10 @@ export default function PostAJob() {
         base64Logo = await toBase64(logoFile);
       }
 
+      const docRef = doc(collection(db, "jobs")); //take id
+
       const jobData: Job = {
-        jobId: "",
+        jobId: docRef.id,
         employerId: user.uid,
         jobTitle: formData.jobTitle,
         tags: formData.tags,
@@ -185,40 +150,22 @@ export default function PostAJob() {
         jobType: (formData.jobType || "full-time").toLowerCase() as JobType,
         avatarCompany: base64Logo,
         companyName: name,
-        urgent: false, //cus
-        location: "London",
+        urgent: false,
+        location: formData.location,
         isRemote: formData.isRemote,
         expirationDate: formData.expirationDate,
         applicants: [],
         status: "Active",
+        createdAt: Timestamp.now(),
       };
 
-      const docRef = await addDoc(collection(db, "jobs"), {
-        ...jobData,
-        createdAt: Timestamp.now(),
-      });
-
-      // them jobid
-      await updateDoc(doc(db, "jobs", docRef.id), {
-        jobId: docRef.id,
-      });
-
-      // const docRef = await addDoc(collection(db, "jobs"), {
-      //   ...jobData,
-      //   createdAt: Timestamp.now(),
-      // });
-
-      // // update jobId = docRef.id
-      // await addDoc(collection(db, "jobs"), {
-      //   ...jobData,
-      //   jobId: docRef.id,
-      //   createdAt: Timestamp.now(),
-      // });
-
-      toast.success("Created job!");
+      await setDoc(docRef, jobData);
 
       setFormData(initialJobState);
       setLogoFile(null);
+
+      router.push(`/find-job/${jobData.jobId}`);
+      toast.success("Created job!");
     } catch (error) {
       console.error("Error uploading job:", error);
       toast.error("An error occurred while posting the job.");
@@ -299,7 +246,7 @@ export default function PostAJob() {
         </div>
 
         {/* Job Title */}
-        <div>
+        <div className="">
           <label className="block mb-2 text-sm font-medium text-gray-700">
             Job Title
           </label>
@@ -309,6 +256,18 @@ export default function PostAJob() {
             placeholder="Add job title, role, vacancies etc."
             value={formData.jobTitle}
             onChange={handleChange}
+          />
+        </div>
+
+        <div className="">
+          <LocationSelector
+            value={
+              formData.location || { province: "", district: "", address: "" }
+            }
+            onChange={(loc) =>
+              setFormData((prev) => ({ ...prev, location: loc }))
+            }
+            provinces={provinces}
           />
         </div>
 

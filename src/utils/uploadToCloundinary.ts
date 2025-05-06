@@ -1,4 +1,4 @@
-  // Hàm upload file lên Cloudinary
+  // Functtion upload file to Cloudinary
   export const uploadToCloudinary = async (file: File): Promise<string> => {
     const formData = new FormData();
     formData.append("file", file);

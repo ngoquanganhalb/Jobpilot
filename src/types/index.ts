@@ -87,10 +87,30 @@ export type FilterFormValues = {
 //------------------------db---------------------------------
 //users board
 export type UserModel = {
+  id?:string;
   name: string;
   username: string;
   email: string;
   accountType: AccountType;
   isAdmin: boolean;
-  password: string;
+  password?: string;
+  avatarUrl?: string;
+  savedJobs?: string[]
+  createdAt: Date
+  profile?: {
+    resumeUrl?: string;
+    bio?: string;
+    skills?: string[];
+    location?: string;
+    phone?: string;
+  }
+  companyProfile?: {
+    name?: string;
+    description?: string;
+    logoUrl?: string;
+    website?: string;
+    address?: string;
+    industry?: string;
+  }
+
 };

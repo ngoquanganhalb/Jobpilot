@@ -1,19 +1,28 @@
-import SearchBar from "@component/SearchBar";
 import ListJob from "./components/ListJob";
-import { useSelector } from "react-redux";
-import { RootState } from "../../../redux/store";
 import Banner from "./components/Banner";
+import { HowJobpilotWork } from "./components/HowJobpilotWorks";
+import { Become } from "./components/Become";
+import { PopularCategory } from "./components/PopularCategory";
+import { SectionWrapper } from "@component/share/SectionWrapper";
+
 export default function HomePageModule() {
-  const user = useSelector((state: RootState) => state.user);
   return (
     <div>
-      <Banner />
-      {/* <div className="p-6">
-        <h1>Xin chào, {user.name || "bạn"}!</h1>
-        <p>User ID: {user.id}</p>
-        {user.isAdmin && <p>(Admin quyền lực )</p>}
-      </div> */}
-      <ListJob />
+      <SectionWrapper>
+        <Banner />
+      </SectionWrapper>
+      <SectionWrapper>
+        <HowJobpilotWork />
+      </SectionWrapper>
+      <SectionWrapper>
+        <PopularCategory />
+      </SectionWrapper>
+      <SectionWrapper>
+        <ListJob />
+      </SectionWrapper>
+      <SectionWrapper>
+        <Become />
+      </SectionWrapper>
     </div>
   );
 }

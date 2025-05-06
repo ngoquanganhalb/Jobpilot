@@ -1,67 +1,32 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import {
-  BsBriefcase,
-  BsPerson,
-  BsBuilding,
-  BsBookmark,
-  BsGear,
-  BsCreditCard,
-} from "react-icons/bs";
-import { FiPlus } from "react-icons/fi";
 import { Sheet, SheetTrigger, SheetContent } from "@component/ui/sheet";
 import Button from "@component/ui/ButtonCustom";
-import MenuIcon from "@component/icons/MenuIcon";
 import ButtonSlideBar from "@component/ui/ButtonSlideBar";
-import Paths from "@/constants/paths";
+import { JSX } from "react";
 
-export default function SideBar() {
+type MenuItem = {
+  label: string;
+  icon: JSX.Element;
+  path: string;
+};
+
+type SideBarProps = {
+  menuItems: MenuItem[];
+  title?: string;
+};
+
+export default function SideBar({
+  menuItems,
+  title = "DASHBOARD",
+}: SideBarProps) {
   const router = useRouter();
 
-  const menuItems = [
-    { icon: <MenuIcon />, label: "Overview", path: Paths.DASHBOARD_OVERVIEW },
-    {
-      icon: <BsPerson className="h-5 w-5 mr-3" />,
-      label: "EmployersProfile",
-      path: Paths.EMPLOYER_PROFILE,
-    },
-    {
-      icon: <FiPlus className="h-5 w-5 mr-3" />,
-      label: "PostAJob",
-      path: Paths.POST_A_JOB,
-    },
-    {
-      icon: <BsBriefcase className="h-5 w-5 mr-3" />,
-      label: "MyJobs",
-      path: Paths.MY_JOBS,
-    },
-    {
-      icon: <BsBookmark className="h-5 w-5 mr-3" />,
-      label: "SavedCandidate",
-      path: Paths.SAVED_CANDIDATE,
-    },
-    {
-      icon: <BsCreditCard className="h-5 w-5 mr-3" />,
-      label: "Plans",
-      path: Paths.PLANS,
-    },
-    {
-      icon: <BsBuilding className="h-5 w-5 mr-3" />,
-      label: "AllCompanies",
-      path: Paths.ALL_COMPANIES,
-    },
-    {
-      icon: <BsGear className="h-5 w-5 mr-3" />,
-      label: "Settings",
-      path: Paths.SETTINGS,
-    },
-  ];
-
   const SidebarNav = () => (
-    <div className="w-64 bg-white shadow-md flex flex-col">
+    <div className="w-64 bg-white shadow-md flex flex-col ">
       <div className="p-4 border-b border-gray-200 font-medium text-gray-500">
-        EMPLOYERS DASHBOARD
+        {title.toUpperCase()}
       </div>
       <nav className="p-2">
         {menuItems.map((item) => (
@@ -79,7 +44,7 @@ export default function SideBar() {
 
   return (
     <>
-      {/* Mobile Sidebar - Sheet */}
+      {/* Mobile Sidebar*/}
       <div className="md:hidden px-4 pt-4">
         <Sheet>
           <SheetTrigger asChild>
@@ -96,5 +61,3 @@ export default function SideBar() {
     </>
   );
 }
-
-

@@ -5,7 +5,6 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { doc, setDoc } from "firebase/firestore";
 import { toast } from "react-toastify";
-
 import Head from "next/head";
 import Link from "next/link";
 import { FaFacebookF, FaEye, FaEyeSlash } from "react-icons/fa";
@@ -16,16 +15,6 @@ import Input from "@component/ui/InputCustom";
 import ArrowIcon from "@component/icons/ArrowIcon";
 import { AccountType, FormData } from "@types";
 import Spinner from "@component/ui/Spinner";
-
-// type AccountType = "candidate" | "employer";
-// type FormData = {
-//   fullName: string;
-//   username: string;
-//   email: string;
-//   password: string;
-//   confirmPassword: string;
-//   agreeToTerms: boolean;
-// };
 
 const SignUpModule = () => {
   const router = useRouter();
@@ -83,7 +72,7 @@ const SignUpModule = () => {
     }
   };
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); //Ngăn trình duyệt reload (hành vi mặc định)
+    e.preventDefault(); //Prevent reload 
     setIsLoading(true);
     // console.log(formData);
 
@@ -108,6 +97,7 @@ const SignUpModule = () => {
         email: formData.email,
         password: formData.password,
       });
+      toast.success("Create account sucessfull");
       router.push("/sign-in");
     } catch (error) {
       // console.log(error.message);
@@ -131,7 +121,7 @@ const SignUpModule = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-gray-50 ">
       {isLoading && <Spinner />}
       <Head>
         <title>Create Account | Jobpilot</title>
@@ -169,8 +159,8 @@ const SignUpModule = () => {
                 type="button"
                 className={`flex items-center justify-center py-3 px-4 rounded-md border ${
                   accountType === "candidate"
-                    ? "bg-gray-300 border-gray-300"
-                    : "bg-white border-gray-300 hover:bg-gray-300"
+                    ? "bg-blue-900 text-white border-blue-900"
+                    : "bg-white border-gray-300 hover:bg-blue-900"
                 }`}
                 onClick={() => setAccountType("candidate")}
               >

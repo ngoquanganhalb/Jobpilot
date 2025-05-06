@@ -1,36 +1,31 @@
+import { useState, useEffect } from "react";
 import LocationIcon from "@component/icons/LocationIcon";
 import SearchIcon from "@component/icons/SearchIcon";
 import Input from "@component/ui/InputCustom";
 import { useDispatch } from "react-redux";
-
 import {
   setKeyword as setKeywordRedux,
   setLocation as setLocationRedux,
 } from "@redux/slices/searchSlice";
-import { useState, useEffect } from "react";
 import FilterSidebar from "./FilterSideBar";
+import useDebounce from "@hooks/useDebounce";
 
 export default function Filter() {
   const dispatch = useDispatch();
 
   const [keyword, setKeyword] = useState("");
   const [location, setLocation] = useState("");
+  const debouncedKeyword = useDebounce(keyword, 500);
+  const debouncedLocation = useDebounce(location, 500);
 
-  // Debounce keyword
+  //debounce search
   useEffect(() => {
-    const timer = setTimeout(() => {
-      dispatch(setKeywordRedux(keyword));
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [keyword, dispatch]);
+    dispatch(setKeywordRedux(debouncedKeyword));
+  }, [debouncedKeyword, dispatch]);
 
-  // Debounce location
   useEffect(() => {
-    const timer = setTimeout(() => {
-      dispatch(setLocationRedux(location));
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [location, dispatch]);
+    dispatch(setLocationRedux(debouncedLocation));
+  }, [debouncedLocation, dispatch]);
 
   return (
     <div className="p-5 md:px-[150px]">
@@ -51,17 +46,9 @@ export default function Filter() {
             onChange={(e) => setLocation(e.target.value)}
           />
         </div>
-        {/* <div className="flex flex-row justify-center gap-1 md:gap-4 w-full md:w-[20%] py-5 px-1"> */}
-        {/* <Button variant="secondary" className="border border-gray-300">
-            Filter
-          </Button> */}
-        {/* <FilterSidebar />
-          <Button className="border border-gray-300">Find Job</Button>
-        </div> */}
 
         <div className="flex flex-row justify-center py-4 w-full md:w-[15%] mr-3">
           <FilterSidebar />
-          {/* <Button className="border border-gray-300 ">Find Job</Button> */}
         </div>
       </div>
     </div>

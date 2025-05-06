@@ -1,29 +1,28 @@
-import Logo from "./icons/Logo";
-import SearchIcon from "./icons/SearchIcon";
-import Button from "./ui/ButtonCustom";
-import Input from "./ui/InputCustom";
-import Link from "next/link";
-import { onAuthStateChanged } from "firebase/auth";
 import { useEffect, useState, useRef, useCallback } from "react";
-import { auth } from "../services/firebase/firebase";
-import NotificationButton from "./ui/NotificationButton";
-import AvatarMenu from "./ui/AvatarMenu";
 import {
   collection,
   getDocs,
   query,
-  orderBy,
   where,
-  startAt,
-  endAt,
+  doc,
+  onSnapshot,
 } from "firebase/firestore";
 import { db } from "@/services/firebase/firebase";
 import { useRouter } from "next/navigation";
 import { debounce } from "lodash";
-import Image from "next/image";
+import Link from "next/link";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../services/firebase/firebase";
+
+import Logo from "./icons/Logo";
+import SearchIcon from "./icons/SearchIcon";
+import Button from "./ui/ButtonCustom";
+import Input from "./ui/InputCustom";
+import NotificationButton from "./ui/NotificationButton";
+import AvatarMenu from "./ui/AvatarMenu";
 
 export default function SearchBar() {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<any>(null);
   const [queryText, setQueryText] = useState("");
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -31,10 +30,43 @@ export default function SearchBar() {
   const router = useRouter();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
+    let unsubscribe: () => void;
+
+    const listenUserAvatar = (uid: string) => {
+      const userRef = doc(db, "users", uid);
+      //onSnapshot = listen realtime
+      unsubscribe = onSnapshot(
+        userRef,
+        (docSnap) => {
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            setUser({
+              uid,
+              email: data.email || "",
+              avatarUrl: data.avatarUrl || "",
+              name: data.name || "",
+            });
+          }
+        },
+        (error) => {
+          console.error("Error listening to user data:", error);
+        }
+      );
+    };
+
+    const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        listenUserAvatar(currentUser.uid);
+      } else {
+        setUser(null);
+        if (unsubscribe) unsubscribe();
+      }
     });
-    return () => unsubscribe();
+
+    return () => {
+      unsubscribeAuth();
+      if (unsubscribe) unsubscribe();
+    };
   }, []);
 
   const fetchSuggestions = useCallback(
@@ -61,7 +93,7 @@ export default function SearchBar() {
           };
         });
 
-        // Lọc bằng includes giống useMemo
+        // Filter by include same as useMemo
         const filtered = allJobs.filter((job) => {
           const lower = text.toLowerCase();
           const titleMatch = job.jobTitle.toLowerCase().includes(lower);
@@ -101,7 +133,7 @@ export default function SearchBar() {
   }, []);
 
   return (
-    <div className="flex flex-col gap-2 xl:flex-row justify-between items-center py-5 md:px-[150px] bg-white">
+    <div className="flex flex-col gap-2 xl:flex-row justify-between items-center py-5 md:px-[150px] bg-white ">
       <div
         className="gap-8 flex flex-col md:flex-row items-center w-full relative"
         ref={wrapperRef}
@@ -156,7 +188,7 @@ export default function SearchBar() {
         </div>
       </div>
 
-      <div className="flex gap-[12px] mt-4 xl:mt-0">
+      <div className="flex gap-3 mt-4 xl:mt-0">
         {user ? (
           <>
             <NotificationButton />
@@ -167,9 +199,9 @@ export default function SearchBar() {
             <Link href="/sign-in" passHref>
               <Button variant="secondary">Sign In</Button>
             </Link>
-            <Link href="/post-job" passHref>
-              <Button>Post A Job</Button>
-            </Link>
+            {/* <Link href={Paths.DASHBOARD} passHref> */}
+            <Button>Post A Job</Button>
+            {/* </Link> */}
           </>
         )}
       </div>
