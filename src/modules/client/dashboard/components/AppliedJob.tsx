@@ -218,7 +218,6 @@ const AppliedJob: React.FC = () => {
         </div>
 
         {/* Table Body */}
-        {/* Table Body */}
         {totalApplications === 0 ? (
           <div className="col-span-12 text-center py-4 text-lg text-gray-500">
             No applications found.
@@ -242,9 +241,19 @@ const AppliedJob: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <h3 className="font-medium text-gray-800">
-                    {applications.job?.jobTitle || "No Title"}
-                  </h3>
+                  <div className="flex flex-row">
+                    <div className="flex flex-row">
+                      <h3 className="font-medium text-gray-800">
+                        {applications.job?.jobTitle || "No Title"}
+                      </h3>
+                      <div className="ml-2">
+                        {renderJobTypeBadge(
+                          applications.job?.jobType || "Unknown"
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
                   <div className="flex items-center mt-1 space-x-2">
                     <div className="flex items-center text-xs text-gray-500">
                       <span className="inline-block mr-1">📍</span>
@@ -259,9 +268,9 @@ const AppliedJob: React.FC = () => {
                     </div>
                   </div>
                 </div>
-                <div className="ml-2">
+                {/* <div className="ml-2">
                   {renderJobTypeBadge(applications.job?.jobType || "Unknown")}
-                </div>
+                </div> */}
               </div>
 
               {/* Date Applied */}

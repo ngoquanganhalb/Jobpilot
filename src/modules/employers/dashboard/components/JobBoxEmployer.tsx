@@ -190,13 +190,18 @@ export default function JobBoxEmployer({
           </div>
           <div>
             <h3 className="font-medium text-gray-800">
-              {job.jobTitle || "No Title"}
+              <div className="flex flex-row">
+                {job.jobTitle || "No Title"}
+                <div className="ml-2">
+                  {renderJobTypeBadge(job?.jobType || "unknow")}
+                </div>
+              </div>
               <div className="text-gray-500 text-xs">To: {expiryText}</div>
             </h3>
             <div className="flex items-center mt-1 space-x-2">
               <div className="flex items-center text-xs text-gray-500">
                 <span className="inline-block mr-1">📍</span>
-                {job.location?.province || 'Unknow location'} 
+                {job.location?.province || "Unknow location"}
               </div>
               <div className="flex items-center text-xs text-gray-500">
                 <span className="inline-block mr-1">💰</span>
@@ -206,9 +211,9 @@ export default function JobBoxEmployer({
               </div>
             </div>
           </div>
-          <div className="ml-2">
+          {/* <div className="ml-2">
             {renderJobTypeBadge(job?.jobType || "unknow")}
-          </div>
+          </div> */}
         </div>
 
         <div className="col-span-2">

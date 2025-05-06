@@ -67,8 +67,8 @@ export type Location = {
 
 export type Job = {
   jobId: string;
-  employerId: string;
-  jobTitle: string;
+  employerId?: string;
+  jobTitle?: string;
   tags?: string[];
   minSalary?: number | "";
   maxSalary?: number | "";

@@ -15,7 +15,7 @@ import MenuIcon from "@component/icons/MenuIcon";
 export const menuItemCandidate = [
   { icon: <MenuIcon />, label: "Overview", path: Paths.DASHBOARD_OVERVIEW },
   {
-    icon: <BsBuildingFill />,
+    icon: <BsBuildingFill className="h-5 w-5 mr-3" />,
     label: "AppliedJobs",
     path: Paths.DASHBOARD_APPLIEDJOB,
   },
@@ -34,11 +34,6 @@ export const menuItemCandidate = [
 export const menuItemsEmployer = [
   { icon: <MenuIcon />, label: "Overview", path: Paths.DASHBOARD_OVERVIEW },
   {
-    icon: <BsPerson className="h-5 w-5 mr-3" />,
-    label: "EmployersProfile",
-    path: Paths.EMPLOYER_PROFILE,
-  },
-  {
     icon: <FiPlus className="h-5 w-5 mr-3" />,
     label: "PostAJob",
     path: Paths.POST_A_JOB,
@@ -48,21 +43,21 @@ export const menuItemsEmployer = [
     label: "MyJobs",
     path: Paths.MY_JOBS,
   },
-  {
-    icon: <BsBookmark className="h-5 w-5 mr-3" />,
-    label: "SavedCandidate",
-    path: Paths.SAVED_CANDIDATE,
-  },
-  {
-    icon: <BsCreditCard className="h-5 w-5 mr-3" />,
-    label: "Plans",
-    path: Paths.PLANS,
-  },
-  {
-    icon: <BsBuilding className="h-5 w-5 mr-3" />,
-    label: "AllCompanies",
-    path: Paths.ALL_COMPANIES,
-  },
+  // {
+  //   icon: <BsBookmark className="h-5 w-5 mr-3" />,
+  //   label: "SavedCandidate",
+  //   path: Paths.SAVED_CANDIDATE,
+  // },
+  // {
+  //   icon: <BsCreditCard className="h-5 w-5 mr-3" />,
+  //   label: "Plans",
+  //   path: Paths.PLANS,
+  // },
+  // {
+  //   icon: <BsBuilding className="h-5 w-5 mr-3" />,
+  //   label: "AllCompanies",
+  //   path: Paths.ALL_COMPANIES,
+  // },
   {
     icon: <BsGear className="h-5 w-5 mr-3" />,
     label: "Settings",

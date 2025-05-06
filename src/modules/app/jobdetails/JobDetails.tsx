@@ -25,7 +25,6 @@ import {
   Calendar,
   MapPin,
   Briefcase,
-  BookOpen,
   Clock,
   Copy,
   Linkedin,
@@ -36,20 +35,9 @@ import {
 import { Job } from "../../../types/db";
 import JobBox from "@component/ui/JobBox";
 import Spinner from "@component/ui/Spinner";
-import { toast } from "react-toastify";
 import Link from "next/link";
 import Paths from "@/constants/paths";
-const jobBenefits = [
-  { name: "401k Salary", color: "gray" },
-  { name: "Anpc", color: "green" },
-  { name: "Learning budget", color: "blue" },
-  { name: "Vision Insurance", color: "indigo" },
-  { name: "4 day workweek", color: "yellow" },
-  { name: "Profit Sharing", color: "red" },
-  { name: "Free gym membership", color: "purple" },
-  { name: "Equity Compensation", color: "sky" },
-  { name: "No politics at work", color: "pink" },
-];
+
 
 export default function JobDetails() {
   const params = useParams(); //take id url
@@ -293,6 +281,7 @@ export default function JobDetails() {
                     <Clock className="w-5 h-5 text-blue-500 mt-1" />
                     <div>
                       <p className="text-gray-500 text-sm">JOB EXPIRES IN</p>
+
                       <p className="font-medium">
                         {job.expirationDate
                           ? new Date(job.expirationDate).toLocaleDateString(
@@ -492,7 +481,7 @@ export default function JobDetails() {
       </div>
 
       <JobApplicationPopup
-        jobTitle="Senior UX Designer"
+        jobTitle={job.jobTitle}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSubmit={handlePopupForm}

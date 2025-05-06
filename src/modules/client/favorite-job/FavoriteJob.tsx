@@ -1,35 +1,16 @@
 "use client";
 import {
-  collection,
   doc,
   getDoc,
-  getDocs,
-  query,
   updateDoc,
-  where,
+
 } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import { db, firestore } from "@services/firebase/firebase";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import StepPagination from "@component/ui/StepPagination";
 import { toast } from "react-toastify";
-import Swal from "sweetalert2";
-import withReactContent from "sweetalert2-react-content";
 import { FaBookmark } from "react-icons/fa6";
-
-import {
-  FaCheckCircle,
-  FaRegClock,
-  FaRegQuestionCircle,
-  FaTimesCircle,
-  FaUserCheck,
-} from "react-icons/fa";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@component/ui/tooltip";
 
 import { Job } from "../../../types/db";
 import { Button } from "@component/ui/Button";
@@ -38,7 +19,6 @@ import Link from "next/link";
 import Paths from "@/constants/paths";
 
 const FavoriteJob: React.FC = () => {
-  const MySwal = withReactContent(Swal);
   const limit = 10;
   // const [currentApplications, setCurrentApplications] = useState<
   //   ApplicationWithJob[]
@@ -197,7 +177,7 @@ const FavoriteJob: React.FC = () => {
           paginatedJobs.map((job) => (
             <div
               key={job.jobId}
-              className="flex flex-wrap md:flex-nowrap justify-between items-start border-b last:border-none border-gray-300 py-4 px-4 rounded-lg hover:ring-1 hover:ring-blue-500 transition duration-150 gap-1"
+              className="flex flex-wrap md:flex-nowrap justify-between items-start border-b last:border-none border-gray-300 p-4 rounded-lg hover:ring-1 hover:ring-blue-500 transition duration-150 gap-1"
             >
               {/* Left - Avatar & Job Info */}
               <div className="flex flex-1 items-start gap-4 min-w-[250px]">
