@@ -28,10 +28,18 @@ export default function Footer() {
         <div className="flex flex-col gap-6">
           <div className="text-xl font-medium">Quick Link</div>
           <div className="flex flex-col gap-1">
-            <div className="text-base text-gray-400">About</div>
-            <div className="text-base text-gray-400">Contact</div>
-            <div className="text-base text-gray-400">Pricing</div>
-            <div className="text-base text-gray-400">Blog</div>
+            <div className="text-base text-gray-400 cursor-pointer hover:underline">
+              About
+            </div>
+            <div className="text-base text-gray-400 cursor-pointer hover:underline">
+              Contact
+            </div>
+            <div className="text-base text-gray-400 cursor-pointer hover:underline">
+              Pricing
+            </div>
+            <div className="text-base text-gray-400 cursor-pointer hover:underline">
+              Blog
+            </div>
           </div>
         </div>
 
@@ -39,10 +47,18 @@ export default function Footer() {
         <div className="flex flex-col gap-6">
           <div className="text-xl font-medium">Candidate</div>
           <div className="flex flex-col gap-1">
-            <div className="text-base text-gray-400">Browse Jobs</div>
-            <div className="text-base text-gray-400">Browse Employers</div>
-            <div className="text-base text-gray-400">Candidate Dashboard</div>
-            <div className="text-base text-gray-400">Saved Jobs</div>
+            <div className="text-base text-gray-400 cursor-pointer hover:underline">
+              Browse Jobs
+            </div>
+            <div className="text-base text-gray-400 cursor-pointer hover:underline">
+              Browse Employers
+            </div>
+            <div className="text-base text-gray-400 cursor-pointer hover:underline">
+              Candidate Dashboard
+            </div>
+            <div className="text-base text-gray-400 cursor-pointer hover:underline">
+              Saved Jobs
+            </div>
           </div>
         </div>
 
@@ -50,27 +66,41 @@ export default function Footer() {
         <div className="flex flex-col gap-6">
           <div className="text-xl font-medium">Employers</div>
           <div className="flex flex-col gap-1">
-            <div className="text-base text-gray-400">Post a Job</div>
-            <div className="text-base text-gray-400">Browse Candidates</div>
-            <div className="text-base text-gray-400">Employers Dashboard</div>
-            <div className="text-base text-gray-400">Applications</div>
+            <div className="text-base text-gray-400 cursor-pointer hover:underline">
+              Post a Job
+            </div>
+            <div className="text-base text-gray-400 cursor-pointer hover:underline">
+              Browse Candidates
+            </div>
+            <div className="text-base text-gray-400 cursor-pointer hover:underline">
+              Employers Dashboard
+            </div>
+            <div className="text-base text-gray-400 cursor-pointer hover:underline">
+              Applications
+            </div>
           </div>
         </div>
 
         {/* Support Section */}
         <div className="flex flex-col gap-6">
-          <div className="text-xl font-medium">Support</div>
+          <div className="text-xl font-medium ">Support</div>
           <div className="flex flex-col gap-1">
-            <div className="text-base text-gray-400">Faqs</div>
-            <div className="text-base text-gray-400">Privacy Policy</div>
-            <div className="text-base text-gray-400">Terms & Conditions</div>
+            <div className="text-base text-gray-400 cursor-pointer hover:underline">
+              Faqs
+            </div>
+            <div className="text-base text-gray-400 cursor-pointer hover:underline">
+              Privacy Policy
+            </div>
+            <div className="text-base text-gray-400 cursor-pointer hover:underline">
+              Terms & Conditions
+            </div>
           </div>
         </div>
       </div>
 
       {/* Footer Bottom */}
       <div className="px-6 md:px-[100px] py-6 bg-zinc-900 text-sm text-gray-500 flex justify-between items-center">
-        <div>@ 2021 Jobpilot - Job Portal. All rights Reserved</div>
+        <div>@ 2025 Jobpilot - Job Portal. All rights Reserved</div>
       </div>
     </div>
   );

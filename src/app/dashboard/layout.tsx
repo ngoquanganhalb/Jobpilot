@@ -23,13 +23,9 @@ export default function DashboardLayout({
 
   const renderSidebar = () => {
     if (accountType === "employer") {
-      return (
-        <SideBar menuItems={menuItemsEmployer} title="Employers Dashboard" />
-      );
+      return <SideBar menuItems={menuItemsEmployer} title="Dashboard" />;
     } else if (accountType === "candidate") {
-      return (
-        <SideBar menuItems={menuItemCandidate} title="Candidates Dashboard" />
-      );
+      return <SideBar menuItems={menuItemCandidate} title="Dashboard" />;
     }
     return null;
   };

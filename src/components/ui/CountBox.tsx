@@ -10,7 +10,7 @@ export default function CountBox({
     <button
       className={`cursor-pointer hover:scale-110 transition-transform duration-200  ${className}`}
     >
-      <div className="flex gap-5 p-5 rounded-[8px] bg-white hover:bg-gray-300">
+      <div className="flex gap-5 p-5 rounded-[8px] bg-white hover:bg-gray-300 mx-5 md:mx-0 ">
         <div
           className="rounded-[3px]
         flex items-center

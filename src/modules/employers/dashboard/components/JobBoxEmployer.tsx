@@ -165,76 +165,181 @@ export default function JobBoxEmployer({
         onClose={() => setEditOpen(false)}
         job={job}
       />
-      {/* Desktop */}
+
+      {/* Desktop View */}
       <Card
-        className={`hidden md:grid grid-cols-12 items-center py-4 px-6 transition-all duration-75 shadow-sm border hover:border-blue-500 hover:rounded-2xl rounded-none ${
-          job.urgent ? "bg-urgent" : ""
-        }`}
+        // className={`hidden md:grid grid-cols-12 items-center py-4 px-6 shadow-sm border transition-all hover:border-blue-500 rounded-none last:rounded-b-2xl
+        //   ${job.urgent ? "bg-urgent" : ""        }
+        //   `}
+        className={`hidden md:grid grid-cols-12 items-center py-4 px-6 shadow-sm border transition-all hover:border-blue-500 rounded-none last:rounded-b-2xl 
+            `}
       >
-        {/* <div className="col-span-4">
-          <h3 className="font-medium text-gray-800 text-lg">{job.jobTitle}</h3>
-          <p className="text-sm text-gray-500 mt-1">
-            {job.jobType} • {expiryText}
-          </p>
-        </div> */}
-        <div className="col-span-5 flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center">
+        {/* Job Info */}
+        <div className="col-span-5 flex items-center gap-4">
+          <div className="w-14 h-14 rounded overflow-hidden flex items-center justify-center border">
             <img
               src={job.avatarCompany || "/images/default-avatar.png"}
               alt="Company Logo"
               className="w-full h-full object-cover"
             />
           </div>
-          <div>
-            <h3 className="font-medium text-gray-800">
-              <div className="flex flex-row">
-                {job.jobTitle || "No Title"}
-                <div className="ml-2">
-                  {renderJobTypeBadge(job?.jobType || "unknow")}
-                </div>
-              </div>
-              <div className="text-gray-500 text-xs">To: {expiryText}</div>
+          <div className="flex-1">
+            <h3 className="font-semibold text-gray-800 text-base flex items-center">
+              {job.jobTitle || "No Title"}
+              <span className="ml-2">
+                {renderJobTypeBadge(job?.jobType || "unknow")}
+              </span>
             </h3>
-            <div className="flex items-center mt-1 space-x-2">
-              <div className="flex items-center text-xs text-gray-500">
-                <span className="inline-block mr-1">📍</span>
-                {job.location?.province || "Unknow location"}
-              </div>
-              <div className="flex items-center text-xs text-gray-500">
-                <span className="inline-block mr-1">💰</span>
+            <p className="text-gray-500 text-xs mt-1">To: {expiryText}</p>
+            <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
+              <span className="flex items-center gap-1">
+                📍 {job.location?.province || "Unknown location"}
+              </span>
+              <span className="flex items-center gap-1">
+                💰{" "}
                 {job.minSalary === 0 && job.maxSalary === 0
                   ? "Negotiate"
-                  : `$${job?.minSalary} - $${job?.maxSalary} `}
-              </div>
+                  : `$${job.minSalary} - $${job.maxSalary}`}
+              </span>
             </div>
           </div>
-          {/* <div className="ml-2">
-            {renderJobTypeBadge(job?.jobType || "unknow")}
-          </div> */}
         </div>
 
-        <div className="col-span-2">
+        {/* Status */}
+        <div className="col-span-2 text-sm">
           {job.status === "Active" ? (
-            <div className="flex items-center text-green-600">
+            <div className="flex items-center text-green-600 font-normal text-base">
               <BiCheckCircle className="mr-1" /> Active
             </div>
           ) : (
-            <div className="flex items-center text-red-500">
+            <div className="flex items-center text-red-500 font-medium">
               <BiXCircle className="mr-1" /> Expired
             </div>
           )}
         </div>
 
-        <div className="col-span-3 flex items-center gap-5">
-          <div className="text-gray-500 text-sm flex items-center">
-            <span>{job.applicants?.length}</span>
-            <MdGroups className="w-6 h-6 ml-2 text-gray-500" />
+        {/* Applications */}
+        <div className="col-span-3 flex items-center justify-start gap-5">
+          <div className="text-gray-600 flex items-center text-sm">
+            <MdGroups className="w-6 h-6 mr-1" /> {job.applicants?.length}
+          </div>
+          {pendingApplicationsCount > 0 && (
+            <Link href={`${Paths.VIEW_APPLICATION}/${job.jobId}`}>
+              <div className="flex items-center gap-2 bg-blue-100 rounded-xl px-3 py-1 hover:bg-blue-200 transition-all cursor-pointer">
+                <AiOutlineBell className="w-5 h-5 text-blue-600" />
+                <span className="text-sm text-blue-600 font-semibold">
+                  {pendingApplicationsCount} new
+                </span>
+              </div>
+            </Link>
+          )}
+        </div>
+
+        {/* Actions */}
+        <div
+          className="col-span-2 flex justify-end items-center gap-2"
+          ref={dropdownRef}
+        >
+          <Link href={`${Paths.VIEW_APPLICATION}/${job.jobId}`}>
+            <Button
+              variant="link"
+              className="text-blue-600 px-0 text-sm cursor-pointer"
+            >
+              View Applications
+            </Button>
+          </Link>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="cursor-pointer">
+                <BsThreeDots className="h-5 w-5 text-gray-500 " />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-48">
+              {/* <DropdownMenuItem className="cursor-pointer">
+                <GrUpgrade className="h-4 w-4 mr-2 text-blue-600" /> Promote Job
+              </DropdownMenuItem> */}
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onClick={() => handleViewDetail(job.jobId)}
+              >
+                <BsFillEyeFill className="h-4 w-4 mr-2 text-green-500" /> View
+                Detail
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onClick={() => markJobAsExpired(job.jobId)}
+              >
+                <MdCancel className="h-4 w-4 mr-2 text-red-500" /> Mark as
+                expired
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onClick={() => handleDeleteJob(job.jobId)}
+              >
+                <MdDeleteForever className="h-4 w-4 mr-2 text-red-500" /> Delete
+                Job
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onClick={() => setEditOpen(true)}
+              >
+                <MdEdit className="h-4 w-4 mr-2 text-yellow-500" /> Edit Job
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </Card>
+
+      {/* Mobile */}
+      <Card className="md:hidden p-4 shadow-sm rounded-xl border hover:border-blue-500 transition-all">
+        <div className="flex items-start gap-4">
+          <div className="w-14 h-14 flex-shrink-0 overflow-hidden rounded-md bg-gray-100">
+            <img
+              src={job.avatarCompany || "/images/default-avatar.png"}
+              alt="Company Logo"
+              className="w-full h-full object-cover"
+            />
           </div>
 
-          <div className="flex items-center">
+          <div className="flex-1">
+            <h3 className="text-base font-semibold text-gray-800">
+              {job.jobTitle || "No Title"}
+            </h3>
+            <div className="text-xs text-gray-500 flex items-center mt-1 space-x-1">
+              <span>{job.jobType}</span>
+              <span>•</span>
+              <span>To: {expiryText}</span>
+            </div>
+
+            <div className="mt-2 flex flex-col space-y-1 text-sm text-gray-600">
+              <div className="flex items-center">
+                <span className="mr-1">📍</span>
+                {job.location?.province || "Unknown location"}
+              </div>
+              <div className="flex items-center">
+                <span className="mr-1">💰</span>
+                {job.minSalary === 0 && job.maxSalary === 0
+                  ? "Negotiate"
+                  : `$${job?.minSalary} - $${job?.maxSalary}`}
+              </div>
+              <div>
+                <strong>Status:</strong>{" "}
+                <span
+                  className={
+                    job.status === "Active" ? "text-green-600" : "text-red-500"
+                  }
+                >
+                  {job.status}
+                </span>
+              </div>
+              <div>
+                <strong>Applications:</strong> {job.applicants?.length}
+              </div>
+            </div>
+
             {pendingApplicationsCount > 0 && (
-              <Link href={`${Paths.VIEW_APPLICATION}/${job.jobId}`}>
-                <div className="mt-1 flex items-center space-x-2 bg-blue-100 rounded-xl px-3 py-1 cursor-pointer hover:bg-blue-200 transition-all">
+              <Link href={`${Paths.VIEW_APPLICATION}/${job.jobId}`} passHref>
+                <div className="mt-3 inline-flex items-center space-x-2 bg-blue-100 rounded-xl px-3 py-1 cursor-pointer hover:bg-blue-200 transition-all">
                   <AiOutlineBell className="w-5 h-5 text-blue-600" />
                   <span className="text-blue-600 font-semibold text-sm">
                     {pendingApplicationsCount} new
@@ -245,17 +350,14 @@ export default function JobBoxEmployer({
           </div>
         </div>
 
-        <div
-          className="col-span-2 flex justify-end gap-2 items-center"
-          ref={dropdownRef}
-        >
-          <Button variant="link" className="text-blue-600 px-0 cursor-pointer">
+        <div className="mt-4 flex justify-between items-center">
+          <Button variant="link" className="text-blue-600 px-0 text-sm">
             <Link href={`${Paths.VIEW_APPLICATION}/${job.jobId}`}>
               View Applications
             </Link>
           </Button>
           <DropdownMenu>
-            <DropdownMenuTrigger className="cursor-pointer" asChild>
+            <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon">
                 <BsThreeDots className="h-5 w-5 text-gray-500" />
               </Button>
@@ -272,74 +374,12 @@ export default function JobBoxEmployer({
                 <MdCancel className="h-4 w-4 mr-2 text-red-500" /> Mark as
                 expired
               </DropdownMenuItem>
-
               <DropdownMenuItem onClick={() => handleDeleteJob(job.jobId)}>
                 <MdDeleteForever className="h-4 w-4 mr-2 text-red-500" /> Delete
                 Job
               </DropdownMenuItem>
-
               <DropdownMenuItem onClick={() => setEditOpen(true)}>
                 <MdEdit className="h-4 w-4 mr-2 text-yellow-500" /> Edit Job
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </Card>
-
-      {/* Mobile */}
-      <Card className="md:hidden p-4 shadow-sm">
-        <h3 className="text-base font-semibold text-gray-800 mb-1">
-          {job.jobTitle}
-        </h3>
-        <p className="text-sm text-gray-500">
-          {job.jobType} • {expiryText}
-        </p>
-        <p className="text-sm mt-2">
-          <strong>Status:</strong>{" "}
-          <span
-            className={
-              job.status === "Active" ? "text-green-600" : "text-red-500"
-            }
-          >
-            {job.status}
-          </span>
-        </p>
-        <p className="text-sm">
-          <strong>Applications:</strong> {job.applicants?.length}
-        </p>
-        <div className="flex items-center">
-          {pendingApplicationsCount > 0 && (
-            <Link href={`/${Paths.VIEW_APPLICATION}/${job.jobId}`} passHref>
-              <div className="mt-1 flex items-center space-x-2 bg-blue-100 rounded-xl px-3 py-1 cursor-pointer hover:bg-blue-200 transition-all">
-                <AiOutlineBell className="w-5 h-5 text-blue-600" />
-                <span className="text-blue-600 font-semibold text-sm">
-                  {pendingApplicationsCount} new
-                </span>
-              </div>
-            </Link>
-          )}
-        </div>
-        <div className="mt-3 flex justify-between items-center">
-          <Button variant="link" className="text-blue-600 px-0 text-sm">
-            View Applications
-          </Button>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <BsThreeDots className="h-5 w-5 text-gray-500" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-48">
-              <DropdownMenuItem>
-                <GrUpgrade className="h-4 w-4 mr-2 text-blue-600" /> Promote Job
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <BsFillEyeFill className="h-4 w-4 mr-2 text-green-500" /> View
-                Detail
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <MdCancel className="h-4 w-4 mr-2 text-red-500" /> Mark as
-                expired
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

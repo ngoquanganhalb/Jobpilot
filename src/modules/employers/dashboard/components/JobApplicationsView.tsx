@@ -117,7 +117,7 @@ export default function JobApplicationsView() {
             id: docSnap.id,
             jobId: data.jobId,
             candidateId: data.candidateId,
-            name: username, 
+            name: username,
             avatar: useravatar,
             appliedAt: data.appliedAt.toDate(),
             status: data.status,
@@ -319,7 +319,7 @@ export default function JobApplicationsView() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem
-                          className="flex items-center gap-2"
+                          className="flex items-center gap-2 cursor-pointer"
                           onClick={() =>
                             handleDownloadCV(application.resumeUrl)
                           }
@@ -330,7 +330,7 @@ export default function JobApplicationsView() {
                         <DropdownMenuSeparator />
 
                         <DropdownMenuItem
-                          className="flex items-center gap-2"
+                          className="flex items-center gap-2 cursor-pointer"
                           onClick={() =>
                             handleChangeStatus(
                               application.id,
@@ -344,7 +344,7 @@ export default function JobApplicationsView() {
                         </DropdownMenuItem>
 
                         <DropdownMenuItem
-                          className="flex items-center gap-2"
+                          className="flex items-center gap-2 cursor-pointer"
                           onClick={() =>
                             handleChangeStatus(
                               application.id,
@@ -358,7 +358,7 @@ export default function JobApplicationsView() {
                         </DropdownMenuItem>
 
                         <DropdownMenuItem
-                          className="flex items-center gap-2"
+                          className="flex items-center gap-2 cursor-pointer"
                           onClick={() =>
                             handleChangeStatus(
                               application.id,
@@ -372,7 +372,7 @@ export default function JobApplicationsView() {
                         </DropdownMenuItem>
 
                         <DropdownMenuItem
-                          className="flex items-center gap-2"
+                          className="flex items-center gap-2 cursor-pointer"
                           onClick={() =>
                             handleChangeStatus(
                               application.id,
@@ -386,7 +386,7 @@ export default function JobApplicationsView() {
                         </DropdownMenuItem>
 
                         <DropdownMenuItem
-                          className="flex items-center gap-2"
+                          className="flex items-center gap-2 cursor-pointer"
                           onClick={() =>
                             handleChangeStatus(
                               application.id,
@@ -402,7 +402,7 @@ export default function JobApplicationsView() {
                         <DropdownMenuSeparator />
 
                         <DropdownMenuItem
-                          className="flex items-center gap-2 text-red-600"
+                          className="flex items-center gap-2 text-red-600 cursor-pointer"
                           onClick={() =>
                             handleDeleteApplication(
                               application.id,
@@ -428,7 +428,7 @@ export default function JobApplicationsView() {
                             {expanded ? application.note : shortNote}
                           </p>
                         </TooltipTrigger>
-                        <TooltipContent className="max-w-xs ">
+                        <TooltipContent className="bg-white text-black border border-gray-200 shadow-md rounded-lg p-4 text-sm max-w-sm">
                           {application.note}
                         </TooltipContent>
                       </Tooltip>
@@ -448,7 +448,7 @@ export default function JobApplicationsView() {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="text-blue-600 flex items-center gap-1"
+                      className="text-blue-600 flex items-center gap-1 cursor-pointer"
                       onClick={() => handleDownloadCV(application.resumeUrl)}
                     >
                       <Download size={16} />
@@ -523,7 +523,7 @@ export default function JobApplicationsView() {
           <Button
             variant="outline"
             size="sm"
-            className="flex items-center gap-1"
+            className="flex items-center gap-1 cursor-pointer"
             onClick={() => setSortDialogOpen(true)}
           >
             <Filter size={16} />
@@ -537,7 +537,7 @@ export default function JobApplicationsView() {
           <ApplicationColumn
             title="New Applications"
             status="pending"
-            className="bg-blue-100 text-blue-800"
+            className="bg-blue-100 text-blue-800 "
             applications={getApplicationsByStatus("pending")}
           />
           <ApplicationColumn

@@ -98,39 +98,46 @@ export default function List() {
   }, []);
 
   return (
-    <div className="mt-6  ">
-      <div className="flex flex-row justify-between">
-        <h2 className="text-lg font-semibold text-gray-800 mb-3">
+    <div className="mt-6">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-lg font-semibold text-gray-800">
           Your Recent Applications
         </h2>
         <Link
           href={Paths.DASHBOARD_APPLIEDJOB}
-          className="text-blue-600 flex items-center"
+          className="text-blue-600 text-sm font-medium flex items-center hover:underline"
         >
           View all <BsArrowRight className="ml-1" />
         </Link>
       </div>
-      <div className="grid grid-cols-12 bg-gray-50 py-3 px-4 rounded-t-md border-b border-gray-200 mt-5">
-        <div className="col-span-5 text-sm font-medium text-gray-600">JOBS</div>
-        <div className="col-span-2 text-sm font-medium text-gray-600">
-          DATE APPLIED
-        </div>
-        <div className="col-span-2 text-sm font-medium text-gray-600 text-center">
-          STATUS
-        </div>
-        <div className="col-span-3 text-sm font-medium text-gray-600 text-center">
-          ACTION
-        </div>
-      </div>
 
-      <div className="space-y-3">
-        {applications.slice(0, 5).map((app) => (
-          <JobBoxCandidate
-            key={app.id}
-            application={app}
-            onDelete={handleDelete}
-          />
-        ))}
+      <div className="rounded-xl shadow-md border ">
+        {/* Header (hidden on mobile) */}
+        <div className="hidden md:grid grid-cols-12 bg-gray-100 py-3 px-4 rounded-t-lg border-b border-gray-300">
+          <div className="col-span-6 text-sm font-semibold text-gray-600">
+            Job
+          </div>
+          <div className="col-span-2 text-sm font-semibold text-gray-600">
+            Date Applied
+          </div>
+          <div className="col-span-2 text-sm font-semibold text-gray-600 text-center">
+            Status
+          </div>
+          <div className="col-span-2 text-sm font-semibold text-gray-600 text-center">
+            Action
+          </div>
+        </div>
+
+        {/* Application Items */}
+        <div className="">
+          {applications.slice(0, 5).map((app) => (
+            <JobBoxCandidate
+              key={app.id}
+              application={app}
+              onDelete={handleDelete}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );

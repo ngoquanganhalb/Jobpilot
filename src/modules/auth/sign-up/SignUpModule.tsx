@@ -72,7 +72,7 @@ const SignUpModule = () => {
     }
   };
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); //Prevent reload 
+    e.preventDefault(); //Prevent reload
     setIsLoading(true);
     // console.log(formData);
 
@@ -157,7 +157,7 @@ const SignUpModule = () => {
             <div className="grid grid-cols-2 gap-4">
               <button
                 type="button"
-                className={`flex items-center justify-center py-3 px-4 rounded-md border ${
+                className={`flex items-center justify-center py-3 px-4 rounded-md border cursor-pointer ${
                   accountType === "candidate"
                     ? "bg-blue-900 text-white border-blue-900"
                     : "bg-white border-gray-300 hover:bg-blue-900"
@@ -169,7 +169,7 @@ const SignUpModule = () => {
               </button>
               <button
                 type="button"
-                className={`flex items-center justify-center py-3 px-4 rounded-md border ${
+                className={`flex items-center justify-center py-3 px-4 rounded-md border cursor-pointer ${
                   accountType === "employer"
                     ? "bg-blue-900 text-white border-blue-900"
                     : "bg-white border-gray-300 hover:bg-blue-900"
@@ -249,7 +249,7 @@ const SignUpModule = () => {
               </button>
             </div>
 
-            <div className="mb-6 flex items-center">
+            <div className="mb-6 flex items-center cursor-pointer">
               <input
                 type="checkbox"
                 name="agreeToTerms"
@@ -268,7 +268,7 @@ const SignUpModule = () => {
 
             <button
               type="submit"
-              className="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 flex items-center justify-center"
+              className="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 flex items-center justify-center cursor-pointer"
             >
               Create Account
               <ArrowIcon className="text-white ml-5" />

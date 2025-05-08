@@ -178,3 +178,16 @@
 .animate-appear-delay {
   animation: appear 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
 }
+
+@keyframes bounce-20px {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.bounce-20px {
+  animation: bounce-20px 2s infinite;
+}

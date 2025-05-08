@@ -39,110 +39,122 @@ const JobBoxCandidate: React.FC<Props> = ({ application, onDelete }) => {
     );
   };
 
-  const statusColor = {
-    pending: "bg-blue-100 text-blue-800",
-    reviewed: "bg-purple-100 text-purple-800",
-    interview: "bg-yellow-100 text-yellow-800",
-    hired: "bg-green-100 text-green-800",
-    rejected: "bg-red-100 text-red-800",
-  };
+  const renderStatus = (status: string) => {
+    const baseClass =
+      "flex items-center gap-2 px-3 py-1 rounded-md text-sm capitalize cursor-help";
+    const statusClass = {
+      pending: "bg-blue-100 text-blue-800",
+      reviewed: "bg-purple-100 text-purple-800",
+      interview: "bg-yellow-100 text-yellow-800",
+      hired: "bg-green-100 text-green-800",
+      rejected: "bg-red-100 text-red-800",
+    };
 
-  const statusIcon = {
-    pending: <FaRegClock className="text-lg mr-2" />,
-    reviewed: <FaCheckCircle className="text-lg mr-2" />,
-    interview: <FaRegQuestionCircle className="text-lg mr-2" />,
-    hired: <FaUserCheck className="text-lg mr-2" />,
-    rejected: <FaTimesCircle className="text-lg mr-2" />,
+    const icon = {
+      pending: <FaRegClock />,
+      reviewed: <FaCheckCircle />,
+      interview: <FaRegQuestionCircle />,
+      hired: <FaUserCheck />,
+      rejected: <FaTimesCircle />,
+    };
+
+    return (
+      <div
+        className={`${baseClass} ${
+          statusClass[status] || "bg-gray-100 text-gray-800"
+        }`}
+      >
+        {icon[status]}
+        {status}
+      </div>
+    );
   };
 
   return (
     <div
       key={application.id}
-      className="grid grid-cols-12 items-center py-4 px-4 border-b border-gray-300 hover:ring-2 hover:ring-blue-500 rounded-2xl"
+      className="border-b px-4 py-6 md:px-5 md:py-5 hover:bg-gray-50 transition-all"
     >
-      {/* Job Info */}
-      <div className="col-span-5 flex items-center space-x-3">
-        <div className="w-12 h-12 rounded overflow-hidden flex items-center justify-center">
-          <img
-            src={application.job?.avatarCompany || "/images/default-avatar.png"}
-            alt="Company Logo"
-            className="w-full h-full object-cover"
-          />
-        </div>
-        <div>
-          <div className="flex items-center">
-            <h3 className="font-medium text-gray-800">
-              {application.job?.jobTitle || "No Title"}
-            </h3>
-            <div className="ml-2">
+      <div className="grid grid-cols-1 md:grid-cols-12 md:items-center gap-4">
+        {/* Job Info */}
+        <div className="md:col-span-6 flex items-center gap-4">
+          <div className="w-14 h-14 rounded-lg overflow-hidden border border-gray-200 flex-shrink-0">
+            <img
+              src={
+                application.job?.avatarCompany || "/images/default-avatar.png"
+              }
+              alt="Company Logo"
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <div>
+            <div className="flex flex-wrap items-center gap-2">
+              <h3 className="text-base font-semibold text-gray-800">
+                {application.job?.jobTitle || "No Title"}
+              </h3>
               {renderJobTypeBadge(application.job?.jobType || "Unknown")}
             </div>
-          </div>
-          <div className="flex items-center mt-1 space-x-2 text-xs text-gray-500">
-            <div className="flex items-center">
-              <span className="inline-block mr-1">📍</span>
-              {application.job?.location?.province || "Unknown"}
-            </div>
-            <div className="flex items-center">
-              <span className="inline-block mr-1">💰</span>
-              {application.job?.minSalary === 0 &&
-              application.job?.maxSalary === 0
-                ? "Negotiate"
-                : `$${application.job?.minSalary} - $${application.job?.maxSalary}`}
+            <div className="flex flex-wrap gap-4 text-sm text-gray-500 mt-1">
+              <span>📍 {application.job?.location?.province || "Unknown"}</span>
+              <span>
+                💰{" "}
+                {application.job?.minSalary === 0 &&
+                application.job?.maxSalary === 0
+                  ? "Negotiate"
+                  : `$${application.job?.minSalary} - $${application.job?.maxSalary}`}
+              </span>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Date Applied */}
-      <div className="col-span-2 text-sm text-gray-600">
-        {application.appliedAt
-          ? application.appliedAt.toLocaleString("en-US", {
-              year: "numeric",
-              month: "short",
-              day: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
-              hour12: false,
-            })
-          : "N/A"}
-      </div>
+        {/* Date Applied */}
+        <div className="md:col-span-2 text-sm text-gray-600 flex flex-row gap-1">
+          <div className="md:hidden font-semibold text-sm items-center flex">
+            Date Applied:{" "}
+          </div>
+          {application.appliedAt
+            ? application.appliedAt.toLocaleString("en-US", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: false,
+              })
+            : "N/A"}
+        </div>
 
-      {/* Status */}
-      <div className="col-span-2">
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div
-                className={`flex items-center justify-center py-1 rounded-md text-sm cursor-help ${
-                  statusColor[application.status] || "bg-gray-100 text-gray-800"
-                }`}
-              >
-                {statusIcon[application.status]}
-                {application.status}
-              </div>
-            </TooltipTrigger>
+        {/* Status */}
+        <div className="md:col-span-2 flex justify-start md:justify-center gap-1">
+          <div className="md:hidden font-semibold text-sm items-center flex">
+            Status:{" "}
+          </div>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                {renderStatus(application.status)}
+              </TooltipTrigger>
+              {application.feedback && application.status !== "pending" && (
+                <TooltipContent
+                  className="bg-white text-black border border-gray-200 shadow-md rounded-lg p-4 text-sm max-w-sm"
+                  side="top"
+                >
+                  {application.feedback}
+                </TooltipContent>
+              )}
+            </Tooltip>
+          </TooltipProvider>
+        </div>
 
-            {application.feedback && application.status !== "pending" && (
-              <TooltipContent
-                className="bg-white text-black border border-gray-200 shadow-md rounded-lg p-4 text-sm max-w-sm"
-                side="top"
-              >
-                {application.feedback}
-              </TooltipContent>
-            )}
-          </Tooltip>
-        </TooltipProvider>
-      </div>
-
-      {/* Actions */}
-      <div className="col-span-3 flex justify-center space-x-3">
-        <button
-          className="py-2 px-4 bg-red-500 text-white rounded-md"
-          onClick={() => onDelete(application.id)}
-        >
-          Delete
-        </button>
+        {/* Actions */}
+        <div className="md:col-span-2 flex md:justify-center">
+          <button
+            className="bg-red-500 text-white rounded-md px-4 py-2 hover:bg-red-600 transition w-full md:w-auto cursor-pointer"
+            onClick={() => onDelete(application.id)}
+          >
+            Delete
+          </button>
+        </div>
       </div>
     </div>
   );

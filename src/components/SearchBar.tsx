@@ -133,7 +133,7 @@ export default function SearchBar() {
   }, []);
 
   return (
-    <div className="flex flex-col gap-2 xl:flex-row justify-between items-center py-5 md:px-[150px] bg-white ">
+    <div className="flex flex-col gap-2 xl:flex-row justify-between items-center py-5 md:px-[150px] bg-white border">
       <div
         className="gap-8 flex flex-col md:flex-row items-center w-full relative"
         ref={wrapperRef}
@@ -145,7 +145,7 @@ export default function SearchBar() {
           </div>
         </Link>
 
-        <div className="relative w-full md:max-w-[500px]">
+        <div className="relative w-full px-4 md:max-w-[500px] ">
           <Input
             icon={<SearchIcon />}
             className="text-gray-900 text-[16px] px-6 w-full"
@@ -191,7 +191,7 @@ export default function SearchBar() {
       <div className="flex gap-3 mt-4 xl:mt-0">
         {user ? (
           <>
-            <NotificationButton />
+            {/* <NotificationButton /> */}
             <AvatarMenu user={user} />
           </>
         ) : (
