@@ -7,6 +7,9 @@ import NProgressHandler from "@component/lib/NProgressHandler";
 export const metadata = {
   title: "Jobpilot",
   description: "...",
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({

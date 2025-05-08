@@ -125,8 +125,8 @@ export default function CandidateSettings() {
   };
 
   return (
-    <div className="container mx-auto py-6 ">
-      <Card className="max-w-2xl mx-auto">
+    <div className="container mx-auto py-6  ">
+      <Card className="max-w-2xl mx-auto shadow-[0_-6px_12px_rgba(0,0,0,0.06),_0_4px_12px_rgba(0,0,0,0.08)]">
         <CardHeader>
           <CardTitle className="text-2xl">Profile Settings</CardTitle>
           <CardDescription>

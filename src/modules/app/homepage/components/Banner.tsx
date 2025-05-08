@@ -50,18 +50,18 @@ export default function Banner() {
     fetchCounts();
   }, []);
   return (
-    <div className="flex flex-col gap-[30px] bg-[rgba(241,242,244,0.6)]  md:px-[100px] md:py-[80px] lg:px-[150px] lg:py-[100px] ">
+    <div className="flex flex-col gap-[30px] bg-[rgba(241,242,244,0.6)] md:px-[100px] md:py-[80px] lg:px-[150px] lg:py-[100px] ">
       <div className="flex flex-col lg:flex-row gap-10 lg:gap-0">
         <div className="flex flex-col w-full lg:w-[60%]">
-          <div className="font-normal text-[36px] md:text-[48px] lg:text-[56px] text-gray-900 leading-[48px] md:leading-[56px] lg:leading-[64px] animate-in fade-in slide-in-from-left-100 duration-1000">
+          <div className="font-normal mx-3 md:mx-0 text-[36px] md:text-[48px] lg:text-[56px] text-gray-900 leading-[48px] md:leading-[56px] lg:leading-[64px] animate-in fade-in slide-in-from-left-100 duration-1000">
             Find a job that suits your interest & skills.
           </div>
-          <div className="w-full md:w-[80%] text-[14px] md:text-[18px] text-gray-600 font-normal leading-[24px] md:leading-[28px] mt-6 animate-in fade-in slide-in-from-left-100 duration-2000">
+          <div className="w-full mx-3 md:mx-0 md:w-[80%] text-[14px] md:text-[18px] text-gray-600 font-normal leading-[24px] md:leading-[28px] mt-6 animate-in fade-in slide-in-from-left-100 duration-2000">
             Aliquam vitae turpis in diam convallis finibus in at risus. Nullam
             in scelerisque leo, eget sollicitudin velit bestibulum.
           </div>
           {/* search */}
-          <div className="flex mt-8 flex-col md:flex-row bg-white border border-gray-100 rounded-[8px] p-3 gap-4 md:gap-3 ">
+          <div className=" mt-8 flex-col md:flex-row bg-white border border-gray-100 rounded-[8px] p-3 gap-4 md:gap-3 hidden md:flex ">
             <div className="flex flex-row items-center gap-3 w-full md:w-auto">
               <Input
                 icon={<SearchIcon />}
@@ -83,6 +83,7 @@ export default function Banner() {
         </div>
         <div className="flex w-full lg:w-[40%] items-center justify-center">
           <Image
+            className="bounce-20px"
             src="/images/BannerHome.png"
             alt="Banner-Header "
             width={1200}
@@ -97,7 +98,7 @@ export default function Banner() {
           count={jobCount}
           title="Jobs"
           img={<JobIcon />}
-          className="w-full sm:w-[300px] md:w-[400px]"
+          className="w-full sm:w-[300px] md:w-[400px] "
         />
         <CountBox
           count={companyCount}

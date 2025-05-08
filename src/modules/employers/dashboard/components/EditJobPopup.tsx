@@ -119,13 +119,19 @@ export default function EditJobPopup({ open, onClose, job }: Props) {
                     setFormData((prev) => ({ ...prev!, jobType: value as any }))
                   }
                 >
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger className="w-full cursor-pointer">
                     <SelectValue placeholder="Select job type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="full-time">Full-time</SelectItem>
-                    <SelectItem value="part-time">Part-time</SelectItem>
-                    <SelectItem value="freelance">Freelance</SelectItem>
+                    <SelectItem className="cursor-pointer" value="full-time">
+                      Full-time
+                    </SelectItem>
+                    <SelectItem className="cursor-pointer" value="part-time">
+                      Part-time
+                    </SelectItem>
+                    <SelectItem className="cursor-pointer" value="freelance">
+                      Freelance
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -195,7 +201,7 @@ export default function EditJobPopup({ open, onClose, job }: Props) {
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
-                    className="w-full justify-start text-left"
+                    className="w-full justify-start text-left cursor-pointer"
                   >
                     {(formData.tags ?? []).length > 0
                       ? (formData.tags ?? []).join(", ")
@@ -284,7 +290,7 @@ export default function EditJobPopup({ open, onClose, job }: Props) {
                   <Button
                     variant="outline"
                     className={cn(
-                      "w-full justify-between",
+                      "w-full justify-between cursor-pointer",
                       !formData.expirationDate && "text-muted-foreground"
                     )}
                   >
@@ -312,13 +318,17 @@ export default function EditJobPopup({ open, onClose, job }: Props) {
 
             <div className="flex items-center space-x-2">
               <Checkbox
+                className="cursor-pointer"
                 id="isRemote"
                 checked={formData.isRemote}
                 onCheckedChange={(checked) =>
                   setFormData((prev) => ({ ...prev!, isRemote: !!checked }))
                 }
               />
-              <label htmlFor="isRemote" className="text-sm text-gray-700">
+              <label
+                htmlFor="isRemote"
+                className="text-sm text-gray-700 cursor-pointer"
+              >
                 Fully Remote Position - Worldwide
               </label>
             </div>

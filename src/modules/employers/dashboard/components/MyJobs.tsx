@@ -11,6 +11,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@redux/store";
 import { setJobs } from "@redux/slices/jobSlice";
 import StepPagination from "@component/ui/StepPagination";
+import Link from "next/link";
+import Paths from "@/constants/paths";
+import { HiBriefcase } from "react-icons/hi";
 
 export default function MyJobs() {
   const [jobActionDropdown, setJobActionDropdown] = useState<number | null>(
@@ -18,7 +21,7 @@ export default function MyJobs() {
   );
   const dispatch = useDispatch();
   const jobs = useSelector((state: RootState) => state.jobs.jobs);
-  // const [myJobs, setMyJobs] = useState<Job[]>([]); 
+  // const [myJobs, setMyJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   //pagnition
   const limit = 10;
@@ -62,6 +65,9 @@ export default function MyJobs() {
             minSalary: data.minSalary,
             maxSalary: data.maxSalary,
             jobType: data.jobType,
+            tags: data.tags,
+            description: data.description,
+            isRemote: data.isRemote,
           };
         });
 
@@ -115,10 +121,19 @@ export default function MyJobs() {
   }
 
   return (
-    <div className="">
-      <h2 className="text-lg font-semibold mb-4">
-        My Posted Jobs: {jobs.length}
-      </h2>
+    <div className="mt-6">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center space-x-3">
+          <HiBriefcase className="text-blue-600 w-6 h-6" />
+          <h2 className="text-xl font-semibold text-gray-800">
+            My Posted Jobs
+            <span className="ml-2 text-sm font-normal text-gray-500">
+              ({jobs.length})
+            </span>
+          </h2>
+        </div>
+      </div>
+      <hr className="border-t border-gray-200 mb-4" />
 
       {jobs.length === 0 ? (
         <div className="p-6 text-center text-gray-500">
@@ -126,24 +141,26 @@ export default function MyJobs() {
           <p>You have not posted any jobs yet. Start posting now!</p>
         </div>
       ) : (
-        <>
-          <div className="hidden md:grid grid-cols-12 bg-gray-100 py-3 px-6 text-sm font-medium text-gray-600">
-            <div className="col-span-5">JOBS</div>
-            <div className="col-span-2">STATUS</div>
-            <div className="col-span-3">APPLICATIONS</div>
-            <div className="col-span-2">ACTIONS</div>
-          </div>
+        <div>
+          <div className="rounded-2xl shadow-[0_-6px_12px_rgba(0,0,0,0.06),_0_4px_12px_rgba(0,0,0,0.08)]">
+            <div className="hidden md:grid grid-cols-12 bg-gray-100 py-4 px-6 text-sm font-medium text-gray-600 ">
+              <div className="col-span-5">JOBS</div>
+              <div className="col-span-2">STATUS</div>
+              <div className="col-span-3">APPLICATIONS</div>
+              <div className="col-span-2">ACTIONS</div>
+            </div>
 
-          <ul className="">
-            {currentJobs.map((job) => (
-              <JobBoxEmployer
-                key={job.jobId}
-                job={job}
-                jobActionDropdown={jobActionDropdown}
-                toggleJobActionDropdown={toggleJobActionDropdown}
-              />
-            ))}
-          </ul>
+            <ul className=" ">
+              {currentJobs.map((job) => (
+                <JobBoxEmployer
+                  key={job.jobId}
+                  job={job}
+                  jobActionDropdown={jobActionDropdown}
+                  toggleJobActionDropdown={toggleJobActionDropdown}
+                />
+              ))}
+            </ul>
+          </div>
 
           {/* Pagination */}
           {totalJobs > limit && (
@@ -155,7 +172,7 @@ export default function MyJobs() {
               onStepClick={handleStepClick}
             />
           )}
-        </>
+        </div>
       )}
     </div>
   );
