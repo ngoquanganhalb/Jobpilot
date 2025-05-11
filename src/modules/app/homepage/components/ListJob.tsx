@@ -28,7 +28,7 @@ export default function ListJob() {
               id={job.jobId}
               company={job.companyName ? job.companyName : "Unknowed Company"}
               location={job.location?.province || "Unknown Location"}
-              title={job.jobTitle}
+              title={job.jobTitle || "Untitled Job"}
               type={job.jobType ? job.jobType.toUpperCase() : "FULL-TIME"}
               salary={
                 job.minSalary && job.maxSalary

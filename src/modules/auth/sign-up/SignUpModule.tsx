@@ -101,7 +101,7 @@ const SignUpModule = () => {
       router.push("/sign-in");
     } catch (error) {
       // console.log(error.message);
-      switch (error.code) {
+      switch ((error as { code: string }).code) {
         case "auth/email-already-in-use":
           toast.error("Email is already in use.");
           break;
