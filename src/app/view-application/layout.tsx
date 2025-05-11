@@ -8,17 +8,15 @@ import Breadcrumb from "@component/Breadcrumb";
 
 import { ReactNode } from "react";
 
-interface LayoutProps {
-  children: ReactNode;
-  employer: ReactNode;
-  candidate: ReactNode;
-}
-
 export default function DashboardLayout({
   children,
   employer,
   candidate,
-}: LayoutProps) {
+}: {
+  children: ReactNode;
+  employer: ReactNode;
+  candidate: ReactNode;
+}) {
   const accountType = useSelector((state: any) => state.user.accountType);
 
   return (
