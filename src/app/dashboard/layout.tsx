@@ -79,22 +79,12 @@ import {
 // Định nghĩa các type cho props
 type LayoutProps = {
   children?: ReactNode;
-};
-
-type LayoutPropsExtended = {
-  children?: ReactNode;
   employer?: ReactNode;
   candidate?: ReactNode;
 };
 
-export default function DashboardLayout(
-  props: LayoutProps | LayoutPropsExtended
-) {
-  const { children, employer, candidate } = {
-    ...props,
-    employer: undefined,
-    candidate: undefined,
-  };
+export default function DashboardLayout(props: LayoutProps) {
+  const { children, employer, candidate } = props;
 
   const accountType = useSelector((state: any) => state.user.accountType);
 
@@ -144,3 +134,4 @@ export default function DashboardLayout(
     </div>
   );
 }
+
