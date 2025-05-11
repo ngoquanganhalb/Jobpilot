@@ -85,7 +85,10 @@ export default function List() {
           return {
             ...data,
             id: docSnap.id,
-            appliedAt: data.appliedAt.toDate?.() ?? new Date(),
+            appliedAt:
+              data.appliedAt instanceof Date
+                ? data.appliedAt
+                : data.appliedAt.toDate(),
             job: jobData,
           };
         })
