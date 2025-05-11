@@ -1,5 +1,5 @@
 "use client";
-
+import { ReactNode } from "react";
 import Header from "@component/Header";
 import SearchBar from "@component/SearchBar";
 import SideBar from "@modules/employers/dashboard/components/SideBar";
@@ -15,9 +15,9 @@ export default function DashboardLayout({
   employer,
   candidate,
 }: {
-  children: React.ReactNode;
-  employer: React.ReactNode;
-  candidate: React.ReactNode;
+  children: ReactNode;
+  employer: ReactNode;
+  candidate: ReactNode;
 }) {
   const accountType = useSelector((state: any) => state.user.accountType);
 

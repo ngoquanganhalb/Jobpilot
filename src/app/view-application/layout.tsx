@@ -6,15 +6,19 @@ import { useSelector } from "react-redux";
 import Head from "next/head";
 import Breadcrumb from "@component/Breadcrumb";
 
+import { ReactNode } from "react";
+
+interface LayoutProps {
+  children: ReactNode;
+  employer: ReactNode;
+  candidate: ReactNode;
+}
+
 export default function DashboardLayout({
   children,
   employer,
   candidate,
-}: {
-  children: React.ReactNode;
-  employer: React.ReactNode;
-  candidate: React.ReactNode;
-}) {
+}: LayoutProps) {
   const accountType = useSelector((state: any) => state.user.accountType);
 
   return (
