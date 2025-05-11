@@ -58,22 +58,14 @@
 
 import Header from "@component/Header";
 import SearchBar from "@component/SearchBar";
-import { useSelector } from "react-redux";
 import Head from "next/head";
 import Breadcrumb from "@component/Breadcrumb";
-import { ReactNode } from "react";
 
-type LayoutProps = {
-  children?: ReactNode;
-  employer: ReactNode;
-  candidate: ReactNode;
-};
-
-export default function DashboardLayout(props: LayoutProps) {
-  const { children, employer, candidate } = props;
-
-  const accountType = useSelector((state: any) => state.user.accountType);
-
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <div>
       <Header />
@@ -89,14 +81,7 @@ export default function DashboardLayout(props: LayoutProps) {
         </Head>
 
         <div className="container flex flex-col md:flex-row gap-0">
-          <div className="flex-1">
-            {accountType === "employer" && employer}
-            {accountType === "candidate" && candidate}
-
-            {accountType !== "employer" &&
-              accountType !== "candidate" &&
-              children}
-          </div>
+          <div className="flex-1">{children}</div>
         </div>
 
         <div className="border-t border-gray-200 mt-12 py-6 bg-white">
