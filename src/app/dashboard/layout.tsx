@@ -79,8 +79,8 @@ import {
 // Định nghĩa các type cho props
 type LayoutProps = {
   children?: ReactNode;
-  employer?: ReactNode;
-  candidate?: ReactNode;
+  employer: ReactNode;
+  candidate: ReactNode;
 };
 
 export default function DashboardLayout(props: LayoutProps) {
@@ -134,4 +134,3 @@ export default function DashboardLayout(props: LayoutProps) {
     </div>
   );
 }
-
