@@ -289,14 +289,14 @@ export default function JobDetails() {
 
                       <p className="font-medium">
                         {job.expirationDate
-                          ? new Date(job.expirationDate).toLocaleDateString(
-                              "en-US",
-                              {
-                                year: "numeric",
-                                month: "long",
-                                day: "numeric",
-                              }
-                            )
+                          ? (job.expirationDate instanceof Timestamp
+                              ? job.expirationDate.toDate()
+                              : job.expirationDate
+                            ).toLocaleDateString("en-US", {
+                              year: "numeric",
+                              month: "long",
+                              day: "numeric",
+                            })
                           : "Undefined"}
                       </p>
                     </div>
