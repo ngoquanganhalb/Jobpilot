@@ -99,7 +99,7 @@ const FavoriteJob: React.FC = () => {
           const userDataFromFirestore = userSnap.data();
           const savedJobsId = userDataFromFirestore.savedJobs || [];
 
-          console.log("Saved job IDs: ", savedJobsId);
+          // console.log("Saved job IDs: ", savedJobsId);
 
           const jobData = await Promise.all(
             savedJobsId.map((jobId: string) => fetchJob(jobId))
@@ -301,14 +301,30 @@ const FavoriteJob: React.FC = () => {
                     </span>
                     <span>
                       🗓️{" "}
-                      {job.expirationDate
-                        ? new Date(job.expirationDate.seconds * 1000) >
-                          new Date()
-                          ? `Until ${new Date(
-                              job.expirationDate.seconds * 1000
-                            ).toLocaleDateString()}`
-                          : "Expired"
-                        : "No deadline"}
+                      {job.expirationDate && job.status === "Active"
+                        ? (() => {
+                            const now = new Date();
+                            now.setHours(0, 0, 0, 0);
+
+                            const expirationDate =
+                              job.expirationDate instanceof Date
+                                ? job.expirationDate
+                                : job.expirationDate.toDate();
+
+                            if (expirationDate > now) {
+                              const diffTime =
+                                expirationDate.getTime() - now.getTime();
+                              const diffDays = Math.ceil(
+                                diffTime / (1000 * 60 * 60 * 24)
+                              );
+                              return `${diffDays} day${
+                                diffDays > 1 ? "s" : ""
+                              } remain`;
+                            } else {
+                              return "Expired";
+                            }
+                          })()
+                        : "Expired"}
                     </span>
                   </div>
                 </div>

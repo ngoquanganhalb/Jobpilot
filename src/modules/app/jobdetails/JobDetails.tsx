@@ -67,6 +67,8 @@ export default function JobDetails() {
           // Convert Timestamp fields to Date
           const jobData: Job = {
             ...data,
+            jobId: jobId,
+            companyName: data.companyName || "Unknown Company",
             createdAt: (data.createdAt as Timestamp)?.toDate(),
             expirationDate: (data.expirationDate as Timestamp)?.toDate(),
           };
@@ -107,6 +109,7 @@ export default function JobDetails() {
               jobId: docSnap.id,
               createdAt: (data.createdAt as Timestamp)?.toDate(),
               expirationDate: (data.expirationDate as Timestamp)?.toDate(),
+              companyName: data.companyName || "Unknown Company",
             };
 
             jobs.push(relatedJob);
@@ -268,7 +271,10 @@ export default function JobDetails() {
                     <div>
                       <p className="text-gray-500 text-sm">JOB POSTED</p>
                       {job.createdAt
-                        ? new Date(job.createdAt).toLocaleDateString("en-US", {
+                        ? (job.createdAt instanceof Date
+                            ? job.createdAt
+                            : job.createdAt.toDate()
+                          ).toLocaleDateString("en-US", {
                             year: "numeric",
                             month: "long",
                             day: "numeric",
@@ -459,7 +465,7 @@ export default function JobDetails() {
                   id={job.jobId}
                   company={job.companyName || "Unknown Company"}
                   location={job.location?.province || "Unknown location"}
-                  title={job.jobTitle}
+                  title={job.jobTitle || "Unknown Title"}
                   type={job.jobType?.toUpperCase() || "FULL-TIME"}
                   salary={
                     job.minSalary && job.maxSalary
@@ -480,12 +486,12 @@ export default function JobDetails() {
       </div>
 
       <JobApplicationPopup
-        jobTitle={job.jobTitle}
+        jobTitle={job.jobTitle || "Unknown Title"}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSubmit={handlePopupForm}
         jobId={jobId}
-        candidateId={userId}
+        candidateId={userId || ""}
         onApplied={() => setCheckApplied(false)} //render ui
       />
     </div>

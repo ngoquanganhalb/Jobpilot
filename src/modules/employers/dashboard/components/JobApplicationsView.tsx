@@ -36,7 +36,12 @@ import {
 import { Dialog, DialogContent, DialogTitle } from "@component/ui/dialog";
 import { RadioGroup, RadioGroupItem } from "@component/ui/radio-group";
 import { Label } from "@component/ui/label";
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import {
+  DragDropContext,
+  Droppable,
+  Draggable,
+  DropResult,
+} from "@hello-pangea/dnd";
 import { StatusBadge } from "@component/ui/StatusBadge";
 import {
   Tooltip,
@@ -213,17 +218,33 @@ export default function JobApplicationsView() {
     const sortedApplications = [...applications];
     if (value === "newest") {
       sortedApplications.sort(
-        (a, b) => b.appliedAt.getTime() - a.appliedAt.getTime()
+        (a, b) =>
+          (b.appliedAt instanceof Date
+            ? b.appliedAt
+            : b.appliedAt.toDate()
+          ).getTime() -
+          (a.appliedAt instanceof Date
+            ? a.appliedAt
+            : a.appliedAt.toDate()
+          ).getTime()
       );
     } else {
       sortedApplications.sort(
-        (a, b) => a.appliedAt.getTime() - b.appliedAt.getTime()
+        (a, b) =>
+          (a.appliedAt instanceof Date
+            ? a.appliedAt
+            : a.appliedAt.toDate()
+          ).getTime() -
+          (b.appliedAt instanceof Date
+            ? b.appliedAt
+            : b.appliedAt.toDate()
+          ).getTime()
       );
     }
     setApplications(sortedApplications);
   };
 
-  const onDragEnd = async (result) => {
+  const onDragEnd = async (result: DropResult) => {
     const { destination, source, draggableId } = result;
 
     if (
@@ -254,7 +275,7 @@ export default function JobApplicationsView() {
       setFeedbackTarget({
         applicationId: draggedApp.id,
         newStatus,
-        applicationName: draggedApp.name,
+        applicationName: draggedApp.name || "Unknown name",
       });
       setShowFeedbackPopup(true);
       return;
@@ -278,16 +299,22 @@ export default function JobApplicationsView() {
   };
 
   // Function to group applications by status
-  const getApplicationsByStatus = (status) => {
+  const getApplicationsByStatus = (status: Application["status"]) => {
     return applications.filter((app) => app.status === status);
   };
 
-  const ApplicantCard = ({ application, index }) => {
+  const ApplicantCard = ({
+    application,
+    index,
+  }: {
+    application: Application;
+    index: number;
+  }) => {
     const [expanded, setExpanded] = useState(false);
 
     const isLongNote = application.note && application.note.length > 100;
     const shortNote = isLongNote
-      ? application.note.slice(0, 100) + "..."
+      ? (application.note ?? "").slice(0, 100) + "..."
       : application.note;
     if (loading) return <Spinner />;
     return (
@@ -335,7 +362,7 @@ export default function JobApplicationsView() {
                             handleChangeStatus(
                               application.id,
                               "pending",
-                              application.name
+                              application.name || "Unknown name"
                             )
                           }
                           disabled={application.status === "pending"}
@@ -349,7 +376,7 @@ export default function JobApplicationsView() {
                             handleChangeStatus(
                               application.id,
                               "reviewed",
-                              application.name
+                              application.name || "Unknown name"
                             )
                           }
                           disabled={application.status === "reviewed"}
@@ -363,7 +390,7 @@ export default function JobApplicationsView() {
                             handleChangeStatus(
                               application.id,
                               "interview",
-                              application.name
+                              application.name || "Unknown name"
                             )
                           }
                           disabled={application.status === "interview"}
@@ -377,7 +404,7 @@ export default function JobApplicationsView() {
                             handleChangeStatus(
                               application.id,
                               "rejected",
-                              application.name
+                              application.name || "Unknown name"
                             )
                           }
                           disabled={application.status === "rejected"}
@@ -391,7 +418,7 @@ export default function JobApplicationsView() {
                             handleChangeStatus(
                               application.id,
                               "hired",
-                              application.name
+                              application.name || "Unknown name"
                             )
                           }
                           disabled={application.status === "hired"}
@@ -406,7 +433,7 @@ export default function JobApplicationsView() {
                           onClick={() =>
                             handleDeleteApplication(
                               application.id,
-                              application.name
+                              application.name || "Unknown name"
                             )
                           }
                         >

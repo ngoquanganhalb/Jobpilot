@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { X, Upload, ArrowRight } from "lucide-react";
+import { Upload, ArrowRight } from "lucide-react";
 import {
   collection,
   addDoc,
@@ -37,6 +37,7 @@ interface JobApplicationFormProps {
   isOpen: boolean;
   onClose: () => void;
   onApplied: () => void;
+  onSubmit?: () => void;
 }
 
 type FormData = {

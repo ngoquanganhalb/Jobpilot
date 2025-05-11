@@ -9,7 +9,7 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
-import { Application, ApplicationWithJob } from "../../../../types/db";
+import { Application, ApplicationWithJob, Job } from "../../../../types/db";
 import React, { useEffect, useState } from "react";
 import { db } from "@services/firebase/firebase";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
@@ -117,7 +117,7 @@ const AppliedJob: React.FC = () => {
                 ? data.appliedAt.toDate()
                 : null,
               candidateId: data.candidateId,
-              job: jobData || undefined,
+              job: jobData ? (jobData as Job) : undefined,
             };
           })
         );

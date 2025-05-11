@@ -68,9 +68,9 @@ export default function EmployerSettings() {
           //render date when refresh page
           setUserData(userInfo);
           setName(userInfo.name);
-          setBio(userInfo.profile.bio);
-          setLocation(userInfo.profile.location);
-          setPhone(userInfo.profile.phone);
+          setBio(userInfo.profile?.bio ?? "");
+          setLocation(userInfo.profile?.location ?? "");
+          setPhone(userInfo.profile?.phone ?? "");
           setUserName(userInfo.username);
         } else {
           console.error("User document does not exist.");
