@@ -106,3 +106,5 @@ export type Application = {
 export type ApplicationWithJob = Application & {
   job?: Job
 };
+
+export type Status = 'pending' | 'reviewed' | 'interview' | 'rejected' | 'hired'
