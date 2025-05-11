@@ -39,7 +39,7 @@ const JobBoxCandidate: React.FC<Props> = ({ application, onDelete }) => {
     );
   };
 
-  const renderStatus = (status: string) => {
+  const renderStatus = (status: "pending" | "reviewed" | "interview" | "hired" | "rejected") => {
     const baseClass =
       "flex items-center gap-2 px-3 py-1 rounded-md text-sm capitalize cursor-help";
     const statusClass = {
