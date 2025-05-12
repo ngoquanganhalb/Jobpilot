@@ -1,5 +1,6 @@
-import CandidateSettings from "@modules/client/dashboard/components/CandidateSettings";
+import CandidateSettingsMoudule from "@modules/client/candidatesettings/CandidateSettingsModule";
 
 export default function Page() {
-  return <CandidateSettings />;
+  // return <CandidateSettings />;
+  return <CandidateSettingsMoudule />;
 }

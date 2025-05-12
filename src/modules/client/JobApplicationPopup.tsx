@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Upload, ArrowRight } from "lucide-react";
 import {
   collection,
@@ -10,6 +10,7 @@ import {
   doc,
   arrayUnion,
   getDocs,
+  getDoc,
 } from "firebase/firestore";
 import { firestore } from "@/services/firebase/firebase";
 import { uploadToCloudinary } from "@utils/uploadToCloundinary";
@@ -29,6 +30,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@component/ui/select";
 
 interface JobApplicationFormProps {
   jobTitle: string;
@@ -62,6 +70,26 @@ export default function JobApplicationPopup({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const [cvOptions, setCvOptions] = useState<any[]>([]);
+  const [selectedCVUrl, setSelectedCVUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchCVs = async () => {
+      try {
+        const userId = candidateId; // hoặc auth.currentUser?.uid
+        const userDoc = await getDoc(doc(firestore, "users", userId));
+        if (userDoc.exists()) {
+          const data = userDoc.data();
+          setCvOptions(data.cvs || []);
+        }
+      } catch (error) {
+        console.error("Error fetching CVs:", error);
+      }
+    };
+
+    if (isOpen) fetchCVs();
+  }, [isOpen, candidateId]);
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setFormData({
@@ -75,7 +103,7 @@ export default function JobApplicationPopup({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.resume) {
+    if (!formData.resume && !selectedCVUrl) {
       toast.error("Please upload your resume.");
       return;
     }
@@ -98,7 +126,9 @@ export default function JobApplicationPopup({
         return;
       }
 
-      const resumeUrl = await uploadToCloudinary(formData.resume);
+      const resumeUrl = selectedCVUrl
+        ? selectedCVUrl
+        : await uploadToCloudinary(formData.resume!);
       // console.log(" 1. Upload resume lên Cloudinary:", resumeUrl);
 
       await addDoc(applicationsRef, {
@@ -180,7 +210,7 @@ export default function JobApplicationPopup({
                       type="button"
                       variant="outline"
                       onClick={triggerFileInput}
-                      className="flex items-center gap-2"
+                      className="flex items-center gap-2 cursor-pointer"
                     >
                       <Upload size={16} />
                       Upload Resume
@@ -195,6 +225,41 @@ export default function JobApplicationPopup({
                     Accepted formats: PDF, DOC, DOCX
                   </p>
                 </div>
+
+                {cvOptions.length > 0 && (
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium mb-1">
+                      (Or Choose Existing Resume)
+                    </label>
+                    <Select
+                      onValueChange={(selectedId) => {
+                        const selected = cvOptions.find(
+                          (cv) => cv.id === selectedId
+                        );
+                        if (selected) {
+                          setFormData({
+                            ...formData,
+                            resume: null, // vì đang dùng URL chứ không phải File
+                            resumeName: selected.name,
+                          });
+                          // Save URL để dùng submit
+                          setSelectedCVUrl(selected.url);
+                        }
+                      }}
+                    >
+                      <SelectTrigger className="w-full cursor-pointer">
+                        <SelectValue placeholder="Select a saved CV" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {cvOptions.map((cv) => (
+                          <SelectItem key={cv.id} value={cv.id}>
+                            {cv.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
 
                 {/* Cover Letter */}
                 <div>
@@ -214,12 +279,16 @@ export default function JobApplicationPopup({
             </form>
           </CardContent>
           <CardFooter className="flex justify-between border-t p-4">
-            <Button variant="outline" onClick={onClose}>
+            <Button
+              variant="outline"
+              onClick={onClose}
+              className="cursor-pointer"
+            >
               Cancel
             </Button>
             <Button
               type="submit"
-              className="bg-blue-600 hover:bg-blue-700 text-white"
+              className="bg-blue-600 hover:bg-blue-700 text-white cursor-pointer"
               onClick={handleSubmit}
               disabled={isSubmitting}
             >

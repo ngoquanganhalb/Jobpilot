@@ -17,6 +17,7 @@ import { BsThreeDots, BsFillEyeFill } from "react-icons/bs";
 import { GrUpgrade } from "react-icons/gr";
 import { MdDeleteForever, MdEdit } from "react-icons/md";
 import { AiOutlineBell } from "react-icons/ai";
+import { FaDollarSign } from "react-icons/fa";
 import Swal from "sweetalert2";
 import { useRef, useEffect } from "react";
 import { Button } from "@/components/ui/Button";
@@ -197,6 +198,7 @@ export default function JobBoxEmployer({
               </span>
               <span className="flex items-center gap-1">
                 💰{" "}
+                {/* <FaDollarSign/>  */}
                 {job.minSalary === 0 && job.maxSalary === 0
                   ? "Negotiate"
                   : `$${job.minSalary} - $${job.maxSalary}`}

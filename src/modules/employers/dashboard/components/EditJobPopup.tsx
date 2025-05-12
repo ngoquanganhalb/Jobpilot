@@ -63,6 +63,14 @@ export default function EditJobPopup({ open, onClose, job }: Props) {
 
     setLoading(true);
     try {
+      const now = new Date();
+      const expiration = formData.expirationDate
+        ? formData.expirationDate instanceof Date
+          ? formData.expirationDate
+          : formData.expirationDate.toDate()
+        : null;
+
+      const status = expiration && expiration >= now ? "Active" : "Expire";
       await updateDoc(doc(db, "jobs", formData.jobId), {
         jobTitle: formData.jobTitle ?? "",
         description: formData.description ?? "",
@@ -73,10 +81,11 @@ export default function EditJobPopup({ open, onClose, job }: Props) {
         isRemote: formData.isRemote ?? false,
         avatarCompany: formData.avatarCompany ?? "",
         tags: formData.tags,
+        status: status,
       });
       onClose();
       toast.success("Success update job");
-      dispatch(updateJob(formData)); //luu vao state
+      dispatch(updateJob({ ...formData, status })); //save state, update info no need to reload
     } catch (err) {
       console.log(err);
       toast.error("Error updating job:");

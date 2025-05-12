@@ -1,5 +1,5 @@
-import EmployerSettings from "@modules/employers/dashboard/components/EmployerSettings";
+import EmployerSettingsMoudule from "@modules/employers/employersettings/EmployerSettingsModule";
 
 export default function Page() {
-  return <EmployerSettings />;
+  return <EmployerSettingsMoudule />;
 }

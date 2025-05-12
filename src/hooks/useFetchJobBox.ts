@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { firestore } from "../services/firebase/firebase";
-import { collection, query, orderBy, where, getDocs } from "firebase/firestore";
+import { collection, query, orderBy, where, getDocs, Timestamp } from "firebase/firestore";
 import { Job } from "../types/db";
 
 export function useFetchJobBox(limit: number = 15) {
@@ -12,11 +12,12 @@ export function useFetchJobBox(limit: number = 15) {
     const fetchJobs = async () => {
       try {
         const jobsRef = collection(firestore, "jobs");
-
+        const today = Timestamp.fromDate(new Date());
         // Fetch only jobs with status === "Active"
         const q = query(
           jobsRef,
           where("status", "==", "Active"),
+          where("expirationDate", ">=", today),
           orderBy("createdAt", "desc")
         );
         

@@ -6,6 +6,7 @@ import {
   where,
   doc,
   onSnapshot,
+  Timestamp,
 } from "firebase/firestore";
 import { db } from "@/services/firebase/firebase";
 import { useRouter } from "next/navigation";
@@ -77,9 +78,11 @@ export default function SearchBar() {
       }
 
       try {
+        const today = Timestamp.fromDate(new Date());
         const q = query(
           collection(db, "jobs"),
-          where("status", "==", "Active")
+          where("status", "==", "Active"),
+          where("expirationDate", ">=", today)
         );
         const snapshot = await getDocs(q);
         const allJobs = snapshot.docs.map((doc) => {

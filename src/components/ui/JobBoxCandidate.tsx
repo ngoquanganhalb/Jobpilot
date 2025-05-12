@@ -14,6 +14,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@component/ui/tooltip";
+import Link from "next/link";
+import Paths from "@/constants/paths";
 
 type Props = {
   application: ApplicationWithJob;
@@ -89,9 +91,14 @@ const JobBoxCandidate: React.FC<Props> = ({ application, onDelete }) => {
           </div>
           <div>
             <div className="flex flex-wrap items-center gap-2">
-              <h3 className="text-base font-semibold text-gray-800">
+              {/* <h3 className="text-base font-semibold text-gray-800">
                 {application.job?.jobTitle || "No Title"}
-              </h3>
+              </h3> */}
+              <Link href={`${Paths.FIND_JOB}/${application.job?.jobId}`} passHref>
+                <h3 className="text-base font-semibold text-gray-800 hover:underline cursor-pointer">
+                  {application.job?.jobTitle || "No Title"}
+                </h3>
+              </Link>
               {renderJobTypeBadge(application.job?.jobType || "Unknown")}
             </div>
             <div className="flex flex-wrap gap-4 text-sm text-gray-500 mt-1">
