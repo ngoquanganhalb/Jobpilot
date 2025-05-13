@@ -1,5 +1,4 @@
 "use client";
-import { useSelector } from "react-redux";
 import Image from "next/image";
 import NavLink from "./ui/NavLink";
 import { Paths } from "@/constants/paths";
@@ -12,19 +11,9 @@ export default function Header() {
       <div className="text-sm text-gray-500 font-normal flex flex-wrap justify-center gap-4 md:gap-6">
         <NavLink href="/">Home</NavLink>
         <NavLink href="/find-job">Find Job</NavLink>
-        {/* <NavLink>Employers</NavLink>
-        <NavLink>Candidates</NavLink> */}
-        {/* <NavLink>Pricing Plans</NavLink> */}
-        {/* <NavLink>Customer Supports</NavLink> */}
-        {/* <NavLink href={Paths.DASHBOARD_OVERVIEW}>Dash Board</NavLink> */}
-        <NavLink href={Paths.DASHBOARD_OVERVIEW}>Dashboard</NavLink>
-        {/* {accountType === "candidate" && (
-          <NavLink href={Paths.DASHBOARD_APPLIEDJOB}>Dashboard</NavLink>
-        )}
-
-        {accountType === "employer" && (
-          <NavLink href={Paths.DASHBOARD_OVERVIEW}>Dashboard</NavLink>
-        )} */}
+        <NavLink href={Paths.DASHBOARD_OVERVIEW} activeBasePath="/dashboard">
+          Dashboard
+        </NavLink>
       </div>
 
       {/* Right contact */}
