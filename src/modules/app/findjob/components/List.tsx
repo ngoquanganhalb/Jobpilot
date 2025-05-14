@@ -210,7 +210,7 @@ export default function List() {
         {currentJobs.length === 0 ? (
           <p className="text-gray-500 text-lg font-semibold">No Job Found</p>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 2xl:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 2xl:grid-cols-3 gap-6 justify-items-center">
             {currentJobs.map((job) => (
               <JobBox
                 key={job.jobId}
