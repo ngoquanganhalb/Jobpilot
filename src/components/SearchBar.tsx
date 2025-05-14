@@ -202,9 +202,9 @@ export default function SearchBar() {
             <Link href="/sign-in" passHref>
               <Button variant="secondary">Sign In</Button>
             </Link>
-            {/* <Link href={Paths.DASHBOARD} passHref> */}
-            <Button>Post A Job</Button>
-            {/* </Link> */}
+            <Link href="/sign-in" passHref>
+              <Button>Post A Job</Button>
+            </Link>
           </>
         )}
       </div>
