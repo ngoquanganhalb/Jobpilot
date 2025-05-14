@@ -113,7 +113,8 @@ export default function List() {
     return jobs.filter((job) => {
       const keywordMatch =
         keyword === "" ||
-        (job.jobTitle?.toLowerCase().includes(keyword.toLowerCase()) ?? false) ||
+        (job.jobTitle?.toLowerCase().includes(keyword.toLowerCase()) ??
+          false) ||
         job.companyName.toLowerCase().includes(keyword.toLowerCase());
 
       const locationMatch =

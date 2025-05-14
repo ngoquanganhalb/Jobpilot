@@ -3,7 +3,7 @@ import { firestore } from "../services/firebase/firebase";
 import { collection, query, orderBy, where, getDocs, Timestamp } from "firebase/firestore";
 import { Job } from "../types/db";
 
-export function useFetchJobBox(limit: number = 15) {
+export function useFetchJobBox(limit: number = 10000) {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
