@@ -180,11 +180,11 @@ export default function JobApplicationPopup({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogOverlay className="bg-black/50" />
+      <DialogOverlay className="bg-black/50 " />
       <DialogContent className="p-0 bg-white rounded-lg w-full max-w-md mx-auto">
         <DialogTitle> </DialogTitle>
 
-        <Card className="border-0 shadow-none">
+        <Card className="border-0 shadow-none w-full">
           <CardHeader className="pb-2 relative">
             <CardTitle className="text-xl font-semibold">
               Apply Job: {jobTitle}
@@ -268,7 +268,7 @@ export default function JobApplicationPopup({
                   </label>
                   <Textarea
                     placeholder="Write down your biography here. Let the employers know who you are..."
-                    className="resize-none min-h-32"
+                    className="resize-none min-h-32 max-w-md break-words whitespace-normal"
                     value={formData.coverLetter}
                     onChange={(e) =>
                       setFormData({ ...formData, coverLetter: e.target.value })

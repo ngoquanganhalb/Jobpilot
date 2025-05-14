@@ -451,7 +451,7 @@ export default function JobApplicationsView() {
                     <div className="mt-3 text-sm text-gray-600 italic">
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <p className="line-clamp-2">
+                          <p className="line-clamp-2 break-words whitespace-normal">
                             {expanded ? application.note : shortNote}
                           </p>
                         </TooltipTrigger>
