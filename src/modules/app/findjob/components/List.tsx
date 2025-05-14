@@ -9,6 +9,10 @@ import { resetFilters, setFilters } from "@redux/slices/filterSlice";
 import { useDispatch } from "react-redux";
 import { useSearchParams } from "next/navigation";
 import Spinner from "@component/ui/Spinner";
+import {
+  setKeyword as setKeywordRedux,
+  setLocation as setLocationRedux,
+} from "@redux/slices/searchSlice";
 
 export default function List() {
   const limit = 12;
@@ -52,6 +56,14 @@ export default function List() {
       );
     }
   }, [queryTag]);
+
+  useEffect(() => {
+    const kw = searchParams.get("keyword") || "";
+    const loc = searchParams.get("location") || "";
+
+    dispatch(setKeywordRedux(kw));
+    dispatch(setLocationRedux(loc));
+  }, [searchParams, dispatch]);
 
   //only searchsearch
   // const searchedJobs = useMemo(() => {
