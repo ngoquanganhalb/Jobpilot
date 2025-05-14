@@ -94,7 +94,7 @@ export default function JobBox({
 
   return (
     <div
-      className={`relative flex flex-col w-[390px] p-[24px] border-3 border-[#E4E5E8] shadow-md rounded-[8px] hover:scale-105 transition-all duration-100 cursor-pointer ${variantStyles} ${className}`}
+      className={`relative flex flex-col w-[99%] sm:w-[390px] p-[24px] border-3 border-[#E4E5E8] shadow-md rounded-[8px] hover:scale-105 transition-all duration-100 cursor-pointer ${variantStyles} ${className}`}
       {...props}
     >
       {/* Bookmark button outside Link */}
