@@ -184,7 +184,7 @@ export default function JobDetails() {
           {/* Main Content */}
           <div className="lg:col-span-2">
             {/* logo */}
-            <div className="flex justify-between bg-white rounded-lg shadow-sm items-center mb-6 p-4 ">
+            <div className="flex justify-between sm:flex-row sm:items-center flex-col bg-white rounded-lg shadow-sm items-center mb-6 p-4 ">
               <div className="flex items-center gap-4 mb-4">
                 <div className=" w-16 h-16 rounded-full flex items-center justify-center">
                   {job.avatarCompany ? (
@@ -276,7 +276,7 @@ export default function JobDetails() {
               </CardContent>
             </Card>
 
-            <Card className="mb-6">
+            <Card className="mb-6 ">
               <CardContent className="p-6">
                 <h2 className="text-xl font-semibold mb-4">Job Overview</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
