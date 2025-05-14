@@ -1,7 +1,7 @@
 // app/jobs/[id]/page.tsx
 "use client";
 import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import { RootState } from "@redux/store";
 import { db, firestore } from "@services/firebase/firebase";
@@ -38,6 +38,8 @@ import Spinner from "@component/ui/Spinner";
 import Link from "next/link";
 import Paths from "@/constants/paths";
 
+import useAuth from "@hooks/useAuth";
+
 export default function JobDetails() {
   const params = useParams(); //take id url
   const jobId = params?.id as string;
@@ -49,6 +51,8 @@ export default function JobDetails() {
   const userId = useSelector((state: RootState) => state.user.id);
   const accountType = useSelector((state: RootState) => state.user.accountType);
   const [checkApplied, setCheckApplied] = useState<boolean | null>(null);
+  const { user } = useAuth();
+  const router = useRouter();
   const handlePopupForm = () => {
     setIsModalOpen(false);
   };
@@ -67,6 +71,8 @@ export default function JobDetails() {
           // Convert Timestamp fields to Date
           const jobData: Job = {
             ...data,
+            jobId: jobId,
+            companyName: data.companyName || "Unknown Company",
             createdAt: (data.createdAt as Timestamp)?.toDate(),
             expirationDate: (data.expirationDate as Timestamp)?.toDate(),
           };
@@ -88,10 +94,14 @@ export default function JobDetails() {
 
     const fetchRelatedJobs = async (tags: string[]) => {
       try {
+        // if (!tags || tags.length === 0) return;
+        const today = Timestamp.fromDate(new Date());
         // take atleast 1 same tagtag
         const relatedQuery = query(
           collection(db, "jobs"),
-          where("tags", "array-contains-any", tags)
+          where("tags", "array-contains-any", tags),
+          where("status", "==", "Active"),
+          where("expirationDate", ">=", today)
         );
 
         const querySnapshot = await getDocs(relatedQuery);
@@ -107,6 +117,7 @@ export default function JobDetails() {
               jobId: docSnap.id,
               createdAt: (data.createdAt as Timestamp)?.toDate(),
               expirationDate: (data.expirationDate as Timestamp)?.toDate(),
+              companyName: data.companyName || "Unknown Company",
             };
 
             jobs.push(relatedJob);
@@ -222,7 +233,13 @@ export default function JobDetails() {
                 checkApplied ? (
                   <Button
                     className="text-lg font-semibold px-6 py-6 bg-[#0A65CC] cursor-pointer"
-                    onClick={() => setIsModalOpen(true)}
+                    onClick={() => {
+                      if (!user) {
+                        router.push("/sign-in");
+                      } else {
+                        setIsModalOpen(true);
+                      }
+                    }}
                   >
                     Apply Now
                   </Button>
@@ -268,7 +285,10 @@ export default function JobDetails() {
                     <div>
                       <p className="text-gray-500 text-sm">JOB POSTED</p>
                       {job.createdAt
-                        ? new Date(job.createdAt).toLocaleDateString("en-US", {
+                        ? (job.createdAt instanceof Date
+                            ? job.createdAt
+                            : job.createdAt.toDate()
+                          ).toLocaleDateString("en-US", {
                             year: "numeric",
                             month: "long",
                             day: "numeric",
@@ -283,14 +303,14 @@ export default function JobDetails() {
 
                       <p className="font-medium">
                         {job.expirationDate
-                          ? new Date(job.expirationDate).toLocaleDateString(
-                              "en-US",
-                              {
-                                year: "numeric",
-                                month: "long",
-                                day: "numeric",
-                              }
-                            )
+                          ? (job.expirationDate instanceof Timestamp
+                              ? job.expirationDate.toDate()
+                              : job.expirationDate
+                            ).toLocaleDateString("en-US", {
+                              year: "numeric",
+                              month: "long",
+                              day: "numeric",
+                            })
                           : "Undefined"}
                       </p>
                     </div>
@@ -459,7 +479,7 @@ export default function JobDetails() {
                   id={job.jobId}
                   company={job.companyName || "Unknown Company"}
                   location={job.location?.province || "Unknown location"}
-                  title={job.jobTitle}
+                  title={job.jobTitle || "Unknown Title"}
                   type={job.jobType?.toUpperCase() || "FULL-TIME"}
                   salary={
                     job.minSalary && job.maxSalary
@@ -480,12 +500,12 @@ export default function JobDetails() {
       </div>
 
       <JobApplicationPopup
-        jobTitle={job.jobTitle}
+        jobTitle={job.jobTitle || "Unknown Title"}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSubmit={handlePopupForm}
         jobId={jobId}
-        candidateId={userId}
+        candidateId={userId || ""}
         onApplied={() => setCheckApplied(false)} //render ui
       />
     </div>

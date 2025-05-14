@@ -79,7 +79,7 @@ export type Job = {
   urgent?: boolean;
   location?: Location;
   isRemote?: boolean;
-  expirationDate?: Date;
+  expirationDate?: Date | Timestamp;
   applicants?: string[]; // userid
   status?: JobStatus;
   createdAt?: Date | Timestamp
@@ -90,7 +90,7 @@ export type Application = {
   id:string
   jobId: string;
   candidateId: string;
-  appliedAt: Date; 
+  appliedAt: Date | Timestamp; 
   status: 'pending' | 'reviewed' | 'interview' | 'rejected' | 'hired';
   resumeUrl?: string;
   note?: string;
@@ -106,3 +106,5 @@ export type Application = {
 export type ApplicationWithJob = Application & {
   job?: Job
 };
+
+export type Status = 'pending' | 'reviewed' | 'interview' | 'rejected' | 'hired'

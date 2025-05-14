@@ -91,8 +91,12 @@ export default function MyJobs() {
   const totalSteps = Math.ceil(totalJobs / limit);
 
   const sortedJobs = [...jobs].sort((a, b) => {
-    const timeA = a.createdAt?.getTime() ?? 0;
-    const timeB = b.createdAt?.getTime() ?? 0;
+    const timeA = a.createdAt instanceof Date
+      ? a.createdAt.getTime()
+      : a.createdAt?.toDate().getTime() ?? 0;
+    const timeB = b.createdAt instanceof Date
+      ? b.createdAt.getTime()
+      : b.createdAt?.toDate().getTime() ?? 0;
     return timeB - timeA;
   });
 

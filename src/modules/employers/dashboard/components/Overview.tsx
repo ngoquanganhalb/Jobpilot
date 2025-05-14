@@ -62,7 +62,7 @@ export default function OverviewEmployer() {
             jobType: data.jobType,
             tags: data.tags,
             description: data.description,
-            isRemote:data.isRemote
+            isRemote: data.isRemote,
           };
         });
 
@@ -140,14 +140,20 @@ export default function OverviewEmployer() {
         ) : jobs.length === 0 ? (
           <div className="p-6 text-center text-gray-500">
             <h3 className="text-lg font-semibold mb-2">No Jobs Found</h3>
-            <p>Looks like you haven't posted any jobs yet.</p>
+            <p>Looks like you have not posted any jobs yet.</p>
           </div>
         ) : (
           <ul className="divide-y divide-gray-100">
             {[...jobs]
               .sort((a, b) => {
-                const timeA = a.createdAt?.getTime() ?? 0;
-                const timeB = b.createdAt?.getTime() ?? 0;
+                const timeA =
+                  a.createdAt instanceof Date
+                    ? a.createdAt.getTime()
+                    : a.createdAt?.toDate().getTime() ?? 0;
+                const timeB =
+                  b.createdAt instanceof Date
+                    ? b.createdAt.getTime()
+                    : b.createdAt?.toDate().getTime() ?? 0;
                 return timeB - timeA;
               })
               .slice(0, 5)

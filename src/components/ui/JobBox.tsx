@@ -33,7 +33,7 @@ export default function JobBox({
       const userRef = doc(firestore, "users", currentUser.uid);
       const userSnap = await getDoc(userRef);
       const savedJobs: string[] = userSnap.data()?.savedJobs || [];
-      setIsBookmarked(savedJobs.includes(id));
+      setIsBookmarked(id ? savedJobs.includes(id) : false);
     };
 
     fetchBookmarkStatus();
@@ -56,7 +56,7 @@ export default function JobBox({
       const savedJobs: string[] = userSnap.data()?.savedJobs || [];
 
       let updatedSavedJobs;
-      if (savedJobs.includes(id)) {
+      if (id && savedJobs.includes(id)) {
         updatedSavedJobs = savedJobs.filter((jobId) => jobId !== id);
         toast.info("Removed from favorites");
         setIsBookmarked(false);

@@ -1,5 +1,5 @@
 "use client";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, Timestamp, updateDoc } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import { db, firestore } from "@services/firebase/firebase";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
@@ -21,6 +21,7 @@ const FavoriteJob: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [savedJobs, setSavedJobs] = useState<Job[]>([]);
   const totalSteps = Math.ceil(savedJobs.length / limit);
+  const today = Timestamp.fromDate(new Date());
 
   // Pagination handlers
   const handleNext = () => {
@@ -99,7 +100,7 @@ const FavoriteJob: React.FC = () => {
           const userDataFromFirestore = userSnap.data();
           const savedJobsId = userDataFromFirestore.savedJobs || [];
 
-          console.log("Saved job IDs: ", savedJobsId);
+          // console.log("Saved job IDs: ", savedJobsId);
 
           const jobData = await Promise.all(
             savedJobsId.map((jobId: string) => fetchJob(jobId))
@@ -301,14 +302,34 @@ const FavoriteJob: React.FC = () => {
                     </span>
                     <span>
                       🗓️{" "}
-                      {job.expirationDate
-                        ? new Date(job.expirationDate.seconds * 1000) >
-                          new Date()
-                          ? `Until ${new Date(
-                              job.expirationDate.seconds * 1000
-                            ).toLocaleDateString()}`
-                          : "Expired"
-                        : "No deadline"}
+                      {job.expirationDate && job.status === "Active" ? (
+                        (() => {
+                          const now = new Date();
+                          now.setHours(0, 0, 0, 0);
+
+                          const expirationDate =
+                            job.expirationDate instanceof Date
+                              ? job.expirationDate
+                              : job.expirationDate.toDate();
+
+                          if (expirationDate > now) {
+                            const diffTime =
+                              expirationDate.getTime() - now.getTime();
+                            const diffDays = Math.ceil(
+                              diffTime / (1000 * 60 * 60 * 24)
+                            );
+                            return `${diffDays} day${
+                              diffDays > 1 ? "s" : ""
+                            } remain`;
+                          } else {
+                            return (
+                              <span className="text-red-500">Expired</span>
+                            );
+                          }
+                        })()
+                      ) : (
+                        <span className="text-red-500">Expired</span>
+                      )}
                     </span>
                   </div>
                 </div>
@@ -329,11 +350,22 @@ const FavoriteJob: React.FC = () => {
                     }
                   />
                 </button>
-                <Link href={`${Paths.FIND_JOB}/${job.jobId}`}>
-                  <Button className="bg-blue-600 text-white hover:bg-blue-700 font-semibold px-4 py-2 text-sm rounded-md flex items-center gap-2 cursor-pointer">
-                    Apply Now <ArrowIcon />
+                {job.status === "Active" &&
+                job.expirationDate &&
+                job.expirationDate > today ? (
+                  <Link href={`${Paths.FIND_JOB}/${job.jobId}`}>
+                    <Button className="bg-blue-600 text-white hover:bg-blue-700 font-semibold px-4 py-2 text-sm rounded-md flex items-center gap-2 cursor-pointer">
+                      Apply Now <ArrowIcon />
+                    </Button>
+                  </Link>
+                ) : (
+                  <Button
+                    disabled
+                    className="bg-gray-300 text-gray-600 font-semibold px-4 py-2 text-sm rounded-md flex items-center gap-1 cursor-not-allowed"
+                  >
+                    Job Expired <ArrowIcon />
                   </Button>
-                </Link>
+                )}
               </div>
             </div>
           ))

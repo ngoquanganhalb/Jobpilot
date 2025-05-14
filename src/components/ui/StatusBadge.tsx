@@ -1,5 +1,9 @@
 //badge for status interview,....
-export const StatusBadge = ({ status }) => {
+
+import { Status } from "../../types/db";
+
+
+export const StatusBadge = ({ status }: { status: Status }) => {
   const statusConfig = {
     pending: { label: "New", bgColor: "bg-blue-100 text-blue-800" },
     reviewed: { label: "Reviewed", bgColor: "bg-purple-100 text-purple-800" },

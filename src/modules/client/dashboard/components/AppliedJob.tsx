@@ -9,7 +9,7 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
-import { Application, ApplicationWithJob } from "../../../../types/db";
+import { Application, ApplicationWithJob, Job } from "../../../../types/db";
 import React, { useEffect, useState } from "react";
 import { db } from "@services/firebase/firebase";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
@@ -30,6 +30,9 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@component/ui/tooltip";
+import Paths from "@/constants/paths";
+import router from "next/router";
+import Link from "next/link";
 
 const AppliedJob: React.FC = () => {
   const MySwal = withReactContent(Swal);
@@ -117,7 +120,7 @@ const AppliedJob: React.FC = () => {
                 ? data.appliedAt.toDate()
                 : null,
               candidateId: data.candidateId,
-              job: jobData || undefined,
+              job: jobData ? (jobData as Job) : undefined,
             };
           })
         );
@@ -230,9 +233,15 @@ const AppliedJob: React.FC = () => {
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h3 className="text-base font-semibold text-gray-800">
-                        {applications.job?.jobTitle || "No Title"}
-                      </h3>
+                      <Link
+                        href={`${Paths.FIND_JOB}/${applications.jobId}`}
+                        passHref
+                      >
+                        <h3 className="text-base font-semibold text-gray-800 hover:underline cursor-pointer">
+                          {applications.job?.jobTitle || "No Title"}
+                        </h3>
+                      </Link>
+
                       {renderJobTypeBadge(
                         applications.job?.jobType || "Unknown"
                       )}

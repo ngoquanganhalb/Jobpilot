@@ -85,7 +85,10 @@ export default function List() {
           return {
             ...data,
             id: docSnap.id,
-            appliedAt: data.appliedAt.toDate?.() ?? new Date(),
+            appliedAt:
+              data.appliedAt instanceof Date
+                ? data.appliedAt
+                : data.appliedAt.toDate(),
             job: jobData,
           };
         })
@@ -129,14 +132,20 @@ export default function List() {
         </div>
 
         {/* Application Items */}
-        <div className="">
-          {applications.slice(0, 5).map((app) => (
-            <JobBoxCandidate
-              key={app.id}
-              application={app}
-              onDelete={handleDelete}
-            />
-          ))}
+        <div>
+          {applications.length === 0 ? (
+            <p className="text-center text-gray-500 py-8">No job found.</p>
+          ) : (
+            applications
+              .slice(0, 5)
+              .map((app) => (
+                <JobBoxCandidate
+                  key={app.id}
+                  application={app}
+                  onDelete={handleDelete}
+                />
+              ))
+          )}
         </div>
       </div>
     </div>

@@ -27,6 +27,7 @@ import { JOB_TAG_OPTIONS, JobTag } from "../../../../types/db";
 import ArrowIcon from "@component/icons/ArrowIcon";
 import Paths from "@/constants/paths";
 import Button from "@component/ui/ButtonCustom";
+import { JSX } from "react";
 
 const categoryIcons: Record<JobTag, JSX.Element> = {
   Engineering: <MdEngineering className="text-indigo-500 text-2xl" />,

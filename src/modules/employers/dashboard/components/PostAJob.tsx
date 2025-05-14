@@ -557,7 +557,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 // Define schema with zod
 const jobFormSchema = z.object({
   jobTitle: z.string().min(1, "Job title is required"),
-  jobType: z.string().default("full-time"),
+  jobType: z.string().min(1, "Job type is required"),
   tags: z.array(z.string()).min(1, "At least one tag is required"),
   minSalary: z.number().min(0, "Min salary must be 0 or greater"),
   maxSalary: z
@@ -569,7 +569,7 @@ const jobFormSchema = z.object({
     ),
   description: z.string().min(1, "Description is required"),
   avatarCompany: z.string().optional(),
-  isRemote: z.boolean().default(true),
+  isRemote: z.boolean(),
   expirationDate: z
     .date()
     .refine(
