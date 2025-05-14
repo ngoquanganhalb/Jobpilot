@@ -1,4 +1,5 @@
 "use client";
+import { useRouter } from "next/navigation";
 import CandidateIcon from "@component/icons/CandidateIcon";
 import CompanyIcon from "@component/icons/CompanyIcon";
 import JobIcon from "@component/icons/JobIcon";
@@ -12,11 +13,47 @@ import { db } from "@services/firebase/firebase";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import useDebounce from "@hooks/useDebounce";
+import {
+  setKeyword as setKeywordRedux,
+  setLocation as setLocationRedux,
+} from "@redux/slices/searchSlice";
 
 export default function Banner() {
   const [jobCount, setJobCount] = useState(0);
   const [companyCount, setCompanyCount] = useState(0);
   const [candidateCount, setCandidateCount] = useState(0);
+  const dispatch = useDispatch();
+  const [keyword, setKeyword] = useState("");
+  const [location, setLocation] = useState("");
+  const debouncedKeyword = useDebounce(keyword, 500);
+  const debouncedLocation = useDebounce(location, 500);
+
+  const router = useRouter();
+
+  const handleSearch = () => {
+    const trimmedKeyword = keyword.trim();
+    const trimmedLocation = location.trim();
+
+    dispatch(setKeywordRedux(trimmedKeyword));
+    dispatch(setLocationRedux(trimmedLocation));
+
+    const query = new URLSearchParams();
+    if (trimmedKeyword) query.append("keyword", trimmedKeyword);
+    if (trimmedLocation) query.append("location", trimmedLocation);
+
+    router.push(`/find-job?${query.toString()}`);
+  };
+
+  //debounce search
+  useEffect(() => {
+    dispatch(setKeywordRedux(debouncedKeyword));
+  }, [debouncedKeyword, dispatch]);
+
+  useEffect(() => {
+    dispatch(setLocationRedux(debouncedLocation));
+  }, [debouncedLocation, dispatch]);
 
   useEffect(() => {
     async function fetchCounts() {
@@ -68,17 +105,23 @@ export default function Banner() {
                   icon={<SearchIcon />}
                   placeholder="Job title, Keyword..."
                   className="flex-1 border-none"
+                  value={keyword}
+                  onChange={(e) => setKeyword(e.target.value)}
                 />
                 <Line className="hidden sm:block" />
                 <Input
                   icon={<LocationIcon />}
                   placeholder="Your Location"
                   className="flex-1 border-none"
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
                 />
               </div>
             </div>
             <div className="flex items-center justify-end">
-              <Button className="w-full md:w-auto">Find Job</Button>
+              <Button className="w-full md:w-auto" onClick={handleSearch}>
+                Find Job
+              </Button>
             </div>
           </div>
         </div>
