@@ -160,7 +160,7 @@ export default function LocationSelector({
   const districts = selectedProvince?.districts || [];
 
   useEffect(() => {
-    // Chỉ gọi onChange nếu giá trị mới khác với giá trị cũ
+    // only call onChange if new value diff to previous value
     if (
       value.province !== province ||
       value.district !== district ||

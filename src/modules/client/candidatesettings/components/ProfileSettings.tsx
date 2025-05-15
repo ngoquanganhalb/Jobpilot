@@ -17,7 +17,6 @@ import { toBase64 } from "@lib/convertBase64";
 import AvatarDropzone from "@component/ui/AvatarDropZone";
 import { MdLocationOn, MdPerson, MdPhone } from "react-icons/md";
 
-// Validation Schemas
 const ProfileSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
   location: z.string().optional(),
@@ -30,7 +29,7 @@ export default function ProfileSettings() {
   const [loading, setLoading] = useState(false);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-  // Profile Form
+
   const {
     control: profileControl,
     handleSubmit: handleProfileSubmit,
@@ -79,7 +78,6 @@ export default function ProfileSettings() {
 
           setUserData(userInfo);
 
-          // Set profile form values
           setProfileValue("name", userInfo.name);
           setProfileValue("location", userInfo.profile?.location ?? "");
           setProfileValue("phone", userInfo.profile?.phone ?? "");

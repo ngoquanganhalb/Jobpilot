@@ -13,7 +13,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Loader2 } from "lucide-react";
 import { UserModel } from "@types";
 import { toast } from "react-toastify";
@@ -83,12 +82,12 @@ export default function CandidateSettings() {
       }
     });
 
-    return () => unsubscribe(); // cleanup
+    return () => unsubscribe();
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!userData || !userData.id) return; // userData.id là id document trong firestore
+    if (!userData || !userData.id) return; // userData.id is id document in firestore
 
     setLoading(true);
     try {
@@ -96,12 +95,12 @@ export default function CandidateSettings() {
 
       let avatarUrl = userData.avatarUrl;
 
-      // Upload avatar nếu có
+      // Upload avatar
       if (avatarFile) {
         avatarUrl = await toBase64(avatarFile);
       }
 
-      // Cập nhật Firestore
+      // up Firestore
       await updateDoc(userRef, {
         name,
         avatarUrl,

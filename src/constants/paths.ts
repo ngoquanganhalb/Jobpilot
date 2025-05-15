@@ -15,6 +15,5 @@ export const Paths = {
   SIGN_IN: '/sign-in',
   SIGN_UP: '/sign-up',
   FAVORITE_JOB: '/dashboard/favorite-job'
-  // DASHOBOARD_FAVORITEJOB:  '/dashboard/favorite-job',
 };
 export default Paths;

@@ -91,10 +91,10 @@ const JobBoxCandidate: React.FC<Props> = ({ application, onDelete }) => {
           </div>
           <div>
             <div className="flex flex-wrap items-center gap-2">
-              {/* <h3 className="text-base font-semibold text-gray-800">
-                {application.job?.jobTitle || "No Title"}
-              </h3> */}
-              <Link href={`${Paths.FIND_JOB}/${application.job?.jobId}`} passHref>
+              <Link
+                href={`${Paths.FIND_JOB}/${application.job?.jobId}`}
+                passHref
+              >
                 <h3 className="text-base font-semibold text-gray-800 hover:underline cursor-pointer">
                   {application.job?.jobTitle || "No Title"}
                 </h3>

@@ -46,7 +46,6 @@ export default function Banner() {
     router.push(`/find-job?${query.toString()}`);
   };
 
-  //debounce search
   useEffect(() => {
     dispatch(setKeywordRedux(debouncedKeyword));
   }, [debouncedKeyword, dispatch]);

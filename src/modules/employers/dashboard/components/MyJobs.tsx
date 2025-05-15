@@ -11,8 +11,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@redux/store";
 import { setJobs } from "@redux/slices/jobSlice";
 import StepPagination from "@component/ui/StepPagination";
-import Link from "next/link";
-import Paths from "@/constants/paths";
 import { HiBriefcase } from "react-icons/hi";
 
 export default function MyJobs() {
@@ -21,7 +19,6 @@ export default function MyJobs() {
   );
   const dispatch = useDispatch();
   const jobs = useSelector((state: RootState) => state.jobs.jobs);
-  // const [myJobs, setMyJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   //pagnition
   const limit = 10;
@@ -91,12 +88,14 @@ export default function MyJobs() {
   const totalSteps = Math.ceil(totalJobs / limit);
 
   const sortedJobs = [...jobs].sort((a, b) => {
-    const timeA = a.createdAt instanceof Date
-      ? a.createdAt.getTime()
-      : a.createdAt?.toDate().getTime() ?? 0;
-    const timeB = b.createdAt instanceof Date
-      ? b.createdAt.getTime()
-      : b.createdAt?.toDate().getTime() ?? 0;
+    const timeA =
+      a.createdAt instanceof Date
+        ? a.createdAt.getTime()
+        : a.createdAt?.toDate().getTime() ?? 0;
+    const timeB =
+      b.createdAt instanceof Date
+        ? b.createdAt.getTime()
+        : b.createdAt?.toDate().getTime() ?? 0;
     return timeB - timeA;
   });
 

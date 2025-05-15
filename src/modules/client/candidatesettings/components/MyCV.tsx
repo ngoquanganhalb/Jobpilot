@@ -52,7 +52,6 @@ export default function MyCV() {
   const [user, setUser] = useState<any | null>(null);
   const auth = getAuth();
 
-  //  Lắng nghe sự thay đổi user
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       setUser(firebaseUser);
@@ -62,7 +61,7 @@ export default function MyCV() {
   }, []);
 
   useEffect(() => {
-    // Fetch existing CVs from Firestore
+    // Fetch  CVs
     const fetchCVs = async () => {
       if (!user?.uid) return;
 
@@ -120,7 +119,6 @@ export default function MyCV() {
     try {
       setIsUploading(true);
 
-      // Upload file to Cloudinary
       const url = await uploadToCloudinary(selectedFile);
 
       // Create new CV object
@@ -133,16 +131,14 @@ export default function MyCV() {
         uploadDate: new Date(),
       };
 
-      // Update Firestore
+      // Update db
       const userRef = doc(db, "users", user.uid);
       await updateDoc(userRef, {
         cvs: arrayUnion(newCV),
       });
 
-      // Update local state
       setCvs((prevCvs) => [...prevCvs, newCV]);
 
-      // Reset form
       setSelectedFile(null);
       setCvName("");
       setIsOpen(false);
@@ -160,13 +156,11 @@ export default function MyCV() {
     try {
       const filteredCvs = cvs.filter((cv) => cv.id !== cvId);
 
-      // Update Firestore
       const userRef = doc(db, "users", user.uid);
       await updateDoc(userRef, {
         cvs: filteredCvs,
       });
 
-      // Update local state
       setCvs(filteredCvs);
     } catch (error) {
       console.error("Error deleting CV:", error);
@@ -210,17 +204,7 @@ export default function MyCV() {
                     <MoreVertical className="h-4 w-4" />
                   </Button>
                 </PopoverTrigger>
-                {/* <PopoverContent className="w-48 p-0">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="w-full flex justify-start text-red-500 hover:text-red-600 hover:bg-red-50"
-                    onClick={() => handleDelete(cv.id)}
-                  >
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    Delete
-                  </Button>
-                </PopoverContent> */}
+
                 <PopoverContent className="w-48 p-1 space-y-1 cursor-pointer">
                   <a
                     href={cv.url}

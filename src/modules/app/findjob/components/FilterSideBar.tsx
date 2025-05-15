@@ -240,22 +240,6 @@ export default function FilterSideBar() {
               type="multiple"
               defaultValue={["location", "jobTags", "jobTypes", "salary"]}
             >
-              {/* <AccordionItem value="location">
-                <AccordionTrigger className="py-2">Location</AccordionTrigger>
-                <AccordionContent className="p-2">
-                  <Controller
-                    name="location"
-                    control={control}
-                    render={({ field }) => (
-                      <Input
-                        placeholder="City, state, or zip code"
-                        {...field}
-                      />
-                    )}
-                  />
-                </AccordionContent>
-              </AccordionItem> */}
-
               <AccordionItem value="jobTags">
                 <AccordionTrigger className="py-2">
                   Job Categories

@@ -18,7 +18,6 @@ export default function Filter() {
   const debouncedKeyword = useDebounce(keyword, 500);
   const debouncedLocation = useDebounce(location, 500);
 
-  //debounce search
   useEffect(() => {
     dispatch(setKeywordRedux(debouncedKeyword));
   }, [debouncedKeyword, dispatch]);

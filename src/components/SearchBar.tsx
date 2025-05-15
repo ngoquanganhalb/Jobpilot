@@ -19,7 +19,6 @@ import Logo from "./icons/Logo";
 import SearchIcon from "./icons/SearchIcon";
 import Button from "./ui/ButtonCustom";
 import Input from "./ui/InputCustom";
-import NotificationButton from "./ui/NotificationButton";
 import AvatarMenu from "./ui/AvatarMenu";
 
 export default function SearchBar() {
@@ -194,7 +193,6 @@ export default function SearchBar() {
       <div className="flex gap-3 mt-4 xl:mt-0">
         {user ? (
           <>
-            {/* <NotificationButton /> */}
             <AvatarMenu user={user} />
           </>
         ) : (

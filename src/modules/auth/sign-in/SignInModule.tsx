@@ -48,7 +48,6 @@ const SignInModule: React.FC = () => {
       );
       const user = userCredential.user;
       const token = await getIdToken(user); // getget token
-      // console.log("token: ", token)
       // get mỏe info from firestore
       const docRef = doc(db, "users", user.uid);
       const docSnap = await getDoc(docRef);
@@ -74,13 +73,8 @@ const SignInModule: React.FC = () => {
         })
       );
 
-      // Save to cookie
-      // setCookie("token", token); // Token
-      // setCookie("accountType", accountType); //  Role
       setCookie("token", await user.getIdToken(), { maxAge: 60 * 60 * 24 }); // 1 Day
       setCookie("accountType", accountType, { maxAge: 60 * 60 * 24 });
-      // setCookie("token", await user.getIdToken(), { maxAge: 60  }); // 1 Day
-      // setCookie("accountType", accountType, { maxAge: 60 });
 
       router.push("/");
     } catch (err: any) {
@@ -90,8 +84,6 @@ const SignInModule: React.FC = () => {
       setIsLoading(false);
     }
   };
-
-
 
   return (
     <div className="flex min-h-screen bg-gray-50 ">
