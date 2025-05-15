@@ -129,7 +129,6 @@ export default function JobApplicationPopup({
       const resumeUrl = selectedCVUrl
         ? selectedCVUrl
         : await uploadToCloudinary(formData.resume!);
-      // console.log(" 1. Upload resume lên Cloudinary:", resumeUrl);
 
       await addDoc(applicationsRef, {
         jobId,
@@ -158,8 +157,6 @@ export default function JobApplicationPopup({
       } else {
         console.error("Job not found!");
       }
-
-      // console.log("2. Ghi vào Firestore");
 
       toast.success("Application submitted successfully!");
       onApplied();

@@ -1,4 +1,3 @@
-// app/jobs/[id]/page.tsx
 "use client";
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
@@ -135,7 +134,7 @@ export default function JobDetails() {
 
   useEffect(() => {
     const checkNoApplied = async () => {
-      // Check chi dang applicationapplication duoc 1 lan
+      // Check one time appliccation
       const applicationsRef = collection(firestore, "applications");
       const checkQuery = query(
         applicationsRef,
@@ -315,29 +314,6 @@ export default function JobDetails() {
                       </p>
                     </div>
                   </div>
-                  {/* <div className="flex items-start gap-3">
-                    <Briefcase className="w-5 h-5 text-blue-500 mt-1" />
-                    <div>
-                      <p className="text-gray-500 text-sm">JOB LEVEL</p> */}
-                  {/* <p className="font-medium">{job.experienceLevel}</p> */}
-                  {/* <p className="font-medium">Entry Level</p>
-                    </div>
-                  </div> */}
-                  {/* <div className="flex items-start gap-3">
-                    <DollarSign className="w-5 h-5 text-blue-500 mt-1" />
-                    <div>
-                      <p className="text-gray-500 text-sm">EXPERIENCE</p>
-                      <p className="font-medium">{job.experience}</p>
-                    </div>
-                  </div> */}
-                  {/* <div className="flex items-start gap-3">
-                    <BookOpen className="w-5 h-5 text-blue-500 mt-1" />
-                    <div>
-                      <p className="text-gray-500 text-sm">EDUCATION</p> */}
-                  {/* <p className="font-medium">{job.education}</p> */}
-                  {/* <p className="font-medium">Graduation</p>
-                    </div>
-                  </div> */}
                 </div>
 
                 <Separator className="my-6" />
@@ -448,23 +424,6 @@ export default function JobDetails() {
                 )}
               </CardContent>
             </Card>
-
-            {/* <Card>
-              <CardContent className="p-6">
-                <h2 className="text-xl font-semibold mb-4">Job Benefits</h2>
-                <div className="flex flex-wrap gap-2">
-                  {jobBenefits.map((benefit, index) => (
-                    <Badge
-                      key={index}
-                      variant="secondary"
-                      className="px-3 py-1.5 mb-2"
-                    >
-                      {benefit.name}
-                    </Badge>
-                  ))}
-                </div>
-              </CardContent>
-            </Card> */}
           </div>
         </div>
 

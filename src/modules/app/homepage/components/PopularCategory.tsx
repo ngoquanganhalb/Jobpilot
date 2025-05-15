@@ -64,33 +64,6 @@ const categoryIcons: Record<JobTag, JSX.Element> = {
   Others: <MdMoreHoriz className="text-gray-400 text-2xl" />,
 };
 
-// const jobTags: JobTag[] = [
-//   "Engineering",
-//   "Design",
-//   "Marketing",
-//   "Sales",
-//   "Finance",
-//   "Human Resources",
-//   "Customer Support",
-//   "Software Development",
-//   "Web Development",
-//   "Mobile Development",
-//   "UI/UX Design",
-//   "Operations",
-//   "Education",
-//   "Healthcare",
-//   "Retail",
-//   "Hospitality",
-//   "Manufacturing",
-//   "Transportation",
-//   "Entertainment",
-//   "Finance & Accounting",
-//   "Supply Chain & Logistics",
-//   "Social Media",
-//   "Sales & Business Development",
-//   "Others",
-// ];
-
 export const PopularCategory = () => {
   return (
     <div className="bg-gray-100 py-12">

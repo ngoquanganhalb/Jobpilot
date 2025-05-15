@@ -36,18 +36,6 @@ export type FormData = {
   agreeToTerms: boolean;
 };
 
-// export type JobBoxType = {
-//   id?: string;
-//   title: string;
-//   type: string;
-//   salary: string;
-//   company: string;
-//   location: string;
-//   className?: string;
-//   urgent?: boolean;
-//   logo?: string;
-//   variant?: "primary" | "secondary";
-// };
 
 //Only for JobBox.tsx useSearchJob
 export type JobBoxType = {
@@ -62,7 +50,7 @@ export type JobBoxType = {
   logo?: string;
   variant?: "primary" | "secondary";
 };
-//chi dung cho JobBoxEmployer.tsx
+//only for JobBoxEmployer.tsx
 export type JobPosting = {
   id: string;
   title: string;
@@ -74,7 +62,7 @@ export type JobPosting = {
   urgent?: boolean;
 }
 
-//dung cho FilterSideBar va useFilterJob , filterSlice
+//for FilterSideBar va useFilterJob , filterSlice
 export type FilterFormValues = {
   searchTerm?: string;
   location?: string;

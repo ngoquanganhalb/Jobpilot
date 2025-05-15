@@ -42,7 +42,7 @@ export default function List() {
     }
   }, [isMounted, searchParams]);
 
-  // Now you can safely use queryTag
+  // safely use queryTag
   useEffect(() => {
     if (queryTag) {
       dispatch(
@@ -64,58 +64,6 @@ export default function List() {
     dispatch(setKeywordRedux(kw));
     dispatch(setLocationRedux(loc));
   }, [searchParams, dispatch]);
-
-  //only searchsearch
-  // const searchedJobs = useMemo(() => {
-  //   return jobs.filter((job) => {
-  //     const keywordMatch =
-  //       keyword === "" ||
-  //       job.jobTitle.toLowerCase().includes(keyword.toLowerCase()) ||
-  //       job.companyName.toLowerCase().includes(keyword.toLowerCase());
-  //     const locationMatch =
-  //       location === "VietNam" ||
-  //       job.location?.toLowerCase().includes(location.toLowerCase());
-  //     return keywordMatch && locationMatch;
-  //   });
-  // }, [jobs, keyword, location]);
-
-  // const filterJobs = useMemo(() => {
-  //   return jobs.filter((job) => {
-
-  //     const locationMatch =
-  //       location === "" ||
-  //       job.location?.toLowerCase().includes(location.toLowerCase());
-
-  //     const tagMatch =
-  //       filter.tags.length === 0 ||
-  //       filter.tags.some((tag) =>
-  //         job.tags?.map((t) => t.toLowerCase()).includes(tag.toLowerCase())
-  //       );
-
-  //     const jobTypeMatch =
-  //       filter.jobTypes.length === 0 ||
-  //       filter.jobTypes.includes(job.jobType?.toUpperCase() as JobType);
-
-  //     const salaryMatch =
-  //       (!filter.minSalary ||
-  //         (typeof job.minSalary === "number" &&
-  //           job.minSalary >= filter.minSalary)) &&
-  //       (!filter.maxSalary ||
-  //         (typeof job.maxSalary === "number" &&
-  //           job.maxSalary <= filter.maxSalary));
-
-  //     const remoteMatch =
-  //       filter.isRemote === false || job.isRemote === filter.isRemote;
-
-  //     return (
-  //       locationMatch &&
-  //       tagMatch &&
-  //       jobTypeMatch &&
-  //       salaryMatch &&
-  //       remoteMatch
-  //     );
-  //   });
-  // }, [jobs, filter]);
 
   useEffect(() => {
     dispatch(resetFilters());
@@ -153,11 +101,6 @@ export default function List() {
             job.jobType?.toUpperCase() === filterJobType.toUpperCase()
         ) ??
           false);
-
-      // const remoteMatch =
-      //   filter.isRemote === null || filter.isRemote === undefined
-      //     ? true
-      //     : job.isRemote === filter.isRemote;
 
       const jobMin = typeof job.minSalary === "number" ? job.minSalary : null;
       const jobMax = typeof job.maxSalary === "number" ? job.maxSalary : null;

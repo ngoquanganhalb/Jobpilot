@@ -1,18 +1,11 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Building2, Loader2, MapPin, Phone } from "lucide-react";
+import { Building2, Loader2 } from "lucide-react";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { firestore } from "@services/firebase/firebase";
 import { Button } from "@component/ui/Button";
 import { Input } from "@component/ui/Input";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { UserModel } from "@types";
 import { toast } from "react-toastify";
@@ -125,41 +118,8 @@ export default function EmployerSettings() {
   };
 
   return (
-    // <div className="container mx-auto py-6">
-    //   <Card className="max-w-2xl mx-auto">
-    //     <CardHeader>
-    //       <CardTitle className="text-2xl">Profile Settings</CardTitle>
-    //       <CardDescription>Update your company information</CardDescription>
-    //     </CardHeader>
-    //     <CardContent>
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Profile Picture */}
-      {/* <div className="space-y-2">
-              <Label htmlFor="avatar">Profile Picture</Label>
-              <div className="flex items-center gap-4">
-                <Avatar className="h-30 w-30">
-                  <AvatarImage
-                    src={avatarPreview || userData?.avatarUrl}
-                    alt={userData?.name}
-                  />
-                  <AvatarFallback>
-                    {userData?.name?.charAt(0) || "U"}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex flex-col gap-2">
-                  <Input
-                    id="avatar"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleAvatarChange}
-                    className="max-w-sm"
-                  />
-                  <p className="text-sm text-gray-500">
-                    Recommended: Company Logo &lt;= 1MB
-                  </p>
-                </div>
-              </div>
-            </div> */}
 
       <div className="flex flex-col md:flex-row items-start md:items-center gap-8">
         {/* Avatar + Dropzone */}
@@ -250,8 +210,5 @@ export default function EmployerSettings() {
         )}
       </Button>
     </form>
-    //     </CardContent>
-    //   </Card>
-    // </div>
   );
 }

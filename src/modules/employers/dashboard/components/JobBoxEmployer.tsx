@@ -17,7 +17,6 @@ import { BsThreeDots, BsFillEyeFill } from "react-icons/bs";
 import { GrUpgrade } from "react-icons/gr";
 import { MdDeleteForever, MdEdit } from "react-icons/md";
 import { AiOutlineBell } from "react-icons/ai";
-import { FaDollarSign } from "react-icons/fa";
 import Swal from "sweetalert2";
 import { useRef, useEffect } from "react";
 import { Button } from "@/components/ui/Button";
@@ -197,8 +196,7 @@ export default function JobBoxEmployer({
                 📍 {job.location?.province || "Unknown location"}
               </span>
               <span className="flex items-center gap-1">
-                💰{" "}
-                {/* <FaDollarSign/>  */}
+                💰 {/* <FaDollarSign/>  */}
                 {job.minSalary === 0 && job.maxSalary === 0
                   ? "Negotiate"
                   : `$${job.minSalary} - $${job.maxSalary}`}
@@ -257,9 +255,6 @@ export default function JobBoxEmployer({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-48">
-              {/* <DropdownMenuItem className="cursor-pointer">
-                <GrUpgrade className="h-4 w-4 mr-2 text-blue-600" /> Promote Job
-              </DropdownMenuItem> */}
               <DropdownMenuItem
                 className="cursor-pointer"
                 onClick={() => handleViewDetail(job.jobId)}

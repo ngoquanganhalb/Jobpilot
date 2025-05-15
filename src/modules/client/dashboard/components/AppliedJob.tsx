@@ -31,7 +31,6 @@ import {
   TooltipTrigger,
 } from "@component/ui/tooltip";
 import Paths from "@/constants/paths";
-import router from "next/router";
 import Link from "next/link";
 
 const AppliedJob: React.FC = () => {
@@ -133,7 +132,6 @@ const AppliedJob: React.FC = () => {
       }
     });
 
-    // Cleanup auth khi component unmount
     return () => unsubscribe();
   }, []);
 

@@ -102,15 +102,6 @@ export default function OverviewEmployer() {
             <BsBriefcase className="text-blue-600 text-xl" />
           </div>
         </div>
-        {/* <div className="bg-yellow-50 rounded-lg p-6 flex justify-between items-center">
-          <div>
-            <h2 className="text-3xl font-bold text-gray-800">21</h2>
-            <p className="text-gray-600">Saved Candidates</p>
-          </div>
-          <div className="bg-white p-4 rounded-md">
-            <FiUser className="text-yellow-500 text-xl" />
-          </div>
-        </div> */}
       </div>
 
       <div className="bg-white rounded-2xl shadow-[0_-6px_12px_rgba(0,0,0,0.06),_0_4px_12px_rgba(0,0,0,0.08)] border border-gray-100 overflow-hidden">

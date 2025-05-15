@@ -32,7 +32,7 @@ const AccountSchema = z
   })
   .refine(
     (data) => {
-      // If newPassword is provided, it must match confirmPassword
+      // validate same password
       if (data.newPassword) {
         return data.newPassword === data.confirmPassword;
       }
@@ -48,12 +48,12 @@ export default function AccountSettings() {
   const [userData, setUserData] = useState<UserModel | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // Password visibility states
+  // Password visibility
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // Account Form
+  // Acc Form
   const {
     control: accountControl,
     handleSubmit: handleAccountFormSubmit,
@@ -157,7 +157,7 @@ export default function AccountSettings() {
         updatedAt: new Date(),
       });
 
-      // Reset password fields
+      // Reset  fields
       setAccountValue("currentPassword", "");
       setAccountValue("newPassword", "");
       setAccountValue("confirmPassword", "");

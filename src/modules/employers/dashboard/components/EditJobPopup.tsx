@@ -149,13 +149,6 @@ export default function EditJobPopup({ open, onClose, job }: Props) {
                 <label className="block mb-2 text-sm font-medium text-gray-700">
                   Company Avatar
                 </label>
-                {/* <Input
-                  type="file"
-                  name="avatarCompany"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                  className="focus:ring-2 focus:ring-blue-500 border-gray-300 rounded-md"
-                /> */}
                 <div className="flex items-center gap-2">
                   <Button
                     type="button"
