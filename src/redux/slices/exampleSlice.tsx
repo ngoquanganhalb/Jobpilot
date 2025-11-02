@@ -21,8 +21,18 @@ const exampleSlice = createSlice({
     setValue: (state, action: PayloadAction<number>) => {
       state.value = action.payload;
     },
+    setFormCloseMonitoring: (state, action) => {
+      return { ...state, ...action.payload };
+    },
+    clearFormCloseMonitoring: () => initialState,
   },
 });
 
-export const { increment, decrement, setValue } = exampleSlice.actions;
+export const {
+  increment,
+  decrement,
+  setValue,
+  clearFormCloseMonitoring,
+  setFormCloseMonitoring,
+} = exampleSlice.actions;
 export default exampleSlice.reducer;

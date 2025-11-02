@@ -1,44 +1,55 @@
-//redux persist
+"use client";
+
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
-import { persistStore, persistReducer } from "redux-persist";
-import storage from "redux-persist/lib/storage"; // save to localStorage
+import { persistStore, persistReducer, Persistor } from "redux-persist";
+import storage from "redux-persist/lib/storage";
+
 import exampleReducer from "./slices/exampleSlice";
 import userReducer from "./slices/userSlice";
-import searchReducer from "./slices/searchSlice"
-import { useDispatch } from "react-redux";
-import jobReducer from './slices/jobSlice';
-import filterReducer from './slices/filterSlice'
+import searchReducer from "./slices/searchSlice";
+import jobReducer from "./slices/jobSlice";
+import filterReducer from "./slices/filterSlice";
+import authReducer from "./slices/authSlice"; // file bạn paste ở trên
 
+// GỘP reducer bình thường
 const rootReducer = combineReducers({
   example: exampleReducer,
   user: userReducer,
   search: searchReducer,
   jobs: jobReducer,
   filter: filterReducer,
+  auth: authReducer,
 });
 
+// CONFIG persist
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["user"], // only persist slice "user"
+  whitelist: ["user"], // chỉ persist slice user
+  // LƯU Ý: KHÔNG persist accessToken trong redux để tránh lộ token
 };
 
-const persistedReducer = persistReducer(persistConfig, rootReducer);
+// wrap rootReducer bằng persistReducer
+const persistedRootReducer = persistReducer(persistConfig, rootReducer);
 
+// tạo store
 export const store = configureStore({
-  reducer: persistedReducer,
+  reducer: persistedRootReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      serializableCheck: false, // prevent error with redux-persist
+      serializableCheck: false, // vì redux-persist có non-serializable
     }),
 });
 
-export const persistor = persistStore(store);
+// ⚠️ KHÔNG tạo persistor ở đây nữa
+export const makePersistor = (): Persistor => {
+  // tạo persistor tương ứng với store hiện tại
+  return persistStore(store);
+};
 
+// types + hook dispatch
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
-export const useAppDispatch = () => useDispatch<AppDispatch>();
-
 
 // only redux
 // import { configureStore } from "@reduxjs/toolkit";
@@ -53,10 +64,6 @@ export const useAppDispatch = () => useDispatch<AppDispatch>();
 //   },
 // });
 
-
-
 // export type RootState = ReturnType<typeof store.getState>;
 // export type AppDispatch = typeof store.dispatch;
 // export const useAppDispatch = () => useDispatch<AppDispatch>();
-
-

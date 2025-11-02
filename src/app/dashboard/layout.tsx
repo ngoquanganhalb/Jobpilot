@@ -87,7 +87,6 @@ export default function DashboardLayout(props: LayoutProps) {
   const { children, employer, candidate } = props;
 
   const accountType = useSelector((state: any) => state.user.accountType);
-
   // Render sidebar tùy thuộc vào accountType
   const renderSidebar = () => {
     if (accountType === "employer") {
