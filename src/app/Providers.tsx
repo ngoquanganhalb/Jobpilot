@@ -8,12 +8,12 @@ import { doLogout } from "@/redux/slices/authSlice";
 import { bindStoreHelpers } from "@/core/axios-custom.helpers";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import FetchPermission from "./FetchPermission";
 
 export default function Providers({ children }: { children: ReactNode }) {
-  // ✅ Tạo queryClient 1 lần duy nhất trong lifecycle client
   const [queryClient] = useState(() => new QueryClient());
 
-  // ✅ bind helpers (dispatch / logout) một lần
+  // bind helpers (dispatch / logout) một lần cho axios
   useEffect(() => {
     bindStoreHelpers({
       dispatch: store.dispatch,
@@ -22,10 +22,16 @@ export default function Providers({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <ReduxProvider store={store}>
-      {/* <PersistGate loading={null} persistor={persistor}> */}
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-      {/* </PersistGate> */}
-    </ReduxProvider>
+    //tanstack
+    <QueryClientProvider client={queryClient}>
+      <ReduxProvider store={store}>
+        <FetchPermission />
+        {/* <PersistGate loading={null} persistor={persistor}> */}
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
+        {/* </PersistGate> */}
+      </ReduxProvider>
+    </QueryClientProvider>
   );
 }

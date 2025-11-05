@@ -1,18 +1,23 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import { AuthService } from "@services/auth/authService";
+import { authService } from "@services/auth/authService";
 
 export interface AuthState {
   user: any | null;
   loading: boolean;
   initialized: boolean; // để biết đã gọi ensureSession lần đầu chưa
   error: string | null;
+  permissions: any[];
 }
-
+type UserProfilePayload = {
+  user: any;
+  permissions: any[];
+};
 const initialState: AuthState = {
   user: null,
   loading: false,
   initialized: false,
   error: null,
+  permissions: [],
 };
 
 // export const loginWithEmail = createAsyncThunk<
@@ -50,26 +55,26 @@ export const ensureSession = createAsyncThunk<
 >("auth/ensureSession", async (_, thunkAPI) => {
   try {
     // 1. xin accessToken mới từ refresh_token cookie (nếu còn)
-    const newToken = await AuthService.refreshSession();
+    const newToken = await authService.refreshSession();
     if (!newToken) {
       return null; // không có phiên
     }
 
     // 2. lấy profile với accessToken vừa refresh
-    const me = await AuthService.apiGetProfile();
+    const me = await authService.apiGetProfile();
     return me ?? null;
-  } catch (err) {
+  } catch {
     return thunkAPI.rejectWithValue("Failed to restore session");
   }
 });
 
-// Thunk: logout
+// Thunk: logout là hàm bđb
 export const doLogout = createAsyncThunk<void, void, { rejectValue: string }>(
   "auth/doLogout",
   async (_, thunkAPI) => {
     try {
-      await AuthService.apiLogout();
-    } catch (err) {
+      await authService.apiLogout();
+    } catch {
       return thunkAPI.rejectWithValue("Logout failed");
     }
   }
@@ -80,8 +85,13 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     // trong vài trường hợp bạn muốn set user thủ công
-    setUser(state, action: PayloadAction<any | null>) {
-      state.user = action.payload;
+    setUser(state, action: PayloadAction<UserProfilePayload>) {
+      state.user = action.payload.user;
+      state.permissions = action.payload.permissions ?? [];
+      state.error = null;
+    },
+    clearAuth() {
+      return initialState;
     },
   },
   extraReducers: (builder) => {
@@ -120,17 +130,24 @@ const authSlice = createSlice({
     // ensureSession
     builder
       .addCase(ensureSession.pending, (state) => {
-        // không đặt loading=true ở đây vì mình hay gọi lúc app mount
-        // bạn có thể tùy chỉnh
         state.error = null;
       })
-      .addCase(ensureSession.fulfilled, (state, action) => {
-        state.initialized = true;
-        state.user = action.payload; // có thể là null
-      })
+      .addCase(
+        ensureSession.fulfilled,
+        (state, action: PayloadAction<UserProfilePayload>) => {
+          if (action.payload) {
+            state.user = action.payload.user;
+            state.permissions = action.payload.permissions ?? [];
+          } else {
+            state.user = null;
+            state.permissions = [];
+          }
+        }
+      )
       .addCase(ensureSession.rejected, (state, action) => {
         state.initialized = true;
         state.user = null;
+        state.permissions = [];
         state.error = action.payload ?? "Session restore failed";
       });
 
@@ -138,12 +155,14 @@ const authSlice = createSlice({
     builder
       .addCase(doLogout.fulfilled, (state) => {
         state.user = null;
+        state.permissions = [];
       })
       .addCase(doLogout.rejected, (state) => {
-        state.user = null; // dù lỗi thì local vẫn clear
+        state.user = null;
+        state.permissions = [];
       });
   },
 });
 
-export const { setUser } = authSlice.actions;
+export const { setUser, clearAuth } = authSlice.actions;
 export default authSlice.reducer;

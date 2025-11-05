@@ -24,70 +24,76 @@ import ArrowIcon from "@component/icons/ArrowIcon";
 import Spinner from "@component/ui/Spinner";
 import { url } from "inspector";
 import { AccountType } from "@types";
+import { LoginDto } from "@/dtos/auth/login.dto";
+import { useLogin } from "./hooks/useLogin";
 
 const SignInModule: React.FC = () => {
   const router = useRouter();
   const dispatch = useDispatch();
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [remember, setRemember] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string>("");
   const { handleSocialSignIn } = useSocialAuth();
+  const [form, setForm] = useState<LoginDto>({} as LoginDto);
+  const { loginMutation } = useLogin();
+  // const handleSubmit = async (e: FormEvent) => {
+  //   e.preventDefault();
+  //   setIsLoading(true);
+  //   try {
+  //     const userCredential = await signInWithEmailAndPassword(
+  //       auth,
+  //       email,
+  //       password
+  //     );
+  //     const user = userCredential.user;
+  //     const token = await getIdToken(user); // getget token
+  //     // get mỏe info from firestore
+  //     const docRef = doc(db, "users", user.uid);
+  //     const docSnap = await getDoc(docRef);
 
+  //     let name = user.displayName || "";
+  //     let isAdmin = false;
+  //     let accountType: AccountType = "candidate";
+
+  //     if (docSnap.exists()) {
+  //       const userData = docSnap.data();
+  //       name = userData.name || name;
+  //       isAdmin = userData.isAdmin || false;
+  //       accountType = userData.accountType || "candidate";
+  //     }
+
+  //     //save data to redux
+  //     dispatch(
+  //       setUser({
+  //         id: user.uid,
+  //         name,
+  //         isAdmin,
+  //         accountType,
+  //       })
+  //     );
+
+  //     setCookie("token", await user.getIdToken(), { maxAge: 60 * 60 * 24 }); // 1 Day
+  //     setCookie("accountType", accountType, { maxAge: 60 * 60 * 24 });
+
+  //     router.push("/");
+  //   } catch (err: any) {
+  //     setError("Invalid email or password.");
+  //     toast.error("Invalid email or password.");
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
   const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
+    e.preventDefault(); // tránh reload trang khi bam submit
     try {
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      const user = userCredential.user;
-      const token = await getIdToken(user); // getget token
-      // get mỏe info from firestore
-      const docRef = doc(db, "users", user.uid);
-      const docSnap = await getDoc(docRef);
-
-      let name = user.displayName || "";
-      let isAdmin = false;
-      let accountType: AccountType = "candidate";
-
-      if (docSnap.exists()) {
-        const userData = docSnap.data();
-        name = userData.name || name;
-        isAdmin = userData.isAdmin || false;
-        accountType = userData.accountType || "candidate";
-      }
-
-      //save data to redux
-      dispatch(
-        setUser({
-          id: user.uid,
-          name,
-          isAdmin,
-          accountType,
-        })
-      );
-
-      setCookie("token", await user.getIdToken(), { maxAge: 60 * 60 * 24 }); // 1 Day
-      setCookie("accountType", accountType, { maxAge: 60 * 60 * 24 });
-
+      await loginMutation(form);
       router.push("/");
-    } catch (err: any) {
-      setError("Invalid email or password.");
-      toast.error("Invalid email or password.");
-    } finally {
-      setIsLoading(false);
+    } catch (error) {
+      toast.error("error get permission");
     }
   };
 
   return (
     <div className="flex min-h-screen bg-gray-50 ">
-      {isLoading && <Spinner />}
       <Head>
         <title>SignIn | Jobpilot</title>
         <meta name="description" content="SignIn your Jobpilot account" />
@@ -117,11 +123,15 @@ const SignInModule: React.FC = () => {
         <form onSubmit={handleSubmit}>
           <div className="mb-6">
             <Input
-              type="email"
-              name="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              type="text"
+              placeholder="Username"
+              // onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                setForm((prev) => ({
+                  ...prev,
+                  username: e.target.value,
+                }));
+              }}
               required
             />
           </div>
@@ -131,9 +141,11 @@ const SignInModule: React.FC = () => {
               name="password"
               type={showPassword ? "text" : "password"}
               placeholder="Password"
-              value={password}
+              // onChange={(e) => {
+              //   setPassword(e.target.value);
+              // }}
               onChange={(e) => {
-                setPassword(e.target.value);
+                setForm((prev) => ({ ...prev, password: e.target.value }));
               }}
               required
             />
@@ -151,9 +163,11 @@ const SignInModule: React.FC = () => {
               type="checkbox"
               name="remember"
               id="remember"
-              checked={remember}
+              // onChange={(e) => {
+              //   setRemember(e.target.checked);
+              // }}
               onChange={(e) => {
-                setRemember(e.target.checked);
+                setForm((prev) => ({ ...prev, rememberMe: e.target.checked }));
               }}
             />
             <label htmlFor="remember" className="text-sm text-gray-600 ml-2">
@@ -161,6 +175,24 @@ const SignInModule: React.FC = () => {
             </label>
           </div>
 
+          {/* <div className="mb-6 flex items-center">
+            <input
+              type="checkbox"
+              // checked={ask}
+              // onChange={(e) => {
+              //   setRemember(e.target.checked);
+              // }}
+              onChange={(e) => {
+                setForm((prev) => ({
+                  ...prev,
+                  askChangPassword: e.target.checked,
+                }));
+              }}
+            />
+            <label htmlFor="remember" className="text-sm text-gray-600 ml-2">
+              Change password{" "}
+            </label>
+          </div> */}
           <button
             type="submit"
             className="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 flex items-center justify-center"

@@ -1,9 +1,6 @@
 "use client";
-import { useState, ChangeEvent, FormEvent } from "react";
-import { auth, db } from "../../../services/firebase/firebase";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { doc, setDoc } from "firebase/firestore";
 import { toast } from "react-toastify";
 import Head from "next/head";
 import Link from "next/link";
@@ -13,116 +10,40 @@ import { BsBriefcase } from "react-icons/bs";
 import { MdPerson, MdBusiness } from "react-icons/md";
 import Input from "@component/ui/InputCustom";
 import ArrowIcon from "@component/icons/ArrowIcon";
-import { AccountType, FormData } from "@types";
-import Spinner from "@component/ui/Spinner";
+import { SignUpDto } from "@/dtos/auth/sign-up.dto";
+import { useSignUp } from "./hooks/useSignUp";
+import { USER_ROLE } from "@/common/enum";
 
 const SignUpModule = () => {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [showConfirmPassword, setShowConfirmPassword] =
     useState<boolean>(false);
-  const [accountType, setAccountType] = useState<AccountType>("candidate");
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-
-  const [formData, setFormData] = useState<FormData>({
-    fullName: "",
-    username: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    agreeToTerms: false,
-  });
-
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.name === "fullName") {
-      setFormData({
-        ...formData,
-        fullName: e.target.value,
-      });
-    }
-    if (e.target.name === "username") {
-      setFormData({
-        ...formData,
-        username: e.target.value,
-      });
-    }
-    if (e.target.name === "email") {
-      setFormData({
-        ...formData,
-        email: e.target.value,
-      });
-    }
-    if (e.target.name === "password") {
-      setFormData({
-        ...formData,
-        password: e.target.value,
-      });
-    }
-    if (e.target.name === "confirmPassword") {
-      setFormData({
-        ...formData,
-        confirmPassword: e.target.value,
-      });
-    }
-    if (e.target.name === "agreeToTerms") {
-      setFormData({
-        ...formData,
-        agreeToTerms: e.target.checked,
-      });
-    }
-  };
+  const [formData, setFormData] = useState<SignUpDto>({} as SignUpDto);
+  const [passwordConfirmed, setPasswordConfirmed] = useState<string>("");
+  const [aggreToTerms, setAggreToTerms] = useState<boolean>(false);
+  const [accountType, setAccoutType] = useState<string>("candidate");
+  const { signUpMutation } = useSignUp();
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault(); //Prevent reload
-    setIsLoading(true);
     // console.log(formData);
 
-    if (formData.password !== formData.confirmPassword) {
+    if (formData.password !== passwordConfirmed) {
       toast.error("Passwords do not match.");
-      setIsLoading(false);
+      return;
+    }
+    if (aggreToTerms === false) {
+      toast.error("Please aggree to terms.");
       return;
     }
     try {
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        formData.email,
-        formData.password
-      );
-      const user = userCredential.user;
-      // save info to firestore
-      await setDoc(doc(db, "users", user.uid), {
-        name: formData.fullName,
-        username: formData.username,
-        isAdmin: false,
-        accountType: accountType,
-        email: formData.email,
-        password: formData.password,
-      });
-      toast.success("Create account sucessfull");
+      await signUpMutation(formData);
       router.push("/sign-in");
-    } catch (error) {
-      // console.log(error.message);
-      switch ((error as { code: string }).code) {
-        case "auth/email-already-in-use":
-          toast.error("Email is already in use.");
-          break;
-        case "auth/invalid-email":
-          toast.error("Invalid email address.");
-          break;
-        case "auth/weak-password":
-          toast.error("Password should be at least 6 characters.");
-          break;
-        default:
-          toast.error("Something went wrong. Please try again.");
-          console.error(error);
-      }
-    } finally {
-      setIsLoading(false);
-    }
+    } catch {}
   };
 
   return (
     <div className="flex min-h-screen bg-gray-50 ">
-      {isLoading && <Spinner />}
       <Head>
         <title>Create Account | Jobpilot</title>
         <meta name="description" content="Create your Jobpilot account" />
@@ -162,7 +83,13 @@ const SignUpModule = () => {
                     ? "bg-blue-900 text-white border-blue-900"
                     : "bg-white border-gray-300 hover:bg-blue-900"
                 }`}
-                onClick={() => setAccountType("candidate")}
+                onClick={() => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    client: USER_ROLE.USER,
+                  }));
+                  setAccoutType("candidate");
+                }}
               >
                 <MdPerson className="mr-2" />
                 <span>Candidate</span>
@@ -174,7 +101,13 @@ const SignUpModule = () => {
                     ? "bg-blue-900 text-white border-blue-900"
                     : "bg-white border-gray-300 hover:bg-blue-900"
                 }`}
-                onClick={() => setAccountType("employer")}
+                onClick={() => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    client: USER_ROLE.EMPLOYER,
+                  }));
+                  setAccoutType("employer");
+                }}
               >
                 <MdBusiness className="mr-2" />
                 <span>Employers</span>
@@ -183,26 +116,21 @@ const SignUpModule = () => {
           </div>
 
           <form onSubmit={handleSubmit}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div className="mb-4">
               <Input
                 type="text"
-                name="fullName"
-                placeholder="Full Name"
-                value={formData.fullName}
-                onChange={handleInputChange}
-                required
-              />
-              <Input
-                type="text"
-                name="username"
                 placeholder="Username"
-                value={formData.username}
-                onChange={handleInputChange}
+                onChange={(e) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    username: e.target.value,
+                  }));
+                }}
                 required
               />
             </div>
 
-            <div className="mb-4">
+            {/* <div className="mb-4">
               <Input
                 type="email"
                 name="email"
@@ -211,15 +139,18 @@ const SignUpModule = () => {
                 onChange={handleInputChange}
                 required
               />
-            </div>
+            </div> */}
 
             <div className="mb-4 relative">
               <Input
                 type={showPassword ? "text" : "password"}
-                name="password"
                 placeholder="Password"
-                value={formData.password}
-                onChange={handleInputChange}
+                onChange={(e) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    password: e.target.value,
+                  }));
+                }}
                 required
               />
               <button
@@ -236,8 +167,9 @@ const SignUpModule = () => {
                 type={showConfirmPassword ? "text" : "password"}
                 name="confirmPassword"
                 placeholder="Confirm Password"
-                value={formData.confirmPassword}
-                onChange={handleInputChange}
+                onChange={(e) => {
+                  setPasswordConfirmed(e.target.value);
+                }}
                 required
               />
               <button
@@ -252,10 +184,8 @@ const SignUpModule = () => {
             <div className="mb-6 flex items-center cursor-pointer">
               <input
                 type="checkbox"
-                name="agreeToTerms"
-                id="agreeToTerms"
-                checked={formData.agreeToTerms}
-                onChange={handleInputChange}
+                checked={aggreToTerms}
+                onChange={(e) => setAggreToTerms(e.target.checked)}
                 required
               />
               <label htmlFor="agreeToTerms" className="text-sm text-gray-600">

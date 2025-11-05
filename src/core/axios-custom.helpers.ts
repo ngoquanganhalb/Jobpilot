@@ -9,7 +9,7 @@ import axios, {
 
 import { ENV } from "@/config/env";
 import { tokenManager } from "@/core/tokenManager";
-import { AuthService } from "@services/auth/authService";
+import { authService } from "@services/auth/authService";
 
 // Tuỳ bạn: global loading event emitter
 // Nếu bạn chưa có emitter, bạn có thể thay thế bằng 1 stub đơn giản
@@ -160,8 +160,7 @@ async function handleTokenRefresh(
   isRefreshing = true;
 
   try {
-    // GỌI refresh-session, server sẽ đọc cookie HttpOnly
-    const newAccessToken = await AuthService.refreshSession(); // string | null
+    const newAccessToken = await authService.refreshSession(); 
 
     if (newAccessToken) {
       // set header cho request gốc trước khi retry
@@ -177,7 +176,7 @@ async function handleTokenRefresh(
     // refresh thất bại => clear queue với lỗi
     processQueue(error as AxiosError, null);
     // logout global
-    await AuthService.apiLogout();
+    await authService.apiLogout();
     if (externalDispatch && doLogoutThunk) {
       externalDispatch(doLogoutThunk());
     }
@@ -187,7 +186,7 @@ async function handleTokenRefresh(
     processQueue(refreshErr as AxiosError, null);
 
     // logout global
-    await AuthService.apiLogout();
+    await authService.apiLogout();
     if (externalDispatch && doLogoutThunk) {
       externalDispatch(doLogoutThunk());
     }
