@@ -9,6 +9,7 @@ import { bindStoreHelpers } from "@/core/axios-custom.helpers";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import FetchPermission from "./FetchPermission";
+import { SessionProvider } from "next-auth/react";
 
 export default function Providers({ children }: { children: ReactNode }) {
   const [queryClient] = useState(() => new QueryClient());
@@ -23,15 +24,17 @@ export default function Providers({ children }: { children: ReactNode }) {
 
   return (
     //tanstack
-    <QueryClientProvider client={queryClient}>
-      <ReduxProvider store={store}>
-        <FetchPermission />
-        {/* <PersistGate loading={null} persistor={persistor}> */}
-        <QueryClientProvider client={queryClient}>
-          {children}
-        </QueryClientProvider>
-        {/* </PersistGate> */}
-      </ReduxProvider>
-    </QueryClientProvider>
+    <SessionProvider>
+      <QueryClientProvider client={queryClient}>
+        <ReduxProvider store={store}>
+          <FetchPermission />
+          {/* <PersistGate loading={null} persistor={persistor}> */}
+          <QueryClientProvider client={queryClient}>
+            {children}
+          </QueryClientProvider>
+          {/* </PersistGate> */}
+        </ReduxProvider>
+      </QueryClientProvider>
+    </SessionProvider>
   );
 }
