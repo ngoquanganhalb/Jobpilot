@@ -4,31 +4,25 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-import { clearUser } from "../../redux/slices/userSlice";
-import { signOut } from "firebase/auth";
-import { useDispatch } from "react-redux";
-import { auth } from "../../services/firebase/firebase";
-import { deleteCookie } from "cookies-next";
 import Paths from "@/constants/paths";
+import { useLogout } from "@hooks/business/useLogout";
 
 export default function AvatarMenu({ user }: { user: any }) {
-  const dispatch = useDispatch();
   const router = useRouter();
+  const { logoutMutation } = useLogout();
 
   const handleSignOut = async () => {
     try {
-      await signOut(auth); // Firebase sign out
-      deleteCookie("token");
-      deleteCookie("accountType");
-      dispatch(clearUser());
+      await logoutMutation();
+
       toast.success("Signed out successfully");
       router.push("/");
-    } catch (error: any) {
+    } catch {
       toast.error("Failed to sign out");
     }
   };
   return (
-    <Menu as="div" className="relative ">
+    <Menu as="div" className="relative">
       <Menu.Button className="w-12 h-12 rounded-full overflow-hidden cursor-pointer transition-transform duration-200 hover:scale-110">
         <Image
           src={user.avatarUrl || "/images/default-avatar.png"}

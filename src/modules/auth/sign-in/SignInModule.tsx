@@ -26,70 +26,23 @@ import { url } from "inspector";
 import { AccountType } from "@types";
 import { LoginDto } from "@/dtos/auth/login.dto";
 import { useLogin } from "./hooks/useLogin";
+import { signIn } from "next-auth/react";
 
 const SignInModule: React.FC = () => {
   const router = useRouter();
   const dispatch = useDispatch();
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
-  const { handleSocialSignIn } = useSocialAuth();
+  // const { handleSocialSignIn } = useSocialAuth();
   const [form, setForm] = useState<LoginDto>({} as LoginDto);
   const { loginMutation } = useLogin();
-  // const handleSubmit = async (e: FormEvent) => {
-  //   e.preventDefault();
-  //   setIsLoading(true);
-  //   try {
-  //     const userCredential = await signInWithEmailAndPassword(
-  //       auth,
-  //       email,
-  //       password
-  //     );
-  //     const user = userCredential.user;
-  //     const token = await getIdToken(user); // getget token
-  //     // get mỏe info from firestore
-  //     const docRef = doc(db, "users", user.uid);
-  //     const docSnap = await getDoc(docRef);
 
-  //     let name = user.displayName || "";
-  //     let isAdmin = false;
-  //     let accountType: AccountType = "candidate";
-
-  //     if (docSnap.exists()) {
-  //       const userData = docSnap.data();
-  //       name = userData.name || name;
-  //       isAdmin = userData.isAdmin || false;
-  //       accountType = userData.accountType || "candidate";
-  //     }
-
-  //     //save data to redux
-  //     dispatch(
-  //       setUser({
-  //         id: user.uid,
-  //         name,
-  //         isAdmin,
-  //         accountType,
-  //       })
-  //     );
-
-  //     setCookie("token", await user.getIdToken(), { maxAge: 60 * 60 * 24 }); // 1 Day
-  //     setCookie("accountType", accountType, { maxAge: 60 * 60 * 24 });
-
-  //     router.push("/");
-  //   } catch (err: any) {
-  //     setError("Invalid email or password.");
-  //     toast.error("Invalid email or password.");
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault(); // tránh reload trang khi bam submit
     try {
       await loginMutation(form);
       router.push("/");
-    } catch (error) {
-      toast.error("error get permission");
-    }
+    } catch {}
   };
 
   return (
@@ -211,7 +164,7 @@ const SignInModule: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <button
             type="button"
-            onClick={() => handleSocialSignIn("facebook")}
+            onClick={() => signIn("facebook")}
             className="w-full flex items-center justify-center py-3 px-4 border border-gray-300 rounded-md hover:bg-gray-300"
           >
             <FaFacebookF className="text-blue-600 mr-2" />
@@ -219,7 +172,7 @@ const SignInModule: React.FC = () => {
           </button>
           <button
             type="button"
-            onClick={() => handleSocialSignIn("google")}
+            onClick={() => signIn("google")}
             className="w-full flex items-center justify-center py-3 px-4 border border-gray-300 rounded-md hover:bg-gray-300"
           >
             <FcGoogle className="mr-2" />

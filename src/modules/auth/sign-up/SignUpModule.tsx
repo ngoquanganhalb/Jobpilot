@@ -1,5 +1,5 @@
 "use client";
-import { useState, FormEvent } from "react";
+import { useState, FormEvent, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import Head from "next/head";
@@ -19,10 +19,17 @@ const SignUpModule = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [showConfirmPassword, setShowConfirmPassword] =
     useState<boolean>(false);
-  const [formData, setFormData] = useState<SignUpDto>({} as SignUpDto);
+  const [formData, setFormData] = useState<SignUpDto>({
+    username: "",
+    password: "",
+    client: USER_ROLE.USER, // mặc định Candidate
+  } as SignUpDto);
   const [passwordConfirmed, setPasswordConfirmed] = useState<string>("");
   const [aggreToTerms, setAggreToTerms] = useState<boolean>(false);
-  const [accountType, setAccoutType] = useState<string>("candidate");
+  const [accountType, setAccoutType] = useState<string>(USER_ROLE.USER);
+  useEffect(() => {
+    setFormData((prev) => ({ ...prev, client: accountType }));
+  }, [accountType]);
   const { signUpMutation } = useSignUp();
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault(); //Prevent reload
@@ -37,10 +44,11 @@ const SignUpModule = () => {
       return;
     }
     try {
-      await signUpMutation(formData);
+      await signUpMutation({ ...formData, client: accountType });
       router.push("/sign-in");
     } catch {}
   };
+  console.log("form", formData);
 
   return (
     <div className="flex min-h-screen bg-gray-50 ">
@@ -79,16 +87,16 @@ const SignUpModule = () => {
               <button
                 type="button"
                 className={`flex items-center justify-center py-3 px-4 rounded-md border cursor-pointer ${
-                  accountType === "candidate"
+                  accountType === USER_ROLE.USER
                     ? "bg-blue-900 text-white border-blue-900"
                     : "bg-white border-gray-300 hover:bg-blue-900"
                 }`}
                 onClick={() => {
+                  setAccoutType(USER_ROLE.USER);
                   setFormData((prev) => ({
                     ...prev,
-                    client: USER_ROLE.USER,
+                    client: accountType,
                   }));
-                  setAccoutType("candidate");
                 }}
               >
                 <MdPerson className="mr-2" />
@@ -97,16 +105,17 @@ const SignUpModule = () => {
               <button
                 type="button"
                 className={`flex items-center justify-center py-3 px-4 rounded-md border cursor-pointer ${
-                  accountType === "employer"
+                  accountType === USER_ROLE.EMPLOYER
                     ? "bg-blue-900 text-white border-blue-900"
                     : "bg-white border-gray-300 hover:bg-blue-900"
                 }`}
                 onClick={() => {
+                  setAccoutType(USER_ROLE.EMPLOYER);
+
                   setFormData((prev) => ({
                     ...prev,
-                    client: USER_ROLE.EMPLOYER,
+                    client: accountType,
                   }));
-                  setAccoutType("employer");
                 }}
               >
                 <MdBusiness className="mr-2" />

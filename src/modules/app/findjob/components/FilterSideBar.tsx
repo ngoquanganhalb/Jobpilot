@@ -1,11 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import {
-  JobType,
-  JOB_TYPE_OPTIONS,
-  JOB_TAG_OPTIONS,
-} from "../../../../types/db";
+import { JOB_TYPE_OPTIONS, JOB_TAG_OPTIONS } from "../../../../types/db";
 import { useForm } from "react-hook-form";
 import { FaFilter } from "react-icons/fa";
 import { GoDotFill } from "react-icons/go";
@@ -29,6 +25,7 @@ import { Badge } from "@component/ui/badge";
 import { Button } from "@component/ui/Button";
 import { Input } from "@component/ui/Input";
 import { cn } from "@component/lib/utils";
+import { JOB_TYPE } from "@/common/enum";
 
 export default function FilterSideBar() {
   const [tagSearch, setTagSearch] = useState("");
@@ -68,7 +65,7 @@ export default function FilterSideBar() {
     setValue("tags", newTags);
   };
 
-  const toggleJobType = (type: JobType) => {
+  const toggleJobType = (type: JOB_TYPE) => {
     const current = watchAll.jobTypes;
     if (current.includes(type)) {
       setValue(

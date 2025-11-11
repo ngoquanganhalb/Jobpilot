@@ -1,5 +1,6 @@
 import { tokenManager } from "@/core/tokenManager";
 import { LoginDto } from "@/dtos/auth/login.dto";
+import { ProfileUser } from "@/dtos/auth/profile-user.dto";
 import { SignUpDto } from "@/dtos/auth/sign-up.dto";
 import { BaseService } from "@services/base.service";
 type SocialLoginDto = {
@@ -16,7 +17,7 @@ class AuthService extends BaseService {
     super("auth");
   }
 
-  public async refreshSession(): Promise<string | null> {
+  public async refreshSession(): Promise<string | undefined> {
     const res = await this.post(`/refresh-session`);
     tokenManager.setAccessToken(res.data.accessToken);
     return res.data.accessToken;
@@ -28,18 +29,19 @@ class AuthService extends BaseService {
   }
 
   public async apiGetProfile() {
-    const response = await this.get(`/users/profile`, { ignoreBaseURL: true });
-    return response.data;
+    return this.get<ProfileUser>(`/users/profile`, {
+      ignoreBaseURL: true,
+    });
   }
 
   public async login(body: LoginDto) {
     const response = await this.post(`/login`, body);
-    return response.data;
+    return response;
   }
 
   public async signUp(body: SignUpDto) {
     const response = await this.post(`/sign-up`, body);
-    return response.data;
+    return response;
   }
 
   // public async loginSocial(body: SocialLoginDto): Promise<{

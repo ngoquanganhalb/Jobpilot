@@ -1,10 +1,10 @@
 import { authorizedAxiosInstance } from "@/core/axios-custom.helpers";
 import { AxiosRequestConfig, AxiosResponse } from "axios";
-interface ApiResponse<T> {
-  message: string;
-  statusCode: number;
-  data: T;
-}
+// interface  {
+//   message: string;
+//   statusCode: number;
+//   data: T;
+// }
 type CustomAxiosRequestConfig = Partial<AxiosRequestConfig> & {
   ignoreBaseURL?: boolean;
 };
@@ -18,10 +18,12 @@ export abstract class BaseService {
   protected async get<T = any>(
     endpoint: string,
     config?: CustomAxiosRequestConfig
-  ): Promise<ApiResponse<T>> {
+  ): Promise<T> {
     const url = config?.ignoreBaseURL ? endpoint : `${this.baseURL}${endpoint}`;
-    const response: AxiosResponse<ApiResponse<T>> =
-      await authorizedAxiosInstance.get<ApiResponse<T>>(url, config);
+    const response: AxiosResponse<T> = await authorizedAxiosInstance.get<T>(
+      url,
+      config
+    );
     return response.data;
   }
 
@@ -29,10 +31,13 @@ export abstract class BaseService {
     endpoint: string,
     data?: D,
     config?: CustomAxiosRequestConfig
-  ): Promise<ApiResponse<T>> {
+  ): Promise<T> {
     const url = config?.ignoreBaseURL ? endpoint : `${this.baseURL}${endpoint}`;
-    const response: AxiosResponse<ApiResponse<T>> =
-      await authorizedAxiosInstance.post<ApiResponse<T>>(url, data, config);
+    const response: AxiosResponse<T> = await authorizedAxiosInstance.post<T>(
+      url,
+      data,
+      config
+    );
     return response.data;
   }
 
@@ -40,10 +45,13 @@ export abstract class BaseService {
     endpoint: string,
     data?: D,
     config?: CustomAxiosRequestConfig
-  ): Promise<ApiResponse<T>> {
+  ): Promise<T> {
     const url = config?.ignoreBaseURL ? endpoint : `${this.baseURL}${endpoint}`;
-    const response: AxiosResponse<ApiResponse<T>> =
-      await authorizedAxiosInstance.patch<ApiResponse<T>>(url, data, config);
+    const response: AxiosResponse<T> = await authorizedAxiosInstance.patch<T>(
+      url,
+      data,
+      config
+    );
     return response.data;
   }
 
@@ -51,20 +59,25 @@ export abstract class BaseService {
     endpoint: string,
     data?: D,
     config?: CustomAxiosRequestConfig
-  ): Promise<ApiResponse<T>> {
+  ): Promise<T> {
     const url = config?.ignoreBaseURL ? endpoint : `${this.baseURL}${endpoint}`;
-    const response: AxiosResponse<ApiResponse<T>> =
-      await authorizedAxiosInstance.put<ApiResponse<T>>(url, data, config);
+    const response: AxiosResponse<T> = await authorizedAxiosInstance.put<T>(
+      url,
+      data,
+      config
+    );
     return response.data;
   }
 
   protected async delete<T = any>(
     endpoint: string,
     config?: CustomAxiosRequestConfig
-  ): Promise<ApiResponse<T>> {
+  ): Promise<T> {
     const url = config?.ignoreBaseURL ? endpoint : `${this.baseURL}${endpoint}`;
-    const response: AxiosResponse<ApiResponse<T>> =
-      await authorizedAxiosInstance.delete<ApiResponse<T>>(url, config);
+    const response: AxiosResponse<T> = await authorizedAxiosInstance.delete<T>(
+      url,
+      config
+    );
     return response.data;
   }
 }

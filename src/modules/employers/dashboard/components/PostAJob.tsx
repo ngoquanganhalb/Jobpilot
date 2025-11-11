@@ -12,8 +12,7 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
-import { collection, Timestamp, getDoc, doc, setDoc } from "firebase/firestore";
-import { getAuth } from "firebase/auth";
+import { collection, Timestamp, doc, setDoc } from "firebase/firestore";
 import { db } from "@services/firebase/firebase";
 import { toast } from "react-toastify";
 import { Upload } from "lucide-react";
@@ -28,41 +27,43 @@ import {
 } from "@/components/ui/popover";
 import Image from "next/image";
 import { toBase64 } from "@lib/convertBase64";
-import { Job, JobType, JOB_TAG_OPTIONS } from "../../../../types/db";
+import { Job, JOB_TAG_OPTIONS } from "../../../../types/db";
 import { useRouter } from "next/navigation";
 import LocationSelector from "@component/ui/LocationSelector";
 import { z } from "zod";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useSelector } from "react-redux";
+import { RootState } from "@redux/store";
+import { JOB_STATUS, JOB_TYPE } from "@/common/enum";
 
 // Define schema with zod
-const jobFormSchema = z.object({
-  jobTitle: z.string().min(1, "Job title is required"),
-  jobType: z.string().min(1, "Job type is required"),
-  tags: z.array(z.string()).min(1, "At least one tag is required"),
-  minSalary: z.number().min(0, "Min salary must be 0 or greater"),
-  maxSalary: z
-    .number()
-    .min(0, "Max salary must be 0 or greater")
-    .refine(
-      (data) => true, // This will be validated in the form with custom logic
-      { message: "Max salary must be greater than min salary" }
-    ),
-  description: z.string().min(1, "Description is required"),
-  avatarCompany: z.string().optional(),
-  isRemote: z.boolean(),
-  expirationDate: z
-    .date()
-    .refine(
-      (date) => !isBefore(date, new Date()) || isToday(date),
-      "Expiration date cannot be in the past"
-    ),
-  location: z.object({
-    province: z.string().min(1, "Province is required"),
-    district: z.string().min(1, "District is required"),
-    address: z.string().min(1, "Address is required"),
-  }),
-});
+const jobFormSchema = z
+  .object({
+    jobTitle: z.string().min(1, "Job title is required"),
+    jobType: z.string().min(1, "Job type is required"),
+    tags: z.array(z.string()).min(1, "At least one tag is required"),
+    minSalary: z.number().min(0, "Min salary must be 0 or greater"),
+    maxSalary: z.number().min(0, "Max salary must be 0 or greater"),
+    description: z.string().min(1, "Description is required"),
+    avatarCompany: z.string().optional(),
+    isRemote: z.boolean(),
+    expirationDate: z
+      .date()
+      .refine(
+        (date) => !isBefore(date, new Date()) || isToday(date),
+        "Expiration date cannot be in the past"
+      ),
+    location: z.object({
+      province: z.string().min(1, "Province is required"),
+      district: z.string().min(1, "District is required"),
+      address: z.string().min(1, "Address is required"),
+    }),
+  })
+  .refine((v) => v.maxSalary >= v.minSalary, {
+    message: "Max salary must be greater than min salary",
+    path: ["maxSalary"],
+  });
 
 type JobFormValues = z.infer<typeof jobFormSchema>;
 
@@ -81,9 +82,10 @@ export default function PostAJob() {
     trigger,
   } = useForm<JobFormValues>({
     resolver: zodResolver(jobFormSchema),
+    mode: "onChange",
     defaultValues: {
       jobTitle: "",
-      jobType: "full-time",
+      jobType: JOB_TYPE.FULL_TIME,
       tags: [],
       minSalary: 0,
       maxSalary: 0,
@@ -98,10 +100,8 @@ export default function PostAJob() {
       },
     },
   });
-
+  const user = useSelector((state: RootState) => state.auth.user);
   // Watch values for validation
-  const minSalary = watch("minSalary");
-  const maxSalary = watch("maxSalary");
   const avatarCompany = watch("avatarCompany");
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -114,31 +114,7 @@ export default function PostAJob() {
   };
 
   const onSubmit = async (data: JobFormValues) => {
-    // Validate min and max salary
-    if (data.maxSalary < data.minSalary) {
-      toast.error("Max Salary must be greater than or equal to Min Salary.");
-      return;
-    }
-
     try {
-      const auth = getAuth();
-      const user = auth.currentUser;
-
-      if (!user) {
-        toast.error("You must be logged in to post a job.");
-        return;
-      }
-
-      const userDocRef = doc(db, "users", user.uid);
-      const userSnapshot = await getDoc(userDocRef);
-
-      if (!userSnapshot.exists()) {
-        toast.error("User profile not found.");
-        return;
-      }
-
-      const userData = userSnapshot.data();
-      const name = userData.name || "Unknown Company";
       let base64Logo = "";
 
       if (logoFile) {
@@ -149,21 +125,21 @@ export default function PostAJob() {
 
       const jobData: Job = {
         jobId: docRef.id,
-        employerId: user.uid,
+        employerId: user?.id,
         jobTitle: data.jobTitle,
         tags: data.tags,
         minSalary: data.minSalary,
         maxSalary: data.maxSalary,
         description: data.description,
-        jobType: data.jobType as JobType,
+        jobType: data.jobType as JOB_TYPE,
         avatarCompany: base64Logo,
-        companyName: name,
+        companyName: user?.name,
         urgent: false,
         location: data.location,
         isRemote: data.isRemote,
         expirationDate: data.expirationDate,
         applicants: [],
-        status: "Active",
+        status: JOB_STATUS.ACTIVE,
         createdAt: Timestamp.now(),
       };
 

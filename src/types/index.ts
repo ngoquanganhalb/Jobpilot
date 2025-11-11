@@ -1,5 +1,5 @@
 import { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode } from "react";
-import { JobType } from "./db";
+import { JOB_STATUS, JOB_TYPE } from "@/common/enum";
 
 export type ButtonProps = {
   children: ReactNode;
@@ -36,7 +36,6 @@ export type FormData = {
   agreeToTerms: boolean;
 };
 
-
 //Only for JobBox.tsx useSearchJob
 export type JobBoxType = {
   id?: string;
@@ -56,26 +55,26 @@ export type JobPosting = {
   title: string;
   type: string;
   timeRemaining?: string;
-  expiryDate?: string|Date;
-  status: "Active" | "Expire";
+  expiryDate?: string | Date;
+  status: JOB_STATUS;
   applications: number;
   urgent?: boolean;
-}
+};
 
 //for FilterSideBar va useFilterJob , filterSlice
 export type FilterFormValues = {
   searchTerm?: string;
   location?: string;
   tags: string[];
-  jobTypes: JobType[];
+  jobTypes: JOB_TYPE[];
   minSalary: number;
   maxSalary: number;
-  isRemote: boolean ;
-}
+  isRemote: boolean;
+};
 //------------------------db---------------------------------
 //users board
 export type UserModel = {
-  id?:string;
+  id?: string;
   name: string;
   username: string;
   email: string;
@@ -83,15 +82,15 @@ export type UserModel = {
   isAdmin: boolean;
   password?: string;
   avatarUrl?: string;
-  savedJobs?: string[]
-  createdAt: Date
+  savedJobs?: string[];
+  createdAt: Date;
   profile?: {
     resumeUrl?: string;
     bio?: string;
     skills?: string[];
     location?: string;
     phone?: string;
-  }
+  };
   companyProfile?: {
     name?: string;
     description?: string;
@@ -99,6 +98,5 @@ export type UserModel = {
     website?: string;
     address?: string;
     industry?: string;
-  }
-
+  };
 };

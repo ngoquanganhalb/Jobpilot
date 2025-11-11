@@ -1,9 +1,9 @@
+import { ProfileUser } from "@/dtos/auth/profile-user.dto";
 import { authService } from "@services/auth/authService";
 import { useQuery } from "@tanstack/react-query";
 
-type ProfileUser = { user: any; permissions: any[] };
 type UseGetUserProfileReturn = {
-  data: ProfileUser;
+  data: ProfileUser | undefined;
   isLoading: boolean;
   isError: boolean;
   refetch: () => void;

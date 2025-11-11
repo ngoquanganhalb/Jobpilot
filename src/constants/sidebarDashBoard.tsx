@@ -1,11 +1,8 @@
 import Paths from "./paths";
 import {
   BsBriefcase,
-  BsPerson,
-  BsBuilding,
   BsBookmark,
   BsGear,
-  BsCreditCard,
   BsBuildingFill,
 } from "react-icons/bs";
 

@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { ApplicationWithJob, Status } from "@/types/db";
+import { ApplicationWithJob } from "@/types/db";
 import {
   FaCheckCircle,
   FaRegClock,
@@ -16,6 +16,7 @@ import {
 } from "@component/ui/tooltip";
 import Link from "next/link";
 import Paths from "@/constants/paths";
+import { APPLICATION_STATUS } from "@/common/enum";
 
 type Props = {
   application: ApplicationWithJob;
@@ -41,7 +42,7 @@ const JobBoxCandidate: React.FC<Props> = ({ application, onDelete }) => {
     );
   };
 
-  const renderStatus = (status: Status) => {
+  const renderStatus = (status: APPLICATION_STATUS) => {
     const baseClass =
       "flex items-center gap-2 px-3 py-1 rounded-md text-sm capitalize cursor-help";
     const statusClass = {

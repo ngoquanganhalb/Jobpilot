@@ -7,7 +7,6 @@ import { toast } from "react-toastify";
 
 export const useLogin = () => {
   const dispatch = useDispatch();
-
   const {
     mutateAsync: mutateAsyncLogin,
     isSuccess: isSuccessLogin,
@@ -16,17 +15,17 @@ export const useLogin = () => {
     mutationFn: async (body: LoginDto) => {
       await authService.login(body);
       const profile = await authService.apiGetProfile();
-      return { profile };
+      // console.log("profile", profile);
+      return profile;
     },
     onError: (e) => {
       toast.error(e.message);
     },
-    onSuccess: ({ profile }) => {
+    onSuccess: (profile) => {
       dispatch(
         setUser({ permissions: profile.permissions, user: profile.user })
       ); // authslice
-
-      toast.success("Welcome back 👋");
+      toast.success("Welcome 👋");
     },
   });
   const loginMutation = async (body: LoginDto): Promise<any> => {

@@ -1,127 +1,62 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { useEffect, useState } from "react";
-import { collection, query, where, getDocs } from "firebase/firestore";
-import { db } from "@services/firebase/firebase";
-import { getAuth } from "firebase/auth";
 import JobBoxEmployer from "./JobBoxEmployer";
-import Spinner from "@component/ui/Spinner";
-import { Job } from "../../../../types/db";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@redux/store";
 import { setJobs } from "@redux/slices/jobSlice";
 import StepPagination from "@component/ui/StepPagination";
 import { HiBriefcase } from "react-icons/hi";
+import { useFetchJob } from "@hooks/job/useFetchJob";
+import { usePagination } from "@hooks/usePagination";
 
 export default function MyJobs() {
   const [jobActionDropdown, setJobActionDropdown] = useState<number | null>(
     null
   );
   const dispatch = useDispatch();
-  const jobs = useSelector((state: RootState) => state.jobs.jobs);
-  const [loading, setLoading] = useState(true);
-  //pagnition
-  const limit = 10;
-  const [currentStep, setCurrentStep] = useState(1);
+  const { data } = useFetchJob();
 
-  //fetch job for only that employer account
+  // Đưa dispatch vào useEffect để tránh gọi mỗi render
   useEffect(() => {
-    const fetchJobs = async () => {
-      const auth = getAuth();
-      const user = auth.currentUser;
+    if (data) dispatch(setJobs(data));
+  }, [data, dispatch]);
 
-      if (!user) {
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const q = query(
-          collection(db, "jobs"),
-          where("employerId", "==", user.uid)
-        );
-        const querySnapshot = await getDocs(q);
-
-        const jobs: Job[] = querySnapshot.docs.map((doc) => {
-          const data = doc.data();
-          return {
-            id: doc.id,
-            jobId: doc.id,
-            employerId: data.employerId || "",
-            jobTitle: data.jobTitle || "",
-            companyName: data.companyName || "Unknown",
-            title: data.jobTitle || "",
-            type: data.jobType || "Unknown",
-            expirationDate: data.expirationDate?.toDate() || null,
-            urgent: data.isRemote || false,
-            status: data.status || "Active",
-            applicants: data.applicants,
-            createdAt: data.createdAt?.toDate() || new Date(0),
-            location: data.location,
-            avatarCompany: data.avatarCompany,
-            minSalary: data.minSalary,
-            maxSalary: data.maxSalary,
-            jobType: data.jobType,
-            tags: data.tags,
-            description: data.description,
-            isRemote: data.isRemote,
-          };
-        });
-
-        // setMyJobs(jobs);
-        dispatch(setJobs(jobs));
-      } catch (error) {
-        console.error("Error fetching jobs:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchJobs();
-  }, []);
-
+  const jobs = useSelector((state: RootState) => state.jobs.jobs);
+  const { page, totalPages, pageItems, next, prev, setPage } = usePagination(
+    jobs,
+    10
+  );
+  //pagnition
+  // const limit = 10;
+  // const [currentStep, setCurrentStep] = useState(1);
   const toggleJobActionDropdown = (jobId: number) => {
     setJobActionDropdown(jobActionDropdown === jobId ? null : jobId);
   };
 
   // Pagination setup
-  const totalJobs = jobs.length;
-  const totalSteps = Math.ceil(totalJobs / limit);
+  // const totalJobs = jobs.length;
+  // const totalSteps = Math.ceil(totalJobs / limit);
 
-  const sortedJobs = [...jobs].sort((a, b) => {
-    const timeA =
-      a.createdAt instanceof Date
-        ? a.createdAt.getTime()
-        : a.createdAt?.toDate().getTime() ?? 0;
-    const timeB =
-      b.createdAt instanceof Date
-        ? b.createdAt.getTime()
-        : b.createdAt?.toDate().getTime() ?? 0;
-    return timeB - timeA;
-  });
+  // const startIndex = (currentStep - 1) * limit;
+  // const endIndex = startIndex + limit;
+  // const currentJobs = jobs.slice(startIndex, endIndex);
 
-  const startIndex = (currentStep - 1) * limit;
-  const endIndex = startIndex + limit;
-  const currentJobs = sortedJobs.slice(startIndex, endIndex);
+  // const handleNext = () => {
+  //   if (currentStep < totalSteps) {
+  //     setCurrentStep((prevStep) => prevStep + 1);
+  //   }
+  // };
 
-  const handleNext = () => {
-    if (currentStep < totalSteps) {
-      setCurrentStep((prevStep) => prevStep + 1);
-    }
-  };
+  // const handlePrevious = () => {
+  //   if (currentStep > 1) {
+  //     setCurrentStep((prevStep) => prevStep - 1);
+  //   }
+  // };
 
-  const handlePrevious = () => {
-    if (currentStep > 1) {
-      setCurrentStep((prevStep) => prevStep - 1);
-    }
-  };
-
-  const handleStepClick = (step: number) => {
-    setCurrentStep(step);
-  };
-
-  if (loading) {
-    return <Spinner />;
-  }
+  // const handleStepClick = (step: number) => {
+  //   setCurrentStep(step);
+  // };
 
   return (
     <div className="mt-6">
@@ -154,7 +89,7 @@ export default function MyJobs() {
             </div>
 
             <ul className=" ">
-              {currentJobs.map((job) => (
+              {pageItems.map((job) => (
                 <JobBoxEmployer
                   key={job.jobId}
                   job={job}
@@ -166,13 +101,13 @@ export default function MyJobs() {
           </div>
 
           {/* Pagination */}
-          {totalJobs > limit && (
+          {jobs.length > 10 && (
             <StepPagination
-              currentStep={currentStep}
-              totalSteps={totalSteps}
-              onNext={handleNext}
-              onPrevious={handlePrevious}
-              onStepClick={handleStepClick}
+              currentStep={page}
+              totalSteps={totalPages}
+              onNext={next}
+              onPrevious={prev}
+              onStepClick={setPage}
             />
           )}
         </div>

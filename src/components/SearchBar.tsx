@@ -1,74 +1,39 @@
+"use client";
 import { useEffect, useState, useRef, useCallback } from "react";
 import {
   collection,
   getDocs,
   query,
   where,
-  doc,
-  onSnapshot,
   Timestamp,
 } from "firebase/firestore";
 import { db } from "@/services/firebase/firebase";
 import { useRouter } from "next/navigation";
 import { debounce } from "lodash";
 import Link from "next/link";
-import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "../services/firebase/firebase";
 
 import Logo from "./icons/Logo";
 import SearchIcon from "./icons/SearchIcon";
 import Button from "./ui/ButtonCustom";
 import Input from "./ui/InputCustom";
 import AvatarMenu from "./ui/AvatarMenu";
+import { useSelector } from "react-redux";
+import { RootState } from "@redux/store";
 
 export default function SearchBar() {
-  const [user, setUser] = useState<any>(null);
+  const [mounted, setMounted] = useState(false);
   const [queryText, setQueryText] = useState("");
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-
+  const user = useSelector((state: RootState) => state.auth);
+  console.log("user", user.permissions.length);
   useEffect(() => {
-    let unsubscribe: () => void;
-
-    const listenUserAvatar = (uid: string) => {
-      const userRef = doc(db, "users", uid);
-      //onSnapshot = listen realtime
-      unsubscribe = onSnapshot(
-        userRef,
-        (docSnap) => {
-          if (docSnap.exists()) {
-            const data = docSnap.data();
-            setUser({
-              uid,
-              email: data.email || "",
-              avatarUrl: data.avatarUrl || "",
-              name: data.name || "",
-            });
-          }
-        },
-        (error) => {
-          console.error("Error listening to user data:", error);
-        }
-      );
-    };
-
-    const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
-      if (currentUser) {
-        listenUserAvatar(currentUser.uid);
-      } else {
-        setUser(null);
-        if (unsubscribe) unsubscribe();
-      }
-    });
-
-    return () => {
-      unsubscribeAuth();
-      if (unsubscribe) unsubscribe();
-    };
+    // Cho phép client quyết định UI sau khi đã mount
+    setMounted(true);
   }, []);
-
+  useEffect(() => {}, []);
   const fetchSuggestions = useCallback(
     debounce(async (text: string) => {
       if (!text.trim()) {
@@ -191,10 +156,11 @@ export default function SearchBar() {
       </div>
 
       <div className="flex gap-3 mt-4 xl:mt-0">
-        {user ? (
-          <>
-            <AvatarMenu user={user} />
-          </>
+        {!mounted ? (
+          // Placeholder cố định để SSR & client khớp ở khung đầu
+          <div className="w-[180px] h-10" />
+        ) : user?.permissions?.length > 0 ? (
+          <AvatarMenu user={user} />
         ) : (
           <>
             <Link href="/sign-in" passHref>

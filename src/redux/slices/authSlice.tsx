@@ -20,32 +20,6 @@ const initialState: AuthState = {
   permissions: [],
 };
 
-// export const loginWithEmail = createAsyncThunk<
-//   User,
-//   { email: string; password: string },
-//   { rejectValue: string }
-// >("auth/loginWithEmail", async (payload, thunkAPI) => {
-//   try {
-//     const user = await apiLoginWithEmail(payload.email, payload.password);
-//     return user;
-//   } catch (err) {
-//     return thunkAPI.rejectWithValue("Invalid email or password");
-//   }
-// });
-
-// export const loginWithGoogle = createAsyncThunk<
-//   User,
-//   { idToken: string },
-//   { rejectValue: string }
-// >("auth/loginWithGoogle", async ({ idToken }, thunkAPI) => {
-//   try {
-//     const user = await apiLoginWithGoogle(idToken);
-//     return user;
-//   } catch (err) {
-//     return thunkAPI.rejectWithValue("Google login failed");
-//   }
-// });
-
 // Thunk: ensureSession
 // - Gọi khi app mount: nếu cookie refresh_token còn hợp lệ -> tự refresh -> tự get /me
 export const ensureSession = createAsyncThunk<
@@ -67,13 +41,13 @@ export const ensureSession = createAsyncThunk<
     return thunkAPI.rejectWithValue("Failed to restore session");
   }
 });
-
 // Thunk: logout là hàm bđb
 export const doLogout = createAsyncThunk<void, void, { rejectValue: string }>(
   "auth/doLogout",
   async (_, thunkAPI) => {
     try {
       await authService.apiLogout();
+      thunkAPI.dispatch(clearAuth());
     } catch {
       return thunkAPI.rejectWithValue("Logout failed");
     }

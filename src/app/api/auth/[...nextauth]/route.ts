@@ -15,7 +15,7 @@ export const authOptions: NextAuthOptions = {
       clientSecret: process.env.AUTH_FACEBOOK_SECRET!,
     }),
   ],
-  session: { strategy: "jwt" },
+  // session: { strategy: "jwt" },
   callbacks: {
     async signIn({ user, account, profile }) {
       if (!account?.provider || !account?.providerAccountId) return false;

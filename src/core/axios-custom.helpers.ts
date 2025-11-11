@@ -128,7 +128,7 @@ function processQueue(error: AxiosError | null, token: string | null = null) {
 // clear loading on success
 function handleResponse(response: AxiosResponse) {
   loadingEventEmitter.emit(EMIT_KEY.LOADING, false);
-  return response;
+  return response.data;
 }
 
 // —— token refresh handler ——
@@ -158,10 +158,8 @@ async function handleTokenRefresh(
   // Lần đầu tiên request này gặp 401
   originalRequest._retry = true;
   isRefreshing = true;
-
   try {
-    const newAccessToken = await authService.refreshSession(); 
-
+    const newAccessToken = await authService.refreshSession();
     if (newAccessToken) {
       // set header cho request gốc trước khi retry
       if (originalRequest.headers) {

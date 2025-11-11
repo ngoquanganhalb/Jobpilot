@@ -1,9 +1,8 @@
 //badge for status interview,....
 
-import { Status } from "../../types/db";
+import { APPLICATION_STATUS } from "@/common/enum";
 
-
-export const StatusBadge = ({ status }: { status: Status }) => {
+export const StatusBadge = ({ status }: { status: APPLICATION_STATUS }) => {
   const statusConfig = {
     pending: { label: "New", bgColor: "bg-blue-100 text-blue-800" },
     reviewed: { label: "Reviewed", bgColor: "bg-purple-100 text-purple-800" },

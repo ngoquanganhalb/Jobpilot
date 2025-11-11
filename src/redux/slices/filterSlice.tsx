@@ -1,13 +1,13 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { JobType } from "@/types/db";
+import { JOB_TYPE } from "@/common/enum";
 
 type FilterState = {
   location?: string;
   tags?: string[];
-  jobTypes?: JobType[];
-  minSalary?: number | null
-  maxSalary?: number | null
-  isRemote?: boolean | null
+  jobTypes?: JOB_TYPE[];
+  minSalary?: number | null;
+  maxSalary?: number | null;
+  isRemote?: boolean | null;
 };
 
 const initialState: FilterState = {

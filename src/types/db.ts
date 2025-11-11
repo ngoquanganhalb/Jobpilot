@@ -1,11 +1,12 @@
+import { APPLICATION_STATUS, JOB_STATUS, JOB_TYPE } from "@/common/enum";
 import { Timestamp } from "firebase/firestore";
 
 export type JobType = "full-time" | "part-time" | "freelance";
-export type JobStatus = "Active" | "Expire";
-export const JOB_TYPE_OPTIONS: JobType[] = [
-  "full-time",
-  "part-time",
-  "freelance",
+export const JOB_TYPE_OPTIONS: JOB_TYPE[] = [
+  JOB_TYPE.FULL_TIME,
+  JOB_TYPE.PART_TIME,
+  JOB_TYPE.INTERNSHIP,
+  JOB_TYPE.FREELANCE,
 ];
 export type JobTag =
   | "Engineering"
@@ -73,30 +74,29 @@ export type Job = {
   minSalary?: number | "";
   maxSalary?: number | "";
   description?: string;
-  jobType?: JobType;
-  companyName:string;
+  jobType?: JOB_TYPE;
+  companyName: string;
   avatarCompany?: string;
   urgent?: boolean;
   location?: Location;
   isRemote?: boolean;
   expirationDate?: Date | Timestamp;
   applicants?: string[]; // userid
-  status?: JobStatus;
-  createdAt?: Date | Timestamp
+  status?: JOB_STATUS;
+  createdAt?: Date | Timestamp;
 };
 
-
 export type Application = {
-  id:string
+  id: string;
   jobId: string;
   candidateId: string;
-  appliedAt: Date | Timestamp; 
-  status: 'pending' | 'reviewed' | 'interview' | 'rejected' | 'hired';
+  appliedAt: Date | Timestamp;
+  status: APPLICATION_STATUS;
   resumeUrl?: string;
   note?: string;
-  showCandidate?:boolean ,
-  showEmployer?:boolean,
-  feedback?: string
+  showCandidate?: boolean;
+  showEmployer?: boolean;
+  feedback?: string;
 
   name?: string;
   avatar?: string;
@@ -104,7 +104,5 @@ export type Application = {
 
 //type fetch for user applied job
 export type ApplicationWithJob = Application & {
-  job?: Job
+  job?: Job;
 };
-
-export type Status = 'pending' | 'reviewed' | 'interview' | 'rejected' | 'hired'
