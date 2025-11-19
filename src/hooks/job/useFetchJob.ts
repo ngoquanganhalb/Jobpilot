@@ -1,7 +1,7 @@
 import { RootState } from "@redux/store";
 import { db } from "@services/firebase/firebase";
 import { Job } from "../../types/db";
-import { collection, getDocs, query, where, orderBy } from "firebase/firestore";
+import { collection, getDocs, orderBy, query, where } from "firebase/firestore";
 import { useSelector } from "react-redux";
 import { useQuery } from "@tanstack/react-query";
 

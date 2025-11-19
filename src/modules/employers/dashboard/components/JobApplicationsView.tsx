@@ -1,18 +1,9 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, type FC } from "react";
 import { useParams } from "next/navigation";
 import { db } from "@services/firebase/firebase";
-import {
-  doc,
-  getDoc,
-  collection,
-  getDocs,
-  query,
-  where,
-  updateDoc,
-} from "firebase/firestore";
+import { doc, updateDoc } from "firebase/firestore";
 import { toast } from "react-toastify";
-import Image from "next/image";
 import {
   MoreHorizontal,
   Trash2,
@@ -49,7 +40,9 @@ import {
   TooltipContent,
 } from "@/components/ui/tooltip";
 import { Application } from "../../../../types/db";
-import Spinner from "@component/ui/Spinner";
+import { APPLICATION_STATUS } from "@/common/enum";
+import { useFindUser } from "@hooks/user/useFindUser";
+import { useFetchApplication } from "@hooks/applications/useFetchApplication";
 
 export default function JobApplicationsView() {
   const [sortDialogOpen, setSortDialogOpen] = useState(false);
@@ -57,8 +50,6 @@ export default function JobApplicationsView() {
   const [applications, setApplications] = useState<Application[]>([]);
   const params = useParams(); //take id url
   const jobId = params?.id as string;
-  const [loading, setLoading] = useState(true);
-  const [jobTitle, setJobTitle] = useState("No Title");
   //feedback
   const [showFeedbackPopup, setShowFeedbackPopup] = useState(false);
   const [feedbackTarget, setFeedbackTarget] = useState<{
@@ -77,74 +68,46 @@ export default function JobApplicationsView() {
       Application["status"][]
     > = {
       pending: [],
-      reviewed: ["pending"],
-      interview: ["pending", "reviewed"],
-      rejected: ["pending", "reviewed", "interview", "hired"],
-      hired: ["pending", "reviewed", "interview", "rejected"],
+      reviewed: [APPLICATION_STATUS.PENDING],
+      interview: [APPLICATION_STATUS.PENDING, APPLICATION_STATUS.REVIEWED],
+      rejected: [
+        APPLICATION_STATUS.PENDING,
+        APPLICATION_STATUS.REVIEWED,
+        APPLICATION_STATUS.INTERVIEW,
+        APPLICATION_STATUS.HIRED,
+      ],
+      hired: [
+        APPLICATION_STATUS.PENDING,
+        APPLICATION_STATUS.REVIEWED,
+        APPLICATION_STATUS.INTERVIEW,
+        APPLICATION_STATUS.REJECTED,
+      ],
     };
     return !invalidTransitions[currentStatus]?.includes(newStatus);
   };
-
-  useEffect(() => {
-    const fetchApplications = async () => {
-      try {
-        const applicationsRef = collection(db, "applications");
-        const q = query(
-          applicationsRef,
-          where("jobId", "==", jobId),
-          where("showEmployer", "==", true)
-        );
-        const querySnapshot = await getDocs(q);
-        const jobRef = doc(db, "jobs", jobId);
-        const jobSnap = await getDoc(jobRef);
-        const jobTitle = jobSnap.exists()
-          ? jobSnap.data().jobTitle
-          : "No title";
-        setJobTitle(jobTitle);
-        const apps: Application[] = [];
-
-        for (const docSnap of querySnapshot.docs) {
-          const data = docSnap.data();
-
-          // Fetch user info
-          const userRef = doc(db, "users", data.candidateId);
-          const userSnap = await getDoc(userRef);
-
-          const username = userSnap.exists()
-            ? userSnap.data().username
-            : "Unknown User";
-
-          const useravatar = userSnap.exists()
-            ? userSnap.data().avatarUrl
-            : "/images/avatar.png";
-
-          apps.push({
-            id: docSnap.id,
-            jobId: data.jobId,
-            candidateId: data.candidateId,
-            name: username,
-            avatar: useravatar,
-            appliedAt: data.appliedAt.toDate(),
-            status: data.status,
-            resumeUrl: data.resumeUrl,
-            note: data.note,
-            showEmployer: data.showEmployer,
-            showCandidate: data.showCandidate,
-            feedback: data.feedback,
-          });
-        }
-        setApplications(apps);
-      } catch (err) {
-        console.error("Error fetching applications:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (jobId) {
-      fetchApplications();
+  const { data = [] } = useFetchApplication(jobId);
+  const { data: additionalData, isLoading } = useFindUser(
+    data.map((i) => i.candidateId)
+  );
+  const beginApplication: Application[] = data.map((application) => {
+    if (isLoading || !additionalData) {
+      return application;
     }
-  }, [jobId]);
+    const user = additionalData?.find((user) => {
+      return user.id === Number(application.candidateId);
+    });
+    return {
+      ...application,
+      name: user?.name,
+      avatar: user?.avatar,
+    };
+  });
+  useEffect(() => {
+    if (beginApplication.length > 0) {
+      setApplications(beginApplication);
+    } else {
+    }
+  }, [data, additionalData]);
 
   const handleDeleteApplication = async (
     applicationId: string,
@@ -154,7 +117,7 @@ export default function JobApplicationsView() {
       prevApplications.filter((app) => app.id !== applicationId)
     );
     const applicationRef = doc(db, "applications", applicationId);
-    await updateDoc(applicationRef, { status: "rejected" });
+    await updateDoc(applicationRef, { status: APPLICATION_STATUS.REJECTED });
     await updateDoc(applicationRef, { showEmployer: false });
     toast.success(`Application: ${applicationName} deleted`);
   };
@@ -175,7 +138,13 @@ export default function JobApplicationsView() {
     }
 
     // if status needs feedback -> popup form
-    if (["interview", "rejected", "hired"].includes(newStatus)) {
+    if (
+      [
+        APPLICATION_STATUS.INTERVIEW,
+        APPLICATION_STATUS.REJECTED,
+        APPLICATION_STATUS.HIRED,
+      ].includes(newStatus)
+    ) {
       setFeedbackTarget({ applicationId, newStatus, applicationName });
       setShowFeedbackPopup(true);
     } else {
@@ -271,7 +240,13 @@ export default function JobApplicationsView() {
     }
 
     // if status needs feedback -> popup like handleChangStatus
-    if (["interview", "rejected", "hired"].includes(newStatus)) {
+    if (
+      [
+        APPLICATION_STATUS.INTERVIEW,
+        APPLICATION_STATUS.REJECTED,
+        APPLICATION_STATUS.HIRED,
+      ].includes(newStatus)
+    ) {
       setFeedbackTarget({
         applicationId: draggedApp.id,
         newStatus,
@@ -311,12 +286,10 @@ export default function JobApplicationsView() {
     index: number;
   }) => {
     const [expanded, setExpanded] = useState(false);
-
     const isLongNote = application.note && application.note.length > 100;
     const shortNote = isLongNote
       ? (application.note ?? "").slice(0, 100) + "..."
       : application.note;
-    if (loading) return <Spinner />;
     return (
       <Draggable draggableId={application.id} index={index}>
         {(provided) => (
@@ -361,11 +334,13 @@ export default function JobApplicationsView() {
                           onClick={() =>
                             handleChangeStatus(
                               application.id,
-                              "pending",
+                              APPLICATION_STATUS.PENDING,
                               application.name || "Unknown name"
                             )
                           }
-                          disabled={application.status === "pending"}
+                          disabled={
+                            application.status === APPLICATION_STATUS.PENDING
+                          }
                         >
                           <ClipboardCheck size={14} /> Mark as New
                         </DropdownMenuItem>
@@ -375,11 +350,13 @@ export default function JobApplicationsView() {
                           onClick={() =>
                             handleChangeStatus(
                               application.id,
-                              "reviewed",
+                              APPLICATION_STATUS.REVIEWED,
                               application.name || "Unknown name"
                             )
                           }
-                          disabled={application.status === "reviewed"}
+                          disabled={
+                            application.status === APPLICATION_STATUS.REVIEWED
+                          }
                         >
                           <CheckCircle size={14} /> Mark as Reviewed
                         </DropdownMenuItem>
@@ -389,11 +366,13 @@ export default function JobApplicationsView() {
                           onClick={() =>
                             handleChangeStatus(
                               application.id,
-                              "interview",
+                              APPLICATION_STATUS.INTERVIEW,
                               application.name || "Unknown name"
                             )
                           }
-                          disabled={application.status === "interview"}
+                          disabled={
+                            application.status === APPLICATION_STATUS.INTERVIEW
+                          }
                         >
                           <Phone size={14} /> Schedule Interview
                         </DropdownMenuItem>
@@ -403,11 +382,13 @@ export default function JobApplicationsView() {
                           onClick={() =>
                             handleChangeStatus(
                               application.id,
-                              "rejected",
+                              APPLICATION_STATUS.REJECTED,
                               application.name || "Unknown name"
                             )
                           }
-                          disabled={application.status === "rejected"}
+                          disabled={
+                            application.status === APPLICATION_STATUS.REJECTED
+                          }
                         >
                           <X size={14} /> Reject
                         </DropdownMenuItem>
@@ -417,11 +398,13 @@ export default function JobApplicationsView() {
                           onClick={() =>
                             handleChangeStatus(
                               application.id,
-                              "hired",
+                              APPLICATION_STATUS.HIRED,
                               application.name || "Unknown name"
                             )
                           }
-                          disabled={application.status === "hired"}
+                          disabled={
+                            application.status === APPLICATION_STATUS.HIRED
+                          }
                         >
                           <User size={14} /> Hire
                         </DropdownMenuItem>
@@ -491,17 +474,12 @@ export default function JobApplicationsView() {
     );
   };
   //shold turn-> componentcomponent
-  const ApplicationColumn = ({
-    title,
-    status,
-    applications,
-    className,
-  }: {
+  const ApplicationColumn: FC<{
     title: string;
-    status: string;
-    applications: any[];
+    status: Application["status"];
+    applications: Application[];
     className?: string;
-  }) => (
+  }> = ({ title, status, applications, className }) => (
     <div
       className={`border rounded-md h-full flex flex-col ${
         className ?? "bg-gray-200"
@@ -544,7 +522,7 @@ export default function JobApplicationsView() {
       {/* Job Title */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-xl font-semibold text-gray-900">
-          Job Applications: {jobTitle}
+          Job Applications
         </h1>
         <div className="flex gap-2">
           <Button
@@ -563,33 +541,33 @@ export default function JobApplicationsView() {
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-2">
           <ApplicationColumn
             title="New Applications"
-            status="pending"
+            status={APPLICATION_STATUS.PENDING}
             className="bg-blue-100 text-blue-800 "
-            applications={getApplicationsByStatus("pending")}
+            applications={getApplicationsByStatus(APPLICATION_STATUS.PENDING)}
           />
           <ApplicationColumn
             title="Reviewed"
-            status="reviewed"
+            status={APPLICATION_STATUS.REVIEWED}
             className="bg-purple-100 text-purple-800"
-            applications={getApplicationsByStatus("reviewed")}
+            applications={getApplicationsByStatus(APPLICATION_STATUS.REVIEWED)}
           />
           <ApplicationColumn
             title="Interview"
-            status="interview"
+            status={APPLICATION_STATUS.INTERVIEW}
             className="bg-yellow-100 text-yellow-800"
-            applications={getApplicationsByStatus("interview")}
+            applications={getApplicationsByStatus(APPLICATION_STATUS.INTERVIEW)}
           />
           <ApplicationColumn
             title="Rejected"
-            status="rejected"
+            status={APPLICATION_STATUS.REJECTED}
             className="bg-red-300 text-red-800"
-            applications={getApplicationsByStatus("rejected")}
+            applications={getApplicationsByStatus(APPLICATION_STATUS.REJECTED)}
           />
           <ApplicationColumn
             title="Hired"
-            status="hired"
+            status={APPLICATION_STATUS.HIRED}
             className="bg-green-100 text-green-800"
-            applications={getApplicationsByStatus("hired")}
+            applications={getApplicationsByStatus(APPLICATION_STATUS.HIRED)}
           />
         </div>
       </DragDropContext>

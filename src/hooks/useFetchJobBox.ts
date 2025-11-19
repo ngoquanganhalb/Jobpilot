@@ -1,7 +1,15 @@
 import { useEffect, useState } from "react";
 import { firestore } from "../services/firebase/firebase";
-import { collection, query, orderBy, where, getDocs, Timestamp } from "firebase/firestore";
+import {
+  collection,
+  query,
+  orderBy,
+  where,
+  getDocs,
+  Timestamp,
+} from "firebase/firestore";
 import { Job } from "../types/db";
+import { JOB_STATUS } from "@/common/enum";
 
 export function useFetchJobBox(limit: number = 10000) {
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -16,11 +24,10 @@ export function useFetchJobBox(limit: number = 10000) {
         // Fetch only jobs with status === "Active"
         const q = query(
           jobsRef,
-          where("status", "==", "Active"),
+          where("status", "in", [JOB_STATUS.ACTIVE, "Active"]),
           where("expirationDate", ">=", today),
           orderBy("createdAt", "desc")
         );
-        
 
         const snapshot = await getDocs(q);
 
@@ -42,7 +49,7 @@ export function useFetchJobBox(limit: number = 10000) {
             expirationDate: data.expirationDate?.toDate?.() || null,
             applicants: data.applicants || [],
             status: data.status || "open",
-            tags: data.tags
+            tags: data.tags,
           };
         });
 

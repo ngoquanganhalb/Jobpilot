@@ -3,19 +3,18 @@ import { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { firestore } from "@services/firebase/firebase";
 import { Button } from "@component/ui/Button";
 import { Input } from "@component/ui/Input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
 import { UserModel } from "@types";
-import { toast } from "react-toastify";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { toBase64 } from "@lib/convertBase64";
 import AvatarDropzone from "@component/ui/AvatarDropZone";
 import { MdLocationOn, MdPerson, MdPhone } from "react-icons/md";
+import { useSelector } from "react-redux";
+import { RootState } from "@redux/store";
+import { useEditUser } from "@hooks/user/useEditUser";
+import { uploadPhotoAndGetUrl } from "@utils/uploadPhotoAndGetUrl";
 
 const ProfileSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
@@ -44,95 +43,41 @@ export default function ProfileSettings() {
       bio: "",
     },
   });
-
+  const user = useSelector((state: RootState) => state.auth.user);
+  const { editMutation } = useEditUser();
   useEffect(() => {
-    const auth = getAuth();
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      if (!currentUser) {
-        setLoading(false);
-        return;
-      }
+    if (!user) return;
 
-      setLoading(true);
-      try {
-        const userRef = doc(firestore, "users", currentUser.uid);
-        const userSnap = await getDoc(userRef);
-        if (userSnap.exists()) {
-          const userDataFromFirestore = userSnap.data();
-          const userInfo: UserModel = {
-            id: userSnap.id,
-            isAdmin: userDataFromFirestore.isAdmin,
-            name: userDataFromFirestore.name || "",
-            username: userDataFromFirestore.username || "",
-            email: userDataFromFirestore.email || "",
-            accountType: userDataFromFirestore.accountType || "candidate",
-            avatarUrl: userDataFromFirestore.avatarUrl || "",
-            profile: userDataFromFirestore.profile || {
-              bio: "",
-              location: "",
-              phone: "",
-              resumeUrl: "",
-            },
-            createdAt: userDataFromFirestore.createdAt || new Date(),
-          };
+    // set local userData for avatar preview fallback
+    setUserData({
+      avatarUrl: user?.avatar ?? null,
+      name: user?.name ?? "",
+    } as any);
 
-          setUserData(userInfo);
+    // populate form fields so inputs show current user values
+    setProfileValue("name", user.name ?? "");
+    setProfileValue("location", user.profileDetails?.location ?? "");
+    setProfileValue("phone", user.phone ?? "");
+    setProfileValue("bio", user.profileDetails?.bio ?? "");
 
-          setProfileValue("name", userInfo.name);
-          setProfileValue("location", userInfo.profile?.location ?? "");
-          setProfileValue("phone", userInfo.profile?.phone ?? "");
-          setProfileValue("bio", userInfo.profile?.bio ?? "");
-        } else {
-          console.error("User document does not exist.");
-        }
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-      } finally {
-        setLoading(false);
-      }
-    });
-
-    return () => unsubscribe(); // cleanup
-  }, [setProfileValue]);
+    // nếu chưa có preview local thì dùng avatar từ user
+    if (!avatarPreview && user.avatar) {
+      setAvatarPreview(user.avatar);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, setProfileValue]);
 
   const onProfileSubmit = async (data: z.infer<typeof ProfileSchema>) => {
-    if (!userData || !userData.id) return;
-
     setLoading(true);
-    try {
-      if (!userData.id) {
-        throw new Error("User ID is undefined");
-      }
-      const userRef = doc(firestore, "users", userData.id);
-
-      let avatarUrl = userData.avatarUrl;
-
-      // Upload avatar if exists
-      if (avatarFile) {
-        avatarUrl = await toBase64(avatarFile);
-      }
-
-      // Update Firestore
-      await updateDoc(userRef, {
-        name: data.name,
-        avatarUrl,
-        id: userData.id,
-        username: data.name,
-        profile: {
-          bio: data.bio,
-          location: data.location,
-          phone: data.phone,
-        },
-        updatedAt: new Date(),
-      });
-
-      toast.success("Profile updated successfully!");
-    } catch (error) {
-      console.error("Error updating profile:", error);
-      toast.error("Update failed. Please try again.");
-    } finally {
-      setLoading(false);
-    }
+    let avatarUrl = userData?.avatarUrl;
+    if (avatarFile) avatarUrl = await uploadPhotoAndGetUrl(avatarFile);
+    editMutation({
+      avatar: avatarUrl,
+      name: data.name,
+      phone: data.phone,
+      profileDetails: { bio: data.bio, location: data.location },
+    });
+    setLoading(false);
   };
 
   return (

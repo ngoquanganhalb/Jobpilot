@@ -15,7 +15,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import {
   FileIcon,
   UploadIcon,
-  X,
   MoreVertical,
   Trash2,
   Eye,

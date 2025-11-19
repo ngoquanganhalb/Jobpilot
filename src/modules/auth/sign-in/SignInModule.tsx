@@ -25,7 +25,7 @@ import Spinner from "@component/ui/Spinner";
 import { url } from "inspector";
 import { AccountType } from "@types";
 import { LoginDto } from "@/dtos/auth/login.dto";
-import { useLogin } from "./hooks/useLogin";
+import { useLogin } from "../../../hooks/auth/useLogin";
 import { signIn } from "next-auth/react";
 
 const SignInModule: React.FC = () => {

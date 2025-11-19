@@ -68,7 +68,7 @@ export type Location = {
 
 export type Job = {
   jobId: string;
-  employerId?: string;
+  employerId?: number;
   jobTitle?: string;
   tags?: string[];
   minSalary?: number | "";
@@ -89,7 +89,7 @@ export type Job = {
 export type Application = {
   id: string;
   jobId: string;
-  candidateId: string;
+  candidateId: number;
   appliedAt: Date | Timestamp;
   status: APPLICATION_STATUS;
   resumeUrl?: string;

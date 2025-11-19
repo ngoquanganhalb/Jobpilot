@@ -3,23 +3,14 @@ import { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { firestore } from "@services/firebase/firebase";
 import { Button } from "@component/ui/Button";
 import { Input } from "@component/ui/Input";
 import { Label } from "@/components/ui/label";
 import { Loader2, Eye, EyeOff } from "lucide-react";
-import { UserModel } from "@types";
-import { toast } from "react-toastify";
-import {
-  getAuth,
-  onAuthStateChanged,
-  updateEmail,
-  updatePassword,
-  reauthenticateWithCredential,
-  EmailAuthProvider,
-} from "firebase/auth";
+
 import { MdEmail } from "react-icons/md";
+import { useGetUserProfile } from "@hooks/business/useGetUserProfile";
+import { useEditUser } from "@hooks/user/useEditUser";
 
 const AccountSchema = z
   .object({
@@ -45,21 +36,21 @@ const AccountSchema = z
   );
 
 export default function AccountSettings() {
-  const [userData, setUserData] = useState<UserModel | null>(null);
-  const [loading, setLoading] = useState(false);
-
   // Password visibility
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
+  const { data, isLoading } = useGetUserProfile();
+  const { editMutation } = useEditUser();
+  const user = data?.user;
   // Acc Form
   const {
     control: accountControl,
     handleSubmit: handleAccountFormSubmit,
-    setValue: setAccountValue,
+    // setValue: setAccountValue,
     formState: { errors: accountErrors },
-    watch: watchAccount,
+    // watch: watchAccount,
+    reset,
   } = useForm({
     resolver: zodResolver(AccountSchema),
     defaultValues: {
@@ -71,104 +62,18 @@ export default function AccountSettings() {
   });
 
   useEffect(() => {
-    const auth = getAuth();
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      if (!currentUser) {
-        setLoading(false);
-        return;
-      }
-
-      setLoading(true);
-      try {
-        const userRef = doc(firestore, "users", currentUser.uid);
-        const userSnap = await getDoc(userRef);
-        if (userSnap.exists()) {
-          const userDataFromFirestore = userSnap.data();
-          const userInfo: UserModel = {
-            id: userSnap.id,
-            isAdmin: userDataFromFirestore.isAdmin,
-            name: userDataFromFirestore.name || "",
-            username: userDataFromFirestore.username || "",
-            email: userDataFromFirestore.email || "",
-            accountType: userDataFromFirestore.accountType || "candidate",
-            avatarUrl: userDataFromFirestore.avatarUrl || "",
-            profile: userDataFromFirestore.profile || {
-              bio: "",
-              location: "",
-              phone: "",
-              resumeUrl: "",
-            },
-            createdAt: userDataFromFirestore.createdAt || new Date(),
-          };
-
-          setUserData(userInfo);
-
-          // Set account form values
-          setAccountValue("email", userInfo.email);
-        } else {
-          console.error("User document does not exist.");
-        }
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-      } finally {
-        setLoading(false);
-      }
-    });
-
-    return () => unsubscribe(); // cleanup
-  }, [setAccountValue]);
+    if (user) {
+      reset({
+        email: user.email ?? "",
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+    }
+  }, [user, reset]);
 
   const onAccountSubmit = async (data: z.infer<typeof AccountSchema>) => {
-    if (!userData) return;
-
-    setLoading(true);
-    try {
-      const auth = getAuth();
-      const currentUser = auth.currentUser;
-
-      if (!currentUser) {
-        throw new Error("No authenticated user");
-      }
-
-      // Reauthenticate user
-      const credential = EmailAuthProvider.credential(
-        currentUser.email || "",
-        data.currentPassword
-      );
-      await reauthenticateWithCredential(currentUser, credential);
-
-      // Update email if changed
-      if (data.email !== currentUser.email) {
-        await updateEmail(currentUser, data.email);
-      }
-
-      // Update password if new password provided
-      if (data.newPassword) {
-        await updatePassword(currentUser, data.newPassword);
-      }
-
-      // Update email in Firestore
-      if (!userData.id) {
-        throw new Error("User ID is undefined");
-      }
-      const userRef = doc(firestore, "users", userData.id);
-      await updateDoc(userRef, {
-        email: data.email,
-        updatedAt: new Date(),
-      });
-
-      // Reset  fields
-      setAccountValue("currentPassword", "");
-      setAccountValue("newPassword", "");
-      setAccountValue("confirmPassword", "");
-
-      toast.success("Account settings updated successfully!");
-    } catch (error: any) {
-      console.error("Error updating account settings:", error);
-      toast.error(error.message || "Update failed. Please try again.");
-    } finally {
-      setLoading(false);
-    }
+    editMutation({ email: data.email, password: data.newPassword });
   };
 
   return (
@@ -316,8 +221,8 @@ export default function AccountSettings() {
         </div>
 
         {/* Submit Button */}
-        <Button type="submit" className="w-full" disabled={loading}>
-          {loading ? (
+        <Button type="submit" className="w-full" disabled={isLoading}>
+          {isLoading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Saving...

@@ -6,8 +6,9 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import Paths from "@/constants/paths";
 import { useLogout } from "@hooks/business/useLogout";
+import { User } from "@/dtos/user/user.dto";
 
-export default function AvatarMenu({ user }: { user: any }) {
+export default function AvatarMenu({ user }: { user: User | null }) {
   const router = useRouter();
   const { logoutMutation } = useLogout();
 
@@ -25,7 +26,7 @@ export default function AvatarMenu({ user }: { user: any }) {
     <Menu as="div" className="relative">
       <Menu.Button className="w-12 h-12 rounded-full overflow-hidden cursor-pointer transition-transform duration-200 hover:scale-110">
         <Image
-          src={user.avatarUrl || "/images/default-avatar.png"}
+          src={user?.avatar || "/images/default-avatar.png"}
           alt="avatar"
           width={48}
           height={48}

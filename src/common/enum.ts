@@ -6,7 +6,9 @@ export enum USER_ROLE {
 }
 export enum JOB_STATUS {
   ACTIVE = "active",
+  EXPIRED = "expired",
 }
+
 export enum APPLICATION_STATUS {
   PENDING = "pending",
   REVIEWED = "reviewed",
@@ -16,8 +18,8 @@ export enum APPLICATION_STATUS {
 }
 
 export enum JOB_TYPE {
-  FULL_TIME = 'full-time',
-  PART_TIME = 'part-time',
-  INTERNSHIP = 'internship',
-  FREELANCE = 'freelance',
+  FULL_TIME = "full-time",
+  PART_TIME = "part-time",
+  INTERNSHIP = "internship",
+  FREELANCE = "freelance",
 }

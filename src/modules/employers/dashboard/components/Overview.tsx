@@ -1,81 +1,19 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import { getAuth } from "firebase/auth";
-import { collection, query, where, getDocs } from "firebase/firestore";
-import { db } from "@services/firebase/firebase";
-import { Job } from "../../../../types/db";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { BsBriefcase, BsArrowRight, BsClipboardData } from "react-icons/bs";
-import { FiUser } from "react-icons/fi";
 import JobBoxEmployer from "./JobBoxEmployer";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@redux/store";
-import { setJobs } from "@redux/slices/jobSlice";
-import Spinner from "@component/ui/Spinner";
+
 import Paths from "@/constants/paths";
+import { useFetchJob } from "@hooks/job/useFetchJob";
+import { useSelector } from "react-redux";
+import { RootState } from "@redux/store";
 export default function OverviewEmployer() {
   const [jobActionDropdown, setJobActionDropdown] = useState<number | null>(
     null
   );
-  const user = useSelector((state: any) => state.user);
-  const [loading, setLoading] = useState(true);
-  const dispatch = useDispatch();
-  const jobs = useSelector((state: RootState) => state.jobs.jobs);
-  //fetch job with timestamp
-  useEffect(() => {
-    const fetchJobs = async () => {
-      const auth = getAuth();
-      const user = auth.currentUser;
-
-      if (!user) {
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const q = query(
-          collection(db, "jobs"),
-          where("employerId", "==", user.uid)
-        );
-        const querySnapshot = await getDocs(q);
-
-        const jobs: Job[] = querySnapshot.docs.map((doc) => {
-          const data = doc.data();
-          return {
-            id: doc.id,
-            jobId: doc.id,
-            employerId: data.employerId || "",
-            jobTitle: data.jobTitle || "",
-            companyName: data.companyName || "Unknown",
-            title: data.jobTitle || "",
-            type: data.jobType || "Unknown",
-            expirationDate: data.expirationDate?.toDate() || null,
-            urgent: data.isRemote || false,
-            status: data.status || "Active",
-            createdAt: data.createdAt?.toDate() || new Date(0),
-            applicants: data.applicants,
-            location: data.location,
-            avatarCompany: data.avatarCompany,
-            minSalary: data.minSalary,
-            maxSalary: data.maxSalary,
-            jobType: data.jobType,
-            tags: data.tags,
-            description: data.description,
-            isRemote: data.isRemote,
-          };
-        });
-
-        dispatch(setJobs(jobs));
-      } catch (error) {
-        console.error("Error fetching jobs:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchJobs();
-  }, []);
+  const user = useSelector((state: RootState) => state.auth.user);
+  const { data: jobs = [] } = useFetchJob();
 
   const toggleJobActionDropdown = (jobId: number) => {
     setJobActionDropdown(jobActionDropdown === jobId ? null : jobId);
@@ -85,7 +23,7 @@ export default function OverviewEmployer() {
     <div className="flex-1 mt-6">
       <div className="mb-6">
         <h1 className="text-2xl font-medium mb-1">
-          Hello, {user.name || "my friend"}
+          Hello, {user?.name || "my friend"}
         </h1>
         <p className="text-gray-600">
           Here is your daily activities and applications
@@ -126,9 +64,7 @@ export default function OverviewEmployer() {
           <div className="col-span-2">Actions</div>
         </div>
 
-        {loading ? (
-          <Spinner />
-        ) : jobs.length === 0 ? (
+        {jobs.length === 0 ? (
           <div className="p-6 text-center text-gray-500">
             <h3 className="text-lg font-semibold mb-2">No Jobs Found</h3>
             <p>Looks like you have not posted any jobs yet.</p>
@@ -140,11 +76,11 @@ export default function OverviewEmployer() {
                 const timeA =
                   a.createdAt instanceof Date
                     ? a.createdAt.getTime()
-                    : a.createdAt?.toDate().getTime() ?? 0;
+                    : (a.createdAt?.toDate().getTime() ?? 0);
                 const timeB =
                   b.createdAt instanceof Date
                     ? b.createdAt.getTime()
-                    : b.createdAt?.toDate().getTime() ?? 0;
+                    : (b.createdAt?.toDate().getTime() ?? 0);
                 return timeB - timeA;
               })
               .slice(0, 5)

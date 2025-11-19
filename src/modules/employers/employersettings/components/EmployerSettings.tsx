@@ -1,130 +1,115 @@
 "use client";
 import { useState, useEffect } from "react";
 import { Building2, Loader2 } from "lucide-react";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc, setDoc } from "firebase/firestore";
 import { firestore } from "@services/firebase/firebase";
 import { Button } from "@component/ui/Button";
 import { Input } from "@component/ui/Input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { UserModel } from "@types";
 import { toast } from "react-toastify";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { toBase64 } from "@lib/convertBase64";
 import AvatarDropzone from "@component/ui/AvatarDropZone";
-import { MdLocationOn, MdPhone } from "react-icons/md";
-
+import { useSelector } from "react-redux";
+import { RootState } from "@redux/store";
+import { ProfileEmployerFireBaseDto } from "@/dtos/user/profile-employer-firebase.dto";
+import Spinner from "@component/ui/Spinner";
+import { useEditUser } from "@hooks/user/useEditUser";
+import { uploadPhotoAndGetUrl } from "@utils/uploadPhotoAndGetUrl";
+type Form = ProfileEmployerFireBaseDto & {
+  avatarUrl: string;
+  companyName: string;
+};
 export default function EmployerSettings() {
-  const [userData, setUserData] = useState<UserModel | null>(null);
+  const user = useSelector((s: RootState) => s.auth.user);
+  const [userData, setUserData] = useState<Form>();
   const [loading, setLoading] = useState(false);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-
-  // Form state
-  const [name, setName] = useState("");
-  const [userName, setUserName] = useState<string | null>(null);
-  const [bio, setBio] = useState("");
-  const [location, setLocation] = useState("");
-  const [phone, setPhone] = useState("");
-
+  const { editMutation } = useEditUser();
   useEffect(() => {
-    const auth = getAuth();
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      if (!currentUser) {
-        setLoading(false);
-        return;
+    const run = async () => {
+      if (!user?.id) return;
+      const ref = doc(firestore, "employer_profile", String(user.id));
+      const snap = await getDoc(ref);
+
+      if (snap.exists()) {
+        const data = snap.data() as ProfileEmployerFireBaseDto;
+        const normalized: Form = {
+          id: snap.id,
+          avatarUrl: user.avatar ?? "",
+          companyName: user.name,
+          // savedJobs: data.savedJobs ?? [],
+          createdAt: (data.createdAt as unknown as Date) ?? new Date(),
+          companyProfile: {
+            description: data.companyProfile?.description ?? "",
+            website: data.companyProfile?.website ?? "",
+            address: data.companyProfile?.address ?? "",
+            industry: data.companyProfile?.industry ?? "",
+          },
+        };
+        setUserData(normalized);
+        setAvatarPreview(user.avatar);
+      } else {
+        const emptyDoc: Form = {
+          id: String(user.id),
+          avatarUrl: "",
+          companyName: "",
+          // savedJobs: [],
+          createdAt: new Date(),
+          companyProfile: {
+            description: "",
+            website: "",
+            address: "",
+            industry: "",
+          },
+        };
+        await setDoc(ref, emptyDoc);
+        setUserData(emptyDoc);
       }
-
-      setLoading(true);
-      try {
-        const userRef = doc(firestore, "users", currentUser.uid);
-        const userSnap = await getDoc(userRef);
-        if (userSnap.exists()) {
-          const userDataFromFirestore = userSnap.data();
-          const userInfo: UserModel = {
-            id: userSnap.id,
-            isAdmin: userDataFromFirestore.isAdmin,
-            name: userDataFromFirestore.name || "",
-            username: userDataFromFirestore.username || "",
-            email: userDataFromFirestore.email || "",
-            accountType: userDataFromFirestore.accountType || "candidate",
-            avatarUrl: userDataFromFirestore.avatarUrl || "",
-            profile: userDataFromFirestore.profile || {
-              bio: "",
-              location: "",
-              phone: "",
-              resumeUrl: "",
-            },
-            createdAt: userDataFromFirestore.createdAt || new Date(),
-          };
-
-          console.log("userInfo: ", userInfo);
-          //render date when refresh page
-          setUserData(userInfo);
-          setName(userInfo.name);
-          setBio(userInfo.profile?.bio ?? "");
-          setLocation(userInfo.profile?.location ?? "");
-          setPhone(userInfo.profile?.phone ?? "");
-          setUserName(userInfo.username);
-        } else {
-          console.error("User document does not exist.");
-        }
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-      } finally {
-        setLoading(false);
-      }
-    });
-
-    return () => unsubscribe(); // cleanup
-  }, []);
-
+    };
+    run();
+  }, [user?.id]);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!userData || !userData.id) return; // userData.id là id document trong firestore
-
+    if (!userData?.id) return;
     setLoading(true);
     try {
-      const userRef = doc(firestore, "users", userData.id);
+      let avatarUrl = userData.avatarUrl ?? "";
+      if (avatarFile) avatarUrl = await uploadPhotoAndGetUrl(avatarFile);
+      await editMutation({
+        avatar: avatarUrl,
+        name: userData.companyName,
+      });
+      const ref = doc(firestore, "employer_profile", userData.id);
 
-      let avatarUrl = userData.avatarUrl;
-
-      // Upload avatar nếu có
-      if (avatarFile) {
-        avatarUrl = await toBase64(avatarFile);
-      }
-
-      // Cập nhật Firestore
-      await updateDoc(userRef, {
-        name,
-        avatarUrl,
-        id: userData.id,
-        username: userName,
-        profile: {
-          bio,
-          location,
-          phone,
+      await updateDoc(ref, {
+        // avatarUrl,
+        companyProfile: {
+          description: userData.companyProfile?.description ?? "",
+          website: userData.companyProfile?.website ?? "",
+          address: userData.companyProfile?.address ?? "",
+          industry: userData.companyProfile?.industry ?? "",
         },
-        updatedAt: new Date(),
       });
 
-      toast.success("Profile updated successfully!");
-    } catch (error) {
-      console.error("Error updating profile:", error);
-      toast.error("Update failed. Please try again.");
+      setUserData((prev) => (prev ? { ...prev, avatarUrl } : prev));
+      setAvatarFile(null);
+      toast.success("Success");
+    } catch (err) {
+      console.error(err);
+      toast.error("Error");
     } finally {
       setLoading(false);
     }
   };
 
+  if (!userData) return <Spinner />;
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Profile Picture */}
-
       <div className="flex flex-col md:flex-row items-start md:items-center gap-8">
-        {/* Avatar + Dropzone */}
         <AvatarDropzone
-          avatarPreview={avatarPreview ?? userData?.avatarUrl ?? null}
+          avatarPreview={avatarPreview ?? userData.avatarUrl ?? null}
           onFileSelected={(file) => {
             setAvatarFile(file);
             setAvatarPreview(URL.createObjectURL(file));
@@ -132,74 +117,127 @@ export default function EmployerSettings() {
           size={200}
         />
 
-        <div className="flex-1 space-y-6">
-          {/* Company Name */}
-          <div className="space-y-1">
-            <Label htmlFor="name">Company Name</Label>
+        <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <Label>Company name</Label>
             <div className="relative">
               <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-500 h-5 w-5" />
               <Input
-                id="name"
-                value={name}
-                onChange={(e) => {
-                  setName(e.target.value);
-                  setUserName(e.target.value);
-                }}
-                placeholder="Enter company name"
+                value={userData.companyName ?? ""}
+                onChange={(e) =>
+                  setUserData((prev) =>
+                    prev
+                      ? {
+                          ...prev,
+                          companyName: e.target.value,
+                        }
+                      : prev
+                  )
+                }
                 className="pl-10"
               />
             </div>
           </div>
-          {/* Location */}
+          {/* Website */}
           <div className="space-y-1">
-            <Label htmlFor="location">Location</Label>
+            <Label htmlFor="website">Website</Label>
             <div className="relative">
-              <MdLocationOn className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-600 w-5 h-5 pointer-events-none" />
+              <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-500 h-5 w-5" />
               <Input
-                id="location"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                placeholder="City, Country"
+                id="website"
+                value={userData.companyProfile?.website ?? ""}
+                onChange={(e) =>
+                  setUserData((prev) =>
+                    prev
+                      ? {
+                          ...prev,
+                          companyProfile: {
+                            ...(prev.companyProfile ?? {}),
+                            website: e.target.value,
+                          },
+                        }
+                      : prev
+                  )
+                }
+                placeholder="https://your-company.com"
                 className="pl-10"
               />
             </div>
           </div>
-          {/* Phone */}
+
+          {/* Industry */}
           <div className="space-y-1">
-            <Label htmlFor="phone">Phone Number</Label>
-            <div className="relative">
-              <MdPhone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-600 w-5 h-5 pointer-events-none" />
-              <Input
-                id="phone"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="Your phone number"
-                type="tel"
-                className="pl-10"
-              />
-            </div>
+            <Label htmlFor="industry">Industry</Label>
+            <Input
+              id="industry"
+              value={userData.companyProfile?.industry ?? ""}
+              onChange={(e) =>
+                setUserData((prev) =>
+                  prev
+                    ? {
+                        ...prev,
+                        companyProfile: {
+                          ...(prev.companyProfile ?? {}),
+                          industry: e.target.value,
+                        },
+                      }
+                    : prev
+                )
+              }
+              placeholder="E.g. Software, Fintech..."
+            />
+          </div>
+
+          {/* Address */}
+          <div className="space-y-1 md:col-span-2">
+            <Label htmlFor="address">Address</Label>
+            <Input
+              id="address"
+              value={userData.companyProfile?.address ?? ""}
+              onChange={(e) =>
+                setUserData((prev) =>
+                  prev
+                    ? {
+                        ...prev,
+                        companyProfile: {
+                          ...(prev.companyProfile ?? {}),
+                          address: e.target.value,
+                        },
+                      }
+                    : prev
+                )
+              }
+              placeholder="City, Country / Full address"
+            />
           </div>
         </div>
       </div>
 
-      {/* Bio */}
+      {/* Description */}
       <div className="space-y-2">
-        <Label htmlFor="bio">About us</Label>
+        <Label htmlFor="description">About us</Label>
         <Textarea
-          id="bio"
-          value={bio}
-          onChange={(e) => setBio(e.target.value)}
+          id="description"
+          value={userData.companyProfile?.description ?? ""}
+          onChange={(e) =>
+            setUserData((prev) =>
+              prev
+                ? {
+                    ...prev,
+                    companyProfile: {
+                      ...(prev.companyProfile ?? {}),
+                      description: e.target.value,
+                    },
+                  }
+                : prev
+            )
+          }
           placeholder="Tell us about your company..."
           rows={4}
         />
       </div>
 
-      {/* Submit Button */}
-      <Button
-        type="submit"
-        className="w-full cursor-pointer"
-        disabled={loading}
-      >
+      <Button type="submit" className="w-full" disabled={loading}>
         {loading ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />

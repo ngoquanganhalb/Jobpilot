@@ -37,7 +37,7 @@ import Spinner from "@component/ui/Spinner";
 import Link from "next/link";
 import Paths from "@/constants/paths";
 
-import useAuth from "@hooks/useAuth";
+import { USER_ROLE } from "@/common/enum";
 
 export default function JobDetails() {
   const params = useParams(); //take id url
@@ -47,11 +47,9 @@ export default function JobDetails() {
   const [loading, setLoading] = useState(true);
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const userId = useSelector((state: RootState) => state.user.id);
-  const accountType = useSelector((state: RootState) => state.user.accountType);
   const [checkApplied, setCheckApplied] = useState<boolean | null>(null);
-  const { user } = useAuth();
   const router = useRouter();
+  const user = useSelector((state: RootState) => state?.auth?.user);
   const handlePopupForm = () => {
     setIsModalOpen(false);
   };
@@ -139,7 +137,7 @@ export default function JobDetails() {
       const checkQuery = query(
         applicationsRef,
         where("jobId", "==", jobId),
-        where("candidateId", "==", userId)
+        where("candidateId", "==", user?.id)
       );
       const checkSnapshot = await getDocs(checkQuery);
 
@@ -228,7 +226,7 @@ export default function JobDetails() {
                   </div>
                 </div>
               </div>
-              {accountType === "candidate" ? (
+              {user?.client === USER_ROLE.USER ? (
                 checkApplied ? (
                   <Button
                     className="text-lg font-semibold px-6 py-6 bg-[#0A65CC] cursor-pointer"
@@ -464,7 +462,7 @@ export default function JobDetails() {
         onClose={() => setIsModalOpen(false)}
         onSubmit={handlePopupForm}
         jobId={jobId}
-        candidateId={userId || ""}
+        candidateId={user?.id?.toString() || ""}
         onApplied={() => setCheckApplied(false)} //render ui
       />
     </div>

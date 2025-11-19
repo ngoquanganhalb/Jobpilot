@@ -1,48 +1,39 @@
-//Providers.tsx
+// Providers.tsx
 "use client";
 
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useState, useEffect } from "react";
 import { Provider as ReduxProvider } from "react-redux";
-// import { PersistGate } from "redux-persist/integration/react";
 import { store } from "@/redux/store";
-import { doLogout } from "@/redux/slices/authSlice";
-import { bindStoreHelpers } from "@/core/axios-custom.helpers";
-
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import FetchPermission from "./FetchPermission";
+const { AuthGateway } = await import("@/core/auth-gateway");
+
+function SessionRestorer() {
+  useEffect(() => {
+    const restoreSession = async () => {
+      try {
+        // Thử lấy session hiện tại
+        // Nếu token hết hạn, axios interceptor sẽ tự động refresh
+        await AuthGateway.getSession();
+      } catch {}
+    };
+
+    restoreSession();
+  }, []);
+
+  return null;
+}
 
 export default function Providers({ children }: { children: ReactNode }) {
   const [queryClient] = useState(() => new QueryClient());
 
-  // bind helpers (dispatch / logout) một lần cho axios
-  useEffect(() => {
-    bindStoreHelpers({
-      dispatch: store.dispatch,
-      doLogoutThunk: () => doLogout(),
-    });
-  }, []);
-
   return (
-    //tanstack
-    // <SessionProvider>
-    //   <QueryClientProvider client={queryClient}>
-    //     <ReduxProvider store={store}>
-    //       <FetchPermission />
-    //       {/* <PersistGate loading={null} persistor={persistor}> */}
-    //       <QueryClientProvider client={queryClient}>
-    //         {children}
-    //       </QueryClientProvider>
-    //       {/* </PersistGate> */}
-    //     </ReduxProvider>
-    //   </QueryClientProvider>
-    // </SessionProvider>
-    // <SessionProvider>
     <ReduxProvider store={store}>
       <QueryClientProvider client={queryClient}>
+        <SessionRestorer />
         <FetchPermission />
         {children}
       </QueryClientProvider>
     </ReduxProvider>
-    // </SessionProvider>
   );
 }

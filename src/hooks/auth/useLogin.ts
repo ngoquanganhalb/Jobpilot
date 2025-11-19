@@ -15,6 +15,7 @@ export const useLogin = () => {
     mutationFn: async (body: LoginDto) => {
       await authService.login(body);
       const profile = await authService.apiGetProfile();
+      console.log("profile", profile);
       // console.log("profile", profile);
       return profile;
     },
@@ -25,6 +26,7 @@ export const useLogin = () => {
       dispatch(
         setUser({ permissions: profile.permissions, user: profile.user })
       ); // authslice
+
       toast.success("Welcome 👋");
     },
   });

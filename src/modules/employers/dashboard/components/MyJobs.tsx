@@ -27,36 +27,9 @@ export default function MyJobs() {
     jobs,
     10
   );
-  //pagnition
-  // const limit = 10;
-  // const [currentStep, setCurrentStep] = useState(1);
   const toggleJobActionDropdown = (jobId: number) => {
     setJobActionDropdown(jobActionDropdown === jobId ? null : jobId);
   };
-
-  // Pagination setup
-  // const totalJobs = jobs.length;
-  // const totalSteps = Math.ceil(totalJobs / limit);
-
-  // const startIndex = (currentStep - 1) * limit;
-  // const endIndex = startIndex + limit;
-  // const currentJobs = jobs.slice(startIndex, endIndex);
-
-  // const handleNext = () => {
-  //   if (currentStep < totalSteps) {
-  //     setCurrentStep((prevStep) => prevStep + 1);
-  //   }
-  // };
-
-  // const handlePrevious = () => {
-  //   if (currentStep > 1) {
-  //     setCurrentStep((prevStep) => prevStep - 1);
-  //   }
-  // };
-
-  // const handleStepClick = (step: number) => {
-  //   setCurrentStep(step);
-  // };
 
   return (
     <div className="mt-6">

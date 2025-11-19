@@ -1,1 +1,3 @@
-export type ProfileUser = { user: any; permissions: any[] };
+import { User } from "../user/user.dto";
+
+export type ProfileUser = { user: User; permissions: any[] };

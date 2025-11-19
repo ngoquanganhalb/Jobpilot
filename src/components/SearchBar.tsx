@@ -28,7 +28,7 @@ export default function SearchBar() {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const user = useSelector((state: RootState) => state.auth);
-  console.log("user", user.permissions.length);
+  console.log("redux", user);
   useEffect(() => {
     // Cho phép client quyết định UI sau khi đã mount
     setMounted(true);
@@ -160,7 +160,7 @@ export default function SearchBar() {
           // Placeholder cố định để SSR & client khớp ở khung đầu
           <div className="w-[180px] h-10" />
         ) : user?.permissions?.length > 0 ? (
-          <AvatarMenu user={user} />
+          <AvatarMenu user={user.user} />
         ) : (
           <>
             <Link href="/sign-in" passHref>

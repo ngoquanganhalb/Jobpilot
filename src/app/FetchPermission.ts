@@ -11,7 +11,12 @@ export default function FetchPermission() {
 
   useEffect(() => {
     if (data) {
-      dispatch(setUser(data));
+      dispatch(
+        setUser({
+          user: data.user,
+          permissions: data?.permissions ?? [],
+        })
+      );
     }
   }, [data, dispatch]);
 

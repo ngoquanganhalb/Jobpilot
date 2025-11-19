@@ -1,3 +1,4 @@
+//authService.ts
 import { tokenManager } from "@/core/tokenManager";
 import { LoginDto } from "@/dtos/auth/login.dto";
 import { ProfileUser } from "@/dtos/auth/profile-user.dto";
@@ -19,23 +20,25 @@ class AuthService extends BaseService {
 
   public async refreshSession(): Promise<string | undefined> {
     const res = await this.post(`/refresh-session`);
-    tokenManager.setAccessToken(res.data.accessToken);
+    // tokenManager.setAccessToken(res.data.accessToken);
     return res.data.accessToken;
   }
 
   public async apiLogout(): Promise<void> {
     await this.post(`/logout`);
-    tokenManager.clear();
+    // tokenManager.clear();
   }
 
   public async apiGetProfile() {
-    return this.get<ProfileUser>(`/users/profile`, {
+    return await this.get<ProfileUser>(`/users/profile`, {
       ignoreBaseURL: true,
+      withCredentials: true,
     });
   }
 
   public async login(body: LoginDto) {
     const response = await this.post(`/login`, body);
+    tokenManager.setAccessToken(response.accessToken);
     return response;
   }
 

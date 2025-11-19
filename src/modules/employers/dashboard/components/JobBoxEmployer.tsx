@@ -34,6 +34,7 @@ import { updateJob, deleteJob } from "@redux/slices/jobSlice";
 import { useRouter } from "next/navigation";
 import Paths from "@/constants/paths";
 import Link from "next/link";
+import { APPLICATION_STATUS, JOB_STATUS } from "@/common/enum";
 
 type JobItemProps = {
   job: Job;
@@ -58,8 +59,8 @@ export default function JobBoxEmployer({
     job.expirationDate instanceof Date
       ? job.expirationDate.toLocaleDateString("en-GB")
       : typeof job.expirationDate === "string"
-      ? job.expirationDate
-      : "No expiry date";
+        ? job.expirationDate
+        : "No expiry date";
   // count candidates with status"pending"
   useEffect(() => {
     const fetchPendingApplications = async () => {
@@ -67,7 +68,7 @@ export default function JobBoxEmployer({
       const q = query(
         applicationsRef,
         where("jobId", "==", job.jobId),
-        where("status", "==", "pending")
+        where("status", "==", APPLICATION_STATUS.PENDING)
       );
       const querySnapshot = await getDocs(q);
       setPendingApplicationsCount(querySnapshot.size);
@@ -95,7 +96,7 @@ export default function JobBoxEmployer({
         status: "Expire",
       });
       toast.success("Job marked as expired!");
-      dispatch(updateJob({ ...job, status: "Expire" })); // Cập nhật Redux
+      dispatch(updateJob({ ...job, status: JOB_STATUS.EXPIRED })); // Cập nhật Redux
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       toast.error("Failed to mark job as expired.");
@@ -125,7 +126,7 @@ export default function JobBoxEmployer({
         text: "Application has been deleted.",
         icon: "success",
       });
-    } catch (error) {
+    } catch {
       toast.error("Failed to delete job.");
     }
   };
@@ -207,7 +208,7 @@ export default function JobBoxEmployer({
 
         {/* Status */}
         <div className="col-span-2 text-sm">
-          {job.status === "Active" ? (
+          {job.status === JOB_STATUS.ACTIVE ? (
             <div className="flex items-center text-green-600 font-normal text-base">
               <BiCheckCircle className="mr-1" /> Active
             </div>
@@ -323,7 +324,9 @@ export default function JobBoxEmployer({
                 <strong>Status:</strong>{" "}
                 <span
                   className={
-                    job.status === "Active" ? "text-green-600" : "text-red-500"
+                    job.status === JOB_STATUS.ACTIVE
+                      ? "text-green-600"
+                      : "text-red-500"
                   }
                 >
                   {job.status}

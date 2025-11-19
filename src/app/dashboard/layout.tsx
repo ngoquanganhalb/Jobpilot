@@ -12,6 +12,7 @@ import {
 } from "@/constants/sidebarDashBoard";
 import { RootState } from "@redux/store";
 import { USER_ROLE } from "@/common/enum";
+import Spinner from "@component/ui/Spinner";
 
 // Định nghĩa các type cho props
 type LayoutProps = {
@@ -23,14 +24,15 @@ type LayoutProps = {
 export default function DashboardLayout(props: LayoutProps) {
   const { children, employer, candidate } = props;
 
-  const accountType = useSelector(
-    (state: RootState) => state.auth.user?.client
-  );
-  // Render sidebar tùy thuộc vào accountType
+  const { user, isLoading } = useSelector((state: RootState) => state.auth);
+  console.log("isLoading", isLoading);
+
+  if (isLoading) return <Spinner />;
+
   const renderSidebar = () => {
-    if (accountType === USER_ROLE.EMPLOYER) {
+    if (user?.client === USER_ROLE.EMPLOYER) {
       return <SideBar menuItems={menuItemsEmployer} title="Dashboard" />;
-    } else if (accountType === USER_ROLE.USER) {
+    } else if (user?.client === USER_ROLE.USER) {
       return <SideBar menuItems={menuItemCandidate} title="Dashboard" />;
     }
     return null;
@@ -53,11 +55,11 @@ export default function DashboardLayout(props: LayoutProps) {
 
           {/* Render nội dung chính */}
           <div className="flex-1">
-            {accountType === USER_ROLE.EMPLOYER && employer}
-            {accountType === USER_ROLE.USER && candidate}
+            {user?.client === USER_ROLE.EMPLOYER && employer}
+            {user?.client === USER_ROLE.USER && candidate}
 
-            {accountType !== USER_ROLE.EMPLOYER &&
-              accountType !== USER_ROLE.USER &&
+            {user?.client !== USER_ROLE.EMPLOYER &&
+              user?.client !== USER_ROLE.USER &&
               children}
           </div>
         </div>

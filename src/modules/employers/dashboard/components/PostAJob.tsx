@@ -1,6 +1,5 @@
 "use client";
 import provinces from "../../../../constants/data/location.json";
-import { useState } from "react";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -15,7 +14,6 @@ import {
 import { collection, Timestamp, doc, setDoc } from "firebase/firestore";
 import { db } from "@services/firebase/firebase";
 import { toast } from "react-toastify";
-import { Upload } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { format, isToday, isBefore } from "date-fns";
 import { FaCalendarAlt } from "react-icons/fa";
@@ -26,7 +24,6 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import Image from "next/image";
-import { toBase64 } from "@lib/convertBase64";
 import { Job, JOB_TAG_OPTIONS } from "../../../../types/db";
 import { useRouter } from "next/navigation";
 import LocationSelector from "@component/ui/LocationSelector";
@@ -46,7 +43,6 @@ const jobFormSchema = z
     minSalary: z.number().min(0, "Min salary must be 0 or greater"),
     maxSalary: z.number().min(0, "Max salary must be 0 or greater"),
     description: z.string().min(1, "Description is required"),
-    avatarCompany: z.string().optional(),
     isRemote: z.boolean(),
     expirationDate: z
       .date()
@@ -69,7 +65,6 @@ type JobFormValues = z.infer<typeof jobFormSchema>;
 
 export default function PostAJob() {
   const router = useRouter();
-  const [logoFile, setLogoFile] = useState<File | null>(null);
 
   // Initialize form with react-hook-form and zod resolver
   const {
@@ -77,12 +72,11 @@ export default function PostAJob() {
     control,
     handleSubmit,
     formState: { errors },
-    watch,
     setValue,
     trigger,
   } = useForm<JobFormValues>({
     resolver: zodResolver(jobFormSchema),
-    mode: "onChange",
+    mode: "onBlur",
     defaultValues: {
       jobTitle: "",
       jobType: JOB_TYPE.FULL_TIME,
@@ -90,7 +84,6 @@ export default function PostAJob() {
       minSalary: 0,
       maxSalary: 0,
       description: "",
-      avatarCompany: "",
       isRemote: false,
       expirationDate: new Date(),
       location: {
@@ -102,24 +95,24 @@ export default function PostAJob() {
   });
   const user = useSelector((state: RootState) => state.auth.user);
   // Watch values for validation
-  const avatarCompany = watch("avatarCompany");
+  // const avatarCompany = watch("avatarCompany");
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setLogoFile(file);
-      const previewURL = URL.createObjectURL(file);
-      setValue("avatarCompany", previewURL);
-    }
-  };
+  // const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = e.target.files?.[0];
+  //   if (file) {
+  //     setLogoFile(file);
+  //     const previewURL = URL.createObjectURL(file);
+  //     setValue("avatarCompany", previewURL);
+  //   }
+  // };
 
   const onSubmit = async (data: JobFormValues) => {
     try {
-      let base64Logo = "";
+      // let base64Logo = "";
 
-      if (logoFile) {
-        base64Logo = await toBase64(logoFile);
-      }
+      // if (logoFile) {
+      //   base64Logo = await toBase64(logoFile);
+      // }
 
       const docRef = doc(collection(db, "jobs"));
 
@@ -132,7 +125,7 @@ export default function PostAJob() {
         maxSalary: data.maxSalary,
         description: data.description,
         jobType: data.jobType as JOB_TYPE,
-        avatarCompany: base64Logo,
+        avatarCompany: user?.avatar,
         companyName: user?.name,
         urgent: false,
         location: data.location,
@@ -151,11 +144,9 @@ export default function PostAJob() {
       setValue("minSalary", 0);
       setValue("maxSalary", 0);
       setValue("description", "");
-      setValue("avatarCompany", "");
       setValue("isRemote", true);
       setValue("expirationDate", new Date());
       setValue("location", { province: "", district: "", address: "" });
-      setLogoFile(null);
 
       router.push(`/find-job/${jobData.jobId}`);
       toast.success("Created job!");
@@ -197,30 +188,9 @@ export default function PostAJob() {
             <label className="block mb-2 text-sm font-medium text-gray-700">
               Company Avatar
             </label>
-            <div className="flex items-center gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() =>
-                  document.getElementById("avatar-upload")?.click()
-                }
-                className="flex items-center gap-2"
-              >
-                <Upload size={16} />
-                Upload Image
-              </Button>
-
-              <input
-                id="avatar-upload"
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                className="hidden"
-              />
-            </div>
-            {avatarCompany && (
+            {user?.avatar && (
               <Image
-                src={avatarCompany}
+                src={user?.avatar}
                 alt="Company Avatar Preview"
                 width={80}
                 height={80}
