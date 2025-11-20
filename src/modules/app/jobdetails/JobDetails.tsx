@@ -137,7 +137,7 @@ export default function JobDetails() {
       const checkQuery = query(
         applicationsRef,
         where("jobId", "==", jobId),
-        where("candidateId", "==", user?.id)
+        where("candidateId", "==", String(user?.id))
       );
       const checkSnapshot = await getDocs(checkQuery);
 

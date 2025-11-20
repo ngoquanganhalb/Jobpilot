@@ -1,5 +1,4 @@
 "use client";
-import { tokenManager } from "@/core/tokenManager";
 import Footer from "@component/Footer";
 import Header from "@component/Header";
 import SearchBar from "@component/SearchBar";
@@ -8,7 +7,6 @@ export default function PageLayout({
 }: {
   children: React.ReactNode;
 }) {
-  console.log("accessToken", tokenManager.getAccessToken());
 
   return (
     <div>

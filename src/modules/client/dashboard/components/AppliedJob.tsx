@@ -9,10 +9,9 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
-import { Application, ApplicationWithJob, Job } from "../../../../types/db";
+import {  ApplicationWithJob, Job } from "../../../../types/db";
 import React, { useEffect, useState } from "react";
 import { db } from "@services/firebase/firebase";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
 import StepPagination from "@component/ui/StepPagination";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
@@ -32,10 +31,13 @@ import {
 } from "@component/ui/tooltip";
 import Paths from "@/constants/paths";
 import Link from "next/link";
+import { useSelector } from "react-redux";
+import { RootState } from "@redux/store";
 
 const AppliedJob: React.FC = () => {
+  const user = useSelector((state: RootState) => state.auth.user);
   const MySwal = withReactContent(Swal);
-  const [jobApplications, SetJobApplication] = useState<ApplicationWithJob[]>(
+  const [jobApplications, setJobApplication] = useState<ApplicationWithJob[]>(
     []
   );
   const limit = 10;
@@ -87,53 +89,51 @@ const AppliedJob: React.FC = () => {
       return null;
     }
   };
+  const fetchApplication = async (id: number) => {
+    if (!id) return; // <-- guard: nếu chưa có id thì không fetch
+    try {
+      const q = query(
+        collection(db, "applications"),
+        where("candidateId", "==", `${id}`),
+        where("showCandidate", "==", true),
+        orderBy("appliedAt", "desc")
+      );
+      const querySnapshot = await getDocs(q);
 
+      const jobApplications = await Promise.all(
+        querySnapshot.docs.map(async (docSnap) => {
+          const data = docSnap.data();
+          const jobData = await fetchJobById(data.jobId);
+          return {
+            id: docSnap.id,
+            jobId: data.jobId,
+            note: data.note,
+            resumeUrl: data.resumeUrl,
+            showCandidate: data.showCandidate,
+            showEmployer: data.showEmployer,
+            status: data.status,
+            feedback: data.feedback,
+            appliedAt: data.appliedAt?.toDate ? data.appliedAt.toDate() : null,
+            candidateId: data.candidateId,
+            job: jobData ? (jobData as Job) : undefined,
+          } as ApplicationWithJob;
+        })
+      );
+
+      setJobApplication(jobApplications);
+      setTotalApplications(jobApplications.length);
+      setCurrentStep(1); // reset pagination to first page when data changes
+    } catch (error) {
+      console.error("Error in fetchApplication:", error);
+    }
+  };
+
+  // ——— SỬA: gọi fetchApplication trong useEffect thay vì gọi trực tiếp ———
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(getAuth(), async (user) => {
-      if (!user) return;
-
-      try {
-        const q = query(
-          collection(db, "applications"),
-          where("candidateId", "==", user.uid),
-          where("showCandidate", "==", true),
-          orderBy("appliedAt", "desc")
-        );
-        const querySnapshot = await getDocs(q);
-
-        const jobApplications = await Promise.all(
-          querySnapshot.docs.map(async (docSnap) => {
-            const data = docSnap.data();
-            const jobData = await fetchJobById(data.jobId);
-
-            return {
-              id: docSnap.id,
-              jobId: data.jobId,
-              note: data.note,
-              resumeUrl: data.resumeUrl,
-              showCandidate: data.showCandidate,
-              showEmployer: data.showEmployer,
-              status: data.status,
-              feedback: data.feedback,
-              appliedAt: data.appliedAt?.toDate
-                ? data.appliedAt.toDate()
-                : null,
-              candidateId: data.candidateId,
-              job: jobData ? (jobData as Job) : undefined,
-            };
-          })
-        );
-
-        SetJobApplication(jobApplications);
-        setTotalApplications(jobApplications.length);
-        console.log(jobApplications);
-      } catch (error) {
-        console.log(error);
-      }
-    });
-
-    return () => unsubscribe();
-  }, []);
+    if (user?.id) {
+      fetchApplication(user.id);
+    }
+  }, [user?.id]);
 
   const handleDelete = async (applicationId: string) => {
     const result = await MySwal.fire({
@@ -153,7 +153,7 @@ const AppliedJob: React.FC = () => {
         });
 
         toast.success("Deleted successfully!");
-        SetJobApplication((prev) =>
+        setJobApplication((prev) =>
           prev.filter((app) => app.id !== applicationId)
         );
       } catch (error) {
@@ -284,12 +284,12 @@ const AppliedJob: React.FC = () => {
                             applications.status === "pending"
                               ? "bg-blue-100 text-blue-800"
                               : applications.status === "reviewed"
-                              ? "bg-purple-100 text-purple-800"
-                              : applications.status === "interview"
-                              ? "bg-yellow-100 text-yellow-800"
-                              : applications.status === "hired"
-                              ? "bg-green-100 text-green-800"
-                              : "bg-red-100 text-red-800"
+                                ? "bg-purple-100 text-purple-800"
+                                : applications.status === "interview"
+                                  ? "bg-yellow-100 text-yellow-800"
+                                  : applications.status === "hired"
+                                    ? "bg-green-100 text-green-800"
+                                    : "bg-red-100 text-red-800"
                           }`}
                         >
                           {applications.status === "pending" && <FaRegClock />}
@@ -392,12 +392,12 @@ const AppliedJob: React.FC = () => {
                             applications.status === "pending"
                               ? "bg-blue-100 text-blue-800"
                               : applications.status === "reviewed"
-                              ? "bg-purple-100 text-purple-800"
-                              : applications.status === "interview"
-                              ? "bg-yellow-100 text-yellow-800"
-                              : applications.status === "hired"
-                              ? "bg-green-100 text-green-800"
-                              : "bg-red-100 text-red-800"
+                                ? "bg-purple-100 text-purple-800"
+                                : applications.status === "interview"
+                                  ? "bg-yellow-100 text-yellow-800"
+                                  : applications.status === "hired"
+                                    ? "bg-green-100 text-green-800"
+                                    : "bg-red-100 text-red-800"
                           }`}
                         >
                           {applications.status === "pending" && <FaRegClock />}

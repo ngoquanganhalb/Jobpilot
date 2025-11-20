@@ -25,7 +25,6 @@ export default function DashboardLayout(props: LayoutProps) {
   const { children, employer, candidate } = props;
 
   const { user, isLoading } = useSelector((state: RootState) => state.auth);
-  console.log("isLoading", isLoading);
 
   if (isLoading) return <Spinner />;
 
