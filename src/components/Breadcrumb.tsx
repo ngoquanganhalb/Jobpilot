@@ -38,6 +38,9 @@ export default function Breadcrumb() {
     if (segments[0] === "view-application" && segments.length === 1) {
       return "View Application";
     }
+    if (segments[0] === "cv" && segments.length === 1) {
+      return "Resume Management";
+    }
     return "Home";
   };
 

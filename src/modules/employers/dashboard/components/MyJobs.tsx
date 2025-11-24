@@ -8,7 +8,7 @@ import { setJobs } from "@redux/slices/jobSlice";
 import StepPagination from "@component/ui/StepPagination";
 import { HiBriefcase } from "react-icons/hi";
 import { useFetchJob } from "@hooks/job/useFetchJob";
-import { usePagination } from "@hooks/usePagination";
+import { usePagination } from "@hooks/common-hooks/usePagination";
 
 export default function MyJobs() {
   const [jobActionDropdown, setJobActionDropdown] = useState<number | null>(

@@ -1,3 +1,4 @@
+"use client";
 import { useState, useEffect } from "react";
 import LocationIcon from "@component/icons/LocationIcon";
 import SearchIcon from "@component/icons/SearchIcon";

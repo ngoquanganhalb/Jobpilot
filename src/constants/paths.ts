@@ -1,6 +1,6 @@
 export const Paths = {
   DASHBOARD_OVERVIEW: "/dashboard/overview",
-  DASHBOARD_MYJOB:"/dashboard/my-jobs",
+  DASHBOARD_MYJOB: "/dashboard/my-jobs",
   EMPLOYER_PROFILE: "/dashboard/employers-profile",
   POST_A_JOB: "/dashboard/post-job",
   MY_JOBS: "/dashboard/my-jobs",
@@ -8,12 +8,14 @@ export const Paths = {
   PLANS: "/dashboard/plans",
   ALL_COMPANIES: "/dashboard/all-companies",
   SETTINGS: "/dashboard/settings",
-  DASHBOARD: '/dashboard',
+  DASHBOARD: "/dashboard",
   FIND_JOB: "/find-job",
-  VIEW_APPLICATION: '/view-application',
-  DASHBOARD_APPLIEDJOB: '/dashboard/applied-job',
-  SIGN_IN: '/sign-in',
-  SIGN_UP: '/sign-up',
-  FAVORITE_JOB: '/dashboard/favorite-job'
+  VIEW_APPLICATION: "/view-application",
+  DASHBOARD_APPLIEDJOB: "/dashboard/applied-job",
+  SIGN_IN: "/sign-in",
+  SIGN_UP: "/sign-up",
+  FAVORITE_JOB: "/dashboard/favorite-job",
+  CV: "/cv",
+  SUGGEST_JOBS:'/suggest-jobs'
 };
 export default Paths;

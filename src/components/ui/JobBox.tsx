@@ -1,3 +1,4 @@
+"use client";
 import { JobBoxType } from "@types";
 import Image from "next/image";
 import { FaRegBookmark, FaBookmark } from "react-icons/fa";

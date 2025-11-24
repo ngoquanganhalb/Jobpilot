@@ -11,7 +11,7 @@ export interface AuthState {
 type UserProfilePayload = {
   user: User;
   permissions: any[];
-  isLoading: boolean;
+  isLoading?: boolean;
 };
 
 const initialState: AuthState = {

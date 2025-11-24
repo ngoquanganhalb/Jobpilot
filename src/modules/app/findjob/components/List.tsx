@@ -1,10 +1,9 @@
+"use client";
 import JobBox from "@component/ui/JobBox";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import StepPagination from "@component/ui/StepPagination";
-import { useFetchJobBox } from "@hooks/useFetchJobBox";
 import { useSelector } from "react-redux";
 import { RootState } from "@redux/store";
-import { Job } from "../../../../types/db";
 import { resetFilters, setFilters } from "@redux/slices/filterSlice";
 import { useDispatch } from "react-redux";
 import { useSearchParams } from "next/navigation";
@@ -13,17 +12,20 @@ import {
   setKeyword as setKeywordRedux,
   setLocation as setLocationRedux,
 } from "@redux/slices/searchSlice";
+import { usePagination } from "@hooks/common-hooks/usePagination";
+import { useFilterJobs } from "@hooks/common-hooks/useFilterJobs";
+import { Job } from "../../../../types/db";
+type Props = {
+  values: Job[];
+};
 
-export default function List() {
-  const limit = 12;
-  const [currentJobs, setCurrentJobs] = useState<Job[]>([]);
-  const [currentStep, setCurrentStep] = useState(1);
-
+export default function List({ values: jobs }: Props) {
+  console.log("first", jobs);
   const keyword = useSelector((state: RootState) => state.search.keyword);
   const location = useSelector((state: RootState) => state.search.location);
   const filter = useSelector((state: RootState) => state.filter);
   const dispatch = useDispatch();
-  const { jobs } = useFetchJobBox();
+  // const { jobs } = useFetchJobBox();
 
   const [isMounted, setIsMounted] = useState(false);
   const searchParams = useSearchParams();
@@ -69,79 +71,15 @@ export default function List() {
     dispatch(resetFilters());
   }, []);
 
-  const filteredJobs = useMemo(() => {
-    return jobs.filter((job) => {
-      const keywordMatch =
-        keyword === "" ||
-        (job.jobTitle?.toLowerCase().includes(keyword.toLowerCase()) ??
-          false) ||
-        job.companyName.toLowerCase().includes(keyword.toLowerCase());
-
-      const locationMatch =
-        location === "" ||
-        job.location?.province
-          ?.toLowerCase()
-          .includes(location.toLowerCase()) ||
-        job.location?.district?.toLowerCase().includes(location.toLowerCase());
-
-      const tagMatch =
-        (filter.tags?.length ?? 0) === 0 ||
-        (job.tags?.some((jobTag) =>
-          (filter.tags ?? []).some(
-            (filterTag) =>
-              jobTag.trim().toLowerCase() === filterTag.trim().toLowerCase()
-          )
-        ) ??
-          false);
-
-      const jobTypeMatch =
-        (filter.jobTypes?.length ?? 0) === 0 ||
-        (filter.jobTypes?.some(
-          (filterJobType) =>
-            job.jobType?.toUpperCase() === filterJobType.toUpperCase()
-        ) ??
-          false);
-
-      const jobMin = typeof job.minSalary === "number" ? job.minSalary : null;
-      const jobMax = typeof job.maxSalary === "number" ? job.maxSalary : null;
-
-      const min = filter.minSalary ?? 0;
-      const max = filter.maxSalary ?? 0;
-
-      const salaryMatch =
-        (min === 0 || (jobMin !== null && jobMin >= min)) &&
-        (max === 0 || (jobMax !== null && jobMax <= max));
-
-      return (
-        keywordMatch && locationMatch && tagMatch && jobTypeMatch && salaryMatch
-      );
-    });
-  }, [jobs, keyword, location, filter]);
-
-  const totalSteps = Math.ceil(filteredJobs.length / limit);
-
-  // Pagination effect
-  useEffect(() => {
-    const startIndex = (currentStep - 1) * limit;
-    const endIndex = startIndex + limit;
-    setCurrentJobs(filteredJobs.slice(startIndex, endIndex));
-  }, [filteredJobs, currentStep]);
-
-  const handleNext = () => {
-    if (currentStep < totalSteps) {
-      setCurrentStep((prevStep) => prevStep + 1);
-    }
-  };
-
-  const handlePrevious = () => {
-    if (currentStep > 1) {
-      setCurrentStep((prevStep) => prevStep - 1);
-    }
-  };
-
-  const handleStepClick = (step: number) => {
-    setCurrentStep(step);
-  };
+  const filteredJobs = useFilterJobs({ jobs, keyword, location, filter });
+  const {
+    page,
+    totalPages,
+    pageItems: currentJobs,
+    next,
+    prev,
+    setPage,
+  } = usePagination(filteredJobs, 12);
 
   if (!isMounted) {
     return <Spinner />;
@@ -177,11 +115,11 @@ export default function List() {
 
       <div className="container mx-auto px-4 py-8">
         <StepPagination
-          currentStep={currentStep}
-          totalSteps={totalSteps}
-          onNext={handleNext}
-          onPrevious={handlePrevious}
-          onStepClick={handleStepClick}
+          currentStep={page}
+          totalSteps={totalPages}
+          onNext={next}
+          onPrevious={prev}
+          onStepClick={setPage}
         />
       </div>
     </div>

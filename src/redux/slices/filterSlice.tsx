@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { JOB_TYPE } from "@/common/enum";
 
-type FilterState = {
+export type FilterState = {
   location?: string;
   tags?: string[];
   jobTypes?: JOB_TYPE[];

@@ -13,6 +13,12 @@ export default function Header() {
         <NavLink href={Paths.DASHBOARD_OVERVIEW} activeBasePath="/dashboard">
           Dashboard
         </NavLink>
+        <NavLink href={Paths.CV} activeBasePath="/cv">
+          Resume Management
+        </NavLink>
+        <NavLink href={Paths.SUGGEST_JOBS} activeBasePath={Paths.SUGGEST_JOBS}>
+          Jobs For You
+        </NavLink>
       </div>
 
       {/* Right contact */}

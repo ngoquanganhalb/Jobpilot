@@ -106,3 +106,35 @@ export type Application = {
 export type ApplicationWithJob = Application & {
   job?: Job;
 };
+
+export interface Cv {
+  id: number;
+  userId?: number;
+  image: string;
+  title: string;
+  name: string;
+  fullName: string;
+  email: string;
+  phone: string;
+  address: string;
+  summary: string;
+  skills: string[];
+  experience: Experience[];
+  education: Education[];
+  isActive: boolean;
+  rawText?: any;
+  theme: number;
+}
+
+export interface Experience {
+  company: string;
+  position: string;
+  duration: string;
+  description: string;
+}
+
+export interface Education {
+  school: string;
+  degree: string;
+  duration: string;
+}
