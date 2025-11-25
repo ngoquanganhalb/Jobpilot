@@ -12,10 +12,12 @@ type SuggesJobResponse = {
 }[];
 const SuggestJob: React.FC = () => {
   // make payload stable so effect deps are predictable
-  const { data: cv, isLoading } = useGetUserCv();
-  const cvActive = cv.filter((i) => i.isActive === true)[0];
-  const payload = useMemo(() => ({ cv_id: cvActive.id, limit: 10000 }), []);
-
+  const { data: cv = [], isLoading } = useGetUserCv();
+  const cvActive = cv?.filter((i) => i.isActive === true)[0];
+  const payload = useMemo(
+    () => ({ cv_id: cvActive?.id, limit: 10000 }),
+    [cvActive?.id]
+  );
   const { getSuggestJobMutation } = useGetSuggestJob();
 
   const [jobs, setJobs] = useState<SuggesJobResponse>([]);
@@ -53,7 +55,7 @@ const SuggestJob: React.FC = () => {
     return () => {
       mounted = false;
     };
-  }, [payload]);
+  }, [payload, isLoading]);
 
   if (loading) return <Spinner />;
   if (!jobs.length)
