@@ -148,7 +148,7 @@ export default function PostAJob() {
       setValue("expirationDate", new Date());
       setValue("location", { province: "", district: "", address: "" });
 
-      router.push(`/find-job/${jobData.jobId}`);
+      router.push(`/dashboard/pricing/${jobData.jobId}`);
       toast.success("Created job!");
     } catch (error) {
       console.error("Error uploading job:", error);

@@ -80,4 +80,16 @@ export abstract class BaseService {
     );
     return response.data;
   }
+
+  protected async postResponse<T = any, D = any>(
+    endpoint: string,
+    data?: D,
+    config?: CustomAxiosRequestConfig
+  ): Promise<T> {
+    const url = config?.ignoreBaseURL ? endpoint : `${this.baseURL}${endpoint}`;
+    const response = await authorizedAxiosInstance.post<T>(url, data, config);
+    const dataResponse: any = response; 
+
+    return dataResponse;
+  }
 }

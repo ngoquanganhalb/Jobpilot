@@ -10,7 +10,7 @@ export async function GET(req: Request) {
     return NextResponse.redirect("/");
   }
 
-  const base = process.env.NEXTAUTH_URL || "http://localhost:3000";
+  const base = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
   const res = NextResponse.redirect(new URL("/", base)); // ✅ dùng URL tuyệt đối
   // Set cookie giống BE mong muốn
   res.headers.append(

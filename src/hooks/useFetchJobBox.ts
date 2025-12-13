@@ -27,6 +27,7 @@ export function useFetchJobBox(limit: number = 10000) {
           jobsRef,
           where("status", "in", [JOB_STATUS.ACTIVE, "Active"]),
           where("expirationDate", ">=", today),
+          where("paymentStatus", "in", ["SUCCESS"]),
           orderBy("createdAt", "desc")
         );
 

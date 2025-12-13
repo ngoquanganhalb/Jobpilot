@@ -5,10 +5,11 @@ import { collection, getDocs, orderBy, query, where } from "firebase/firestore";
 import { useSelector } from "react-redux";
 import { useQuery } from "@tanstack/react-query";
 
-const fetchJobs = async (userId: string) => {
+const fetchJobs = async (userId: number) => {
   const q = query(
     collection(db, "jobs"),
     where("employerId", "==", userId),
+    where("paymentStatus", "in", ["SUCCESS"]),
     orderBy("createdAt", "desc")
   );
   const querySnapshot = await getDocs(q);
@@ -44,10 +45,12 @@ const fetchJobs = async (userId: string) => {
 
 export const useFetchJob = () => {
   const user = useSelector((state: RootState) => state.auth.user);
+
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["FETCH_JOBS", user.id],
-    queryFn: () => fetchJobs(user.id),
-    enabled: Boolean(user.id),
+    queryKey: ["FETCH_JOBS", user?.id],
+    queryFn: () => fetchJobs(user!.id),
+    enabled: Boolean(user?.id),
   });
+
   return { data, isLoading, isError };
 };

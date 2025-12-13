@@ -1,19 +1,25 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { BsBriefcase, BsArrowRight, BsClipboardData } from "react-icons/bs";
 import JobBoxEmployer from "./JobBoxEmployer";
 
 import Paths from "@/constants/paths";
 import { useFetchJob } from "@hooks/job/useFetchJob";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@redux/store";
+import { setJobs } from "@redux/slices/jobSlice";
 export default function OverviewEmployer() {
   const [jobActionDropdown, setJobActionDropdown] = useState<number | null>(
     null
   );
+  const dispatch = useDispatch();
+
   const user = useSelector((state: RootState) => state.auth.user);
   const { data: jobs = [] } = useFetchJob();
+  useEffect(() => {
+    if (jobs) dispatch(setJobs(jobs));
+  }, [jobs, dispatch]);
 
   const toggleJobActionDropdown = (jobId: number) => {
     setJobActionDropdown(jobActionDropdown === jobId ? null : jobId);
