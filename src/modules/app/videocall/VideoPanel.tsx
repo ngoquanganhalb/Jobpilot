@@ -1,578 +1,429 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-
-interface VideoPanelProps {
-  stompClient: any;
-  roomId: string;
-  name: string;
-  connected: boolean;
-}
-
-interface PeerConnection {
-  pc: RTCPeerConnection;
-  stream?: MediaStream;
-}
+import { useWebRTC } from "@hooks/video-call/useWebRTC";
+import { Mic, MicOff, ScreenShare, Video, VideoOff } from "lucide-react";
+import { useRef, useEffect, useState } from "react";
 
 export default function VideoPanel({
   stompClient,
   roomId,
   name,
   connected,
-}: VideoPanelProps) {
+}: any) {
   const localVideoRef = useRef<HTMLVideoElement>(null);
-  const [localStream, setLocalStream] = useState<MediaStream | null>(null);
-  const [peers, setPeers] = useState<Map<string, PeerConnection>>(new Map());
-  const peersRef = useRef<Map<string, PeerConnection>>(new Map());
-  const pendingCandidates = useRef<Map<string, RTCIceCandidateInit[]>>(
-    new Map()
+  const localFocusedRef = useRef<HTMLVideoElement>(null);
+  const localThumbnailRef = useRef<HTMLVideoElement>(null);
+  const [focusedParticipant, setFocusedParticipant] = useState<string | null>(
+    null
   );
-  const hasJoinedRef = useRef(false);
 
-  const configuration = {
-    iceServers: [
-      { urls: "stun:stun.l.google.com:19302" },
-      { urls: "stun:stun1.l.google.com:19302" },
-    ],
-  };
+  const {
+    localStream,
+    peers,
+    micOn,
+    cameraOn,
+    muteMic,
+    toggleCamera,
+    shareScreen,
+  } = useWebRTC({
+    stompClient,
+    roomId,
+    name,
+    connected,
+  });
 
-  // Initialize local stream
+  // Attach local stream to grid view video
   useEffect(() => {
-    const initLocalStream = async () => {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: true,
-          audio: true,
-        });
-        setLocalStream(stream);
-        if (localVideoRef.current) {
-          localVideoRef.current.srcObject = stream;
-        }
-        console.log("✅ Local stream initialized");
-      } catch (error) {
-        console.error("❌ Error accessing media devices:", error);
-      }
-    };
-
-    initLocalStream();
-
-    return () => {
-      localStream?.getTracks().forEach((track) => track.stop());
-    };
-  }, []);
-
-  // Create peer connection
-  const createPeerConnection = (peerId: string): RTCPeerConnection => {
-    console.log("🔧 Creating peer connection for:", peerId);
-    const pc = new RTCPeerConnection(configuration);
-
-    // Add local stream tracks
-    if (localStream) {
-      localStream.getTracks().forEach((track) => {
-        pc.addTrack(track, localStream);
-      });
-      console.log("✅ Added local tracks to peer:", peerId);
+    if (localVideoRef.current && localStream) {
+      localVideoRef.current.srcObject = localStream;
+      console.log("✅ Local video (grid) attached", localStream);
     }
+  }, [localStream, focusedParticipant]);
 
-    // Handle ICE candidates
-    pc.onicecandidate = (event) => {
-      if (event.candidate && stompClient.current?.connected) {
-        console.log("📤 Sending ICE candidate to:", peerId);
-        stompClient.current.publish({
-          destination: `/app/room/${roomId}/signal`,
-          body: JSON.stringify({
-            type: "candidate",
-            sender: name,
-            payload: {
-              target: peerId,
-              candidate: event.candidate,
-            },
-          }),
-        });
-      }
-    };
-
-    // Handle connection state
-    pc.onconnectionstatechange = () => {
-      console.log(`🔗 [${peerId}] Connection state:`, pc.connectionState);
-      if (
-        pc.connectionState === "failed" ||
-        pc.connectionState === "disconnected" ||
-        pc.connectionState === "closed"
-      ) {
-        removePeer(peerId);
-        console.log("⚠️ Connection issue with:", peerId);
-      }
-    };
-
-    pc.oniceconnectionstatechange = () => {
-      if (
-        pc.iceConnectionState === "disconnected" ||
-        pc.iceConnectionState === "closed" ||
-        pc.iceConnectionState === "failed"
-      ) {
-        removePeer(peerId);
-      }
-      console.log(`🧊 [${peerId}] ICE state:`, pc.iceConnectionState);
-    };
-
-    // Handle incoming stream
-    pc.ontrack = (event) => {
-      console.log(
-        "📹 Received track from",
-        peerId,
-        "- type:",
-        event.track.kind
-      );
-      const remoteStream = event.streams[0];
-
-      peersRef.current.set(peerId, {
-        pc,
-        stream: remoteStream,
-      });
-      setPeers(new Map(peersRef.current));
-      console.log("✅ Remote stream set for:", peerId);
-    };
-
-    return pc;
-  };
-
-  // Join room and setup signaling
+  // Attach local stream to focused video
   useEffect(() => {
-    if (!connected || !localStream || hasJoinedRef.current) return;
-
-    const client = stompClient.current;
-    console.log("🚀 Setting up room:", roomId, "as:", name);
-
-    let signalSub: any = null;
-    let systemSub: any = null;
-
-    // Small delay to ensure connection is fully established
-    const setupTimeout = setTimeout(() => {
-      console.log("📡 Subscribing to topics...");
-
-      // Subscribe to signaling messages
-      signalSub = client.subscribe(
-        `/topic/room/${roomId}/signal`,
-        (message: any) => {
-          try {
-            const data = JSON.parse(message.body);
-            if (data.sender !== name) {
-              console.log("📨 Received:", data.type, "from:", data.sender);
-              handleSignal(data);
-            }
-          } catch (error) {
-            console.error("❌ Error parsing signal message:", error);
-          }
-        }
-      );
-
-      // Subscribe to system messages
-      systemSub = client.subscribe(
-        `/topic/room/${roomId}/system`,
-        (message: any) => {
-          const msg = message.body;
-          console.log("📢 System:", msg);
-
-          // Only the FIRST user sends offer when someone joins
-          if (msg.includes("joined") && !msg.includes(name)) {
-            const joinedUser = msg.split(" ")[0];
-            console.log(
-              "👤 New user joined:",
-              joinedUser,
-              "- Initiating connection..."
-            );
-            // Small delay to ensure both sides are ready
-            setTimeout(() => {
-              createOffer(joinedUser);
-            }, 1000);
-          }
-        }
-      );
-
-      console.log("✅ Subscriptions ready");
-
-      // Join the room after subscriptions are set up
-      console.log("📤 Sending join message...");
-      client.publish({
-        destination: `/app/room/${roomId}/join`,
-        body: JSON.stringify({
-          type: "join",
-          sender: name,
-          roomId: roomId,
-        }),
-      });
-
-      hasJoinedRef.current = true;
-      console.log("✅ Join complete");
-    }, 200);
-
-    return () => {
-      clearTimeout(setupTimeout);
-      console.log("🧹 Cleaning up...");
-
-      // Send leave message
-      if (client.connected && hasJoinedRef.current) {
-        try {
-          client.publish({
-            destination: `/app/room/${roomId}/leave`,
-            body: JSON.stringify({
-              type: "leave",
-              sender: name,
-              roomId: roomId,
-            }),
-          });
-        } catch (error) {
-          console.error("❌ Error sending leave:", error);
-        }
-      }
-
-      signalSub?.unsubscribe();
-      systemSub?.unsubscribe();
-
-      // Close all peer connections
-      // peersRef.current.forEach((peer, peerId) => {
-      //   console.log("🔌 Closing peer connection:", peerId);
-      //   peer.pc.close();
-      // });
-      peersRef.current.forEach((_, peerId) => {
-        removePeer(peerId);
-      });
-
-      peersRef.current.clear();
-      pendingCandidates.current.clear();
-
-      hasJoinedRef.current = false;
-    };
-  }, [connected, localStream, roomId, name]);
-
-  // Handle signaling messages
-  const handleSignal = async (data: any) => {
-    const { type, sender, payload } = data;
-
-    switch (type) {
-      case "offer":
-        // Only handle if it's meant for us (no target means broadcast)
-        if (!payload.target || payload.target === name) {
-          console.log("📥 Handling offer from:", sender);
-          await handleOffer(sender, payload.offer);
-        }
-        break;
-      case "answer":
-        if (payload.target === name) {
-          console.log("📥 Handling answer from:", sender);
-          await handleAnswer(sender, payload.answer);
-        }
-        break;
-      case "candidate":
-        if (payload.target === name) {
-          console.log("📥 Handling ICE candidate from:", sender);
-          await handleCandidate(sender, payload.candidate);
-        }
-        break;
+    if (
+      localFocusedRef.current &&
+      localStream &&
+      focusedParticipant === "local"
+    ) {
+      localFocusedRef.current.srcObject = localStream;
+      console.log("✅ Local video (focused) attached", localStream);
     }
+  }, [localStream, focusedParticipant]);
+
+  // Attach local stream to thumbnail
+  useEffect(() => {
+    if (
+      localThumbnailRef.current &&
+      localStream &&
+      focusedParticipant &&
+      focusedParticipant !== "local"
+    ) {
+      localThumbnailRef.current.srcObject = localStream;
+      console.log("✅ Local video (thumbnail) attached", localStream);
+    }
+  }, [localStream, focusedParticipant]);
+
+  // Calculate grid layout based on number of participants
+  const totalParticipants = 1 + peers.size;
+
+  const getGridClass = () => {
+    if (totalParticipants === 1) return "grid-cols-1";
+    if (totalParticipants === 2) return "grid-cols-2";
+    if (totalParticipants <= 4) return "grid-cols-2";
+    if (totalParticipants <= 6) return "grid-cols-3";
+    if (totalParticipants <= 9) return "grid-cols-3";
+    return "grid-cols-4";
   };
 
-  // Create and send offer
-  const createOffer = async (peerId: string) => {
-    try {
-      // Don't create if already exists and connected
-      const existing = peersRef.current.get(peerId);
-      if (existing && existing.pc.connectionState === "connected") {
-        console.log("⏭️ Already connected to:", peerId);
-        return;
-      }
-
-      // Close existing connection if any
-      if (existing) {
-        console.log("🔄 Closing old connection with:", peerId);
-        existing.pc.close();
-      }
-
-      console.log("🎯 Creating offer for:", peerId);
-      const pc = createPeerConnection(peerId);
-      peersRef.current.set(peerId, { pc });
-      setPeers(new Map(peersRef.current));
-
-      const offer = await pc.createOffer({
-        offerToReceiveAudio: true,
-        offerToReceiveVideo: true,
-      });
-      await pc.setLocalDescription(offer);
-
-      console.log("📤 Sending offer to:", peerId);
-      stompClient.current.publish({
-        destination: `/app/room/${roomId}/signal`,
-        body: JSON.stringify({
-          type: "offer",
-          sender: name,
-          payload: {
-            target: peerId,
-            offer: offer,
-          },
-        }),
-      });
-    } catch (error) {
-      console.error("❌ Error creating offer:", error);
-    }
+  const getAspectRatio = () => {
+    if (totalParticipants === 1) return "aspect-video";
+    if (totalParticipants === 2) return "aspect-video";
+    return "aspect-square";
   };
 
-  // Handle incoming offer
-  const handleOffer = async (
-    peerId: string,
-    offer: RTCSessionDescriptionInit
-  ) => {
-    try {
-      console.log("🎯 Processing offer from:", peerId);
-
-      // Close existing connection if any
-      const existingPeer = peersRef.current.get(peerId);
-      if (existingPeer) {
-        console.log("🔄 Closing existing connection with:", peerId);
-        existingPeer.pc.close();
-      }
-
-      const pc = createPeerConnection(peerId);
-      peersRef.current.set(peerId, { pc });
-      setPeers(new Map(peersRef.current));
-
-      await pc.setRemoteDescription(new RTCSessionDescription(offer));
-      console.log("✅ Remote description set for:", peerId);
-
-      // Process pending candidates
-      const pending = pendingCandidates.current.get(peerId) || [];
-      if (pending.length > 0) {
-        console.log(
-          `📦 Adding ${pending.length} pending candidates for:`,
-          peerId
-        );
-        for (const candidate of pending) {
-          await pc.addIceCandidate(new RTCIceCandidate(candidate));
-        }
-        pendingCandidates.current.delete(peerId);
-      }
-
-      const answer = await pc.createAnswer();
-      await pc.setLocalDescription(answer);
-
-      console.log("📤 Sending answer to:", peerId);
-      stompClient.current.publish({
-        destination: `/app/room/${roomId}/signal`,
-        body: JSON.stringify({
-          type: "answer",
-          sender: name,
-          payload: {
-            target: peerId,
-            answer: answer,
-          },
-        }),
-      });
-    } catch (error) {
-      console.error("❌ Error handling offer:", error);
-    }
-  };
-
-  // Handle incoming answer
-  const handleAnswer = async (
-    peerId: string,
-    answer: RTCSessionDescriptionInit
-  ) => {
-    try {
-      const peerConn = peersRef.current.get(peerId);
-      if (!peerConn) {
-        console.warn("⚠️ No peer connection found for:", peerId);
-        return;
-      }
-
-      if (peerConn.pc.signalingState === "stable") {
-        console.log("⏭️ Already stable with:", peerId);
-        return;
-      }
-
-      await peerConn.pc.setRemoteDescription(new RTCSessionDescription(answer));
-      console.log("✅ Remote description set from answer:", peerId);
-
-      // Process pending candidates
-      const pending = pendingCandidates.current.get(peerId) || [];
-      if (pending.length > 0) {
-        console.log(
-          `📦 Adding ${pending.length} pending candidates for:`,
-          peerId
-        );
-        for (const candidate of pending) {
-          await peerConn.pc.addIceCandidate(new RTCIceCandidate(candidate));
-        }
-        pendingCandidates.current.delete(peerId);
-      }
-    } catch (error) {
-      console.error("❌ Error handling answer:", error);
-    }
-  };
-
-  // Handle ICE candidate
-  const handleCandidate = async (
-    peerId: string,
-    candidate: RTCIceCandidateInit
-  ) => {
-    try {
-      const peerConn = peersRef.current.get(peerId);
-
-      if (!peerConn) {
-        console.log("⏳ Peer not ready, queuing candidate from:", peerId);
-        const pending = pendingCandidates.current.get(peerId) || [];
-        pending.push(candidate);
-        pendingCandidates.current.set(peerId, pending);
-        return;
-      }
-
-      if (!peerConn.pc.remoteDescription) {
-        console.log(
-          "⏳ Remote description not set, queuing candidate from:",
-          peerId
-        );
-        const pending = pendingCandidates.current.get(peerId) || [];
-        pending.push(candidate);
-        pendingCandidates.current.set(peerId, pending);
-        return;
-      }
-
-      await peerConn.pc.addIceCandidate(new RTCIceCandidate(candidate));
-      console.log("✅ ICE candidate added from:", peerId);
-    } catch (error) {
-      console.error("❌ Error handling candidate:", error);
-    }
-  };
-
-  const removePeer = (peerId: string) => {
-    console.log("🧹 Removing peer:", peerId);
-
-    const peer = peersRef.current.get(peerId);
-    if (peer) {
-      // stop remote stream
-      peer.stream?.getTracks().forEach((t) => t.stop());
-
-      // close pc
-      peer.pc.ontrack = null;
-      peer.pc.onicecandidate = null;
-      peer.pc.close();
-    }
-
-    peersRef.current.delete(peerId);
-    pendingCandidates.current.delete(peerId);
-
-    // update UI
-    setPeers(new Map(peersRef.current));
+  const handleParticipantClick = (id: string) => {
+    setFocusedParticipant(id === focusedParticipant ? null : id);
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-4">
-      <h2 className="text-xl font-bold mb-4">Video Call</h2>
+    <div className="h-full flex flex-col bg-gray-900">
+      {/* Video Grid */}
+      <div className="flex-1 p-4 overflow-hidden relative">
+        {focusedParticipant ? (
+          // Focused view with thumbnails
+          <div className="h-full flex flex-col gap-4">
+            {/* Main focused video */}
+            <div className="flex-1 min-h-0 flex items-center justify-center">
+              {focusedParticipant === "local" ? (
+                <div className="relative w-full h-full bg-gray-800 rounded-lg overflow-hidden">
+                  <video
+                    ref={localFocusedRef}
+                    autoPlay
+                    muted
+                    playsInline
+                    className="w-full h-full object-contain"
+                  />
+                  {!cameraOn && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-gray-800">
+                      <div className="w-32 h-32 bg-blue-600 rounded-full flex items-center justify-center text-white text-5xl font-bold">
+                        {name.charAt(0).toUpperCase()}
+                      </div>
+                    </div>
+                  )}
+                  <div className="absolute bottom-6 left-6 bg-black bg-opacity-70 text-white px-4 py-2 rounded-lg text-lg font-medium flex items-center gap-2">
+                    {name} (You)
+                    {!micOn && <MicOff size={18} />}
+                  </div>
+                  <button
+                    onClick={() => setFocusedParticipant(null)}
+                    className="absolute top-4 right-4 bg-black bg-opacity-70 hover:bg-opacity-90 text-white p-2 rounded-lg transition"
+                    title="Exit focused view"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ) : (
+                Array.from(peers.entries()).map(([peerId, peer]) =>
+                  peerId === focusedParticipant ? (
+                    <RemoteVideoFocused
+                      key={peerId}
+                      peerId={peerId}
+                      peer={peer}
+                      onClose={() => setFocusedParticipant(null)}
+                    />
+                  ) : null
+                )
+              )}
+            </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        {/* Local video */}
-        <div className="relative">
-          <video
-            ref={localVideoRef}
-            autoPlay
-            muted
-            playsInline
-            className="w-full h-64 bg-gray-900 rounded-lg object-cover"
-          />
-          <div className="absolute bottom-2 left-2 bg-blue-600 text-white px-2 py-1 rounded text-sm font-semibold">
-            {name} (You)
-          </div>
-        </div>
+            {/* Thumbnails strip */}
+            <div className="flex-shrink-0 overflow-x-auto">
+              <div className="flex gap-3 pb-2">
+                {/* Local thumbnail - only show if not focused */}
+                {focusedParticipant !== "local" && (
+                  <div
+                    onClick={() => handleParticipantClick("local")}
+                    className="relative flex-shrink-0 w-40 h-28 bg-gray-800 rounded-lg overflow-hidden cursor-pointer hover:ring-2 hover:ring-blue-500 transition"
+                  >
+                    <video
+                      ref={localThumbnailRef}
+                      autoPlay
+                      muted
+                      playsInline
+                      className="w-full h-full object-cover"
+                    />
+                    {!cameraOn && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-gray-800">
+                        <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white text-lg font-bold">
+                          {name.charAt(0).toUpperCase()}
+                        </div>
+                      </div>
+                    )}
+                    <div className="absolute bottom-1 left-1 bg-black bg-opacity-60 text-white px-2 py-0.5 rounded text-xs font-medium flex items-center gap-1">
+                      You {!micOn && <MicOff size={10} />}
+                    </div>
+                  </div>
+                )}
 
-        {/* Remote videos */}
-        {Array.from(peers.entries()).map(([peerId, peerConn]) => (
-          <RemoteVideo key={peerId} peerId={peerId} peerConn={peerConn} />
-        ))}
-      </div>
-
-      <div className="mt-4 p-3 bg-gray-50 rounded text-sm space-y-1">
-        <div className="flex items-center gap-2">
-          <span className="font-semibold">WebSocket:</span>
-          <span className={connected ? "text-green-600" : "text-red-600"}>
-            {connected ? "✅ Connected" : "❌ Disconnected"}
-          </span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="font-semibold">Camera/Mic:</span>
-          <span className={localStream ? "text-green-600" : "text-red-600"}>
-            {localStream ? "✅ Active" : "❌ Inactive"}
-          </span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="font-semibold">Remote Peers:</span>
-          <span className="font-mono">{peers.size}</span>
-        </div>
-        {peers.size > 0 && (
-          <div className="mt-2 pl-4 space-y-1 border-l-2 border-gray-300">
-            {Array.from(peers.entries()).map(([peerId, peer]) => (
-              <div key={peerId} className="text-xs font-mono">
-                <span className="font-semibold">{peerId}:</span>{" "}
-                <span
-                  className={
-                    peer.pc.connectionState === "connected"
-                      ? "text-green-600"
-                      : peer.pc.connectionState === "connecting"
-                        ? "text-yellow-600"
-                        : "text-red-600"
-                  }
-                >
-                  {peer.pc.connectionState}
-                </span>
-                {" / "}
-                <span
-                  className={peer.stream ? "text-green-600" : "text-gray-400"}
-                >
-                  {peer.stream ? "stream ✅" : "no stream"}
-                </span>
+                {/* Remote thumbnails - hide the focused one */}
+                {Array.from(peers.entries()).map(([peerId, peer]) =>
+                  peerId !== focusedParticipant ? (
+                    <RemoteVideoThumbnail
+                      key={peerId}
+                      peerId={peerId}
+                      peer={peer}
+                      onClick={() => handleParticipantClick(peerId)}
+                    />
+                  ) : null
+                )}
               </div>
+            </div>
+          </div>
+        ) : (
+          // Grid view (default)
+          <div className={`grid ${getGridClass()} gap-4 h-full content-center`}>
+            {/* Local Video */}
+            <div
+              onClick={() => handleParticipantClick("local")}
+              className={`relative ${getAspectRatio()} bg-gray-800 rounded-lg overflow-hidden group cursor-pointer hover:ring-2 hover:ring-blue-500 transition`}
+            >
+              <video
+                ref={localVideoRef}
+                autoPlay
+                muted
+                playsInline
+                className="w-full h-full object-cover"
+              />
+              {!cameraOn && (
+                <div className="absolute inset-0 flex items-center justify-center bg-gray-800">
+                  <div className="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
+                    {name.charAt(0).toUpperCase()}
+                  </div>
+                </div>
+              )}
+              <div className="absolute bottom-3 left-3 bg-black bg-opacity-60 text-white px-3 py-1 rounded-md text-sm font-medium flex items-center gap-2">
+                {name} (You)
+                {!micOn && <MicOff size={14} />}
+              </div>
+            </div>
+
+            {/* Remote Videos */}
+            {Array.from(peers.entries()).map(([peerId, peer]) => (
+              <RemoteVideo
+                key={peerId}
+                peerId={peerId}
+                peer={peer}
+                aspectRatio={getAspectRatio()}
+                onClick={() => handleParticipantClick(peerId)}
+              />
             ))}
           </div>
         )}
+      </div>
+
+      {/* Controls Bar */}
+      <div className="bg-gray-800 border-t border-gray-700 px-6 py-4">
+        <div className="flex items-center justify-center gap-3">
+          <button
+            onClick={muteMic}
+            className={`p-4 rounded-full transition ${
+              micOn
+                ? "bg-gray-700 hover:bg-gray-600 text-white"
+                : "bg-red-600 hover:bg-red-700 text-white"
+            }`}
+            title={micOn ? "Mute microphone" : "Unmute microphone"}
+          >
+            {micOn ? <Mic size={24} /> : <MicOff size={24} />}
+          </button>
+
+          <button
+            onClick={toggleCamera}
+            className={`p-4 rounded-full transition ${
+              cameraOn
+                ? "bg-gray-700 hover:bg-gray-600 text-white"
+                : "bg-red-600 hover:bg-red-700 text-white"
+            }`}
+            title={cameraOn ? "Turn off camera" : "Turn on camera"}
+          >
+            {cameraOn ? <Video size={24} /> : <VideoOff size={24} />}
+          </button>
+
+          <button
+            onClick={shareScreen}
+            className="p-4 rounded-full bg-gray-700 hover:bg-gray-600 text-white transition"
+            title="Share screen"
+          >
+            <ScreenShare size={24} />
+          </button>
+        </div>
       </div>
     </div>
   );
 }
 
+// Remote Video Components
 function RemoteVideo({
   peerId,
-  peerConn,
+  peer,
+  aspectRatio,
+  onClick,
 }: {
   peerId: string;
-  peerConn: PeerConnection;
+  peer: any;
+  aspectRatio: string;
+  onClick: () => void;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    if (videoRef.current && peerConn.stream) {
-      console.log("🎥 Attaching stream to video element for:", peerId);
-      videoRef.current.srcObject = peerConn.stream;
+    if (videoRef.current && peer.stream) {
+      videoRef.current.srcObject = peer.stream;
+      console.log("✅ Remote video attached for:", peerId);
     }
-  }, [peerConn.stream, peerId]);
+  }, [peer.stream, peerId]);
+
+  const isConnected = peer.pc.connectionState === "connected";
 
   return (
-    <div className="relative">
+    <div
+      onClick={onClick}
+      className={`relative ${aspectRatio} bg-gray-800 rounded-lg overflow-hidden group cursor-pointer hover:ring-2 hover:ring-green-500 transition`}
+    >
       <video
         ref={videoRef}
         autoPlay
         playsInline
-        className="w-full h-64 bg-gray-900 rounded-lg object-cover"
+        className="w-full h-full object-cover"
       />
-      <div className="absolute bottom-2 left-2 bg-green-600 text-white px-2 py-1 rounded text-sm font-semibold">
+
+      {!peer.stream && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-800">
+          <div className="w-20 h-20 bg-green-600 rounded-full flex items-center justify-center text-white text-2xl font-bold mb-3">
+            {peerId.charAt(0).toUpperCase()}
+          </div>
+          {!isConnected && (
+            <>
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-white mb-2"></div>
+              <div className="text-gray-400 text-sm">Connecting...</div>
+            </>
+          )}
+        </div>
+      )}
+
+      <div className="absolute bottom-3 left-3 bg-black bg-opacity-60 text-white px-3 py-1 rounded-md text-sm font-medium">
         {peerId}
       </div>
-      {!peerConn.stream && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-white bg-gray-800 bg-opacity-75">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mb-2"></div>
-          <div className="text-sm">Connecting to {peerId}...</div>
-          <div className="text-xs text-gray-300 mt-1">
-            {peerConn.pc.connectionState}
+
+      {!isConnected && (
+        <div className="absolute top-3 right-3">
+          <div className="animate-pulse bg-yellow-500 w-2 h-2 rounded-full"></div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function RemoteVideoFocused({
+  peerId,
+  peer,
+  onClose,
+}: {
+  peerId: string;
+  peer: any;
+  onClose: () => void;
+}) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    if (videoRef.current && peer.stream) {
+      videoRef.current.srcObject = peer.stream;
+    }
+  }, [peer.stream, peerId]);
+
+  const isConnected = peer.pc.connectionState === "connected";
+
+  return (
+    <div className="relative w-full h-full bg-gray-800 rounded-lg overflow-hidden">
+      <video
+        ref={videoRef}
+        autoPlay
+        playsInline
+        className="w-full h-full object-contain"
+      />
+
+      {!peer.stream && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-800">
+          <div className="w-32 h-32 bg-green-600 rounded-full flex items-center justify-center text-white text-5xl font-bold mb-4">
+            {peerId.charAt(0).toUpperCase()}
+          </div>
+          {!isConnected && (
+            <>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mb-3"></div>
+              <div className="text-gray-300 text-lg">
+                Connecting to {peerId}...
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
+      <div className="absolute bottom-6 left-6 bg-black bg-opacity-70 text-white px-4 py-2 rounded-lg text-lg font-medium">
+        {peerId}
+      </div>
+
+      <button
+        onClick={onClose}
+        className="absolute top-4 right-4 bg-black bg-opacity-70 hover:bg-opacity-90 text-white p-2 rounded-lg transition"
+        title="Exit focused view"
+      >
+        ✕
+      </button>
+    </div>
+  );
+}
+
+function RemoteVideoThumbnail({
+  peerId,
+  peer,
+  onClick,
+}: {
+  peerId: string;
+  peer: any;
+  onClick: () => void;
+}) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    if (videoRef.current && peer.stream) {
+      videoRef.current.srcObject = peer.stream;
+    }
+  }, [peer.stream, peerId]);
+
+  return (
+    <div
+      onClick={onClick}
+      className="relative flex-shrink-0 w-40 h-28 bg-gray-800 rounded-lg overflow-hidden cursor-pointer hover:ring-2 hover:ring-green-500 transition"
+    >
+      <video
+        ref={videoRef}
+        autoPlay
+        playsInline
+        className="w-full h-full object-cover"
+      />
+
+      {!peer.stream && (
+        <div className="absolute inset-0 flex items-center justify-center bg-gray-800">
+          <div className="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center text-white text-lg font-bold">
+            {peerId.charAt(0).toUpperCase()}
           </div>
         </div>
       )}
+
+      <div className="absolute bottom-1 left-1 bg-black bg-opacity-60 text-white px-2 py-0.5 rounded text-xs font-medium">
+        {peerId}
+      </div>
     </div>
   );
 }

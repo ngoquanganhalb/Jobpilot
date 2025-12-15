@@ -12,7 +12,7 @@ export type PaymentResponse = {
 
 class PaymentService extends BaseService {
   constructor() {
-    super("http://localhost:8080/api/v1/payment");
+    super("");
   }
 
   public checkout(checkoutData: CheckoutDto) {
@@ -25,7 +25,7 @@ class PaymentService extends BaseService {
 
     return this.postResponse<PaymentResponse>("/checkout", payload, {
       ignoreBaseURL: true,
-      baseURL: "http://localhost:8080/api/v1/payment/stripe/",
+      baseURL: `${process.env.NEXT_PUBLIC_API_JAVA_BASE_URL}/api/v1/payment/stripe/`,
     }).then((res) => {
       return res;
     });

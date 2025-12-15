@@ -3,7 +3,7 @@ import SockJS from "sockjs-client";
 
 export const createStompClient = (onConnect: () => void) => {
   const client = new Client({
-    webSocketFactory: () => new SockJS("http://localhost:8080/ws"),
+    webSocketFactory: () => new SockJS(`${process.env.NEXT_PUBLIC_API_JAVA_BASE_URL}/ws`),
     debug: (str) => {
       console.log("STOMP: " + str);
     },
