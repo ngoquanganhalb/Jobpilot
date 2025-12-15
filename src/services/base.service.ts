@@ -93,6 +93,18 @@ export abstract class BaseService {
     return dataResponse;
   }
 
+  protected async putResponse<T = any, D = any>(
+    endpoint: string,
+    data?: D,
+    config?: CustomAxiosRequestConfig
+  ): Promise<T> {
+    const url = config?.ignoreBaseURL ? endpoint : `${this.baseURL}${endpoint}`;
+    const response = await authorizedAxiosInstance.put<T>(url, data, config);
+    const dataResponse: any = response;
+
+    return dataResponse;
+  }
+
   protected async getResponse<T = any>(
     endpoint: string,
     config?: CustomAxiosRequestConfig

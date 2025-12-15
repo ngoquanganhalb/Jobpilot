@@ -43,6 +43,9 @@ import { Application } from "../../../../types/db";
 import { APPLICATION_STATUS } from "@/common/enum";
 import { useFindUser } from "@hooks/user/useFindUser";
 import { useFetchApplication } from "@hooks/applications/useFetchApplication";
+import { useSendNotification } from "@hooks/notification/useSendNotification";
+import { RootState } from "@redux/store";
+import { useSelector } from "react-redux";
 
 export default function JobApplicationsView() {
   const [sortDialogOpen, setSortDialogOpen] = useState(false);
@@ -50,8 +53,10 @@ export default function JobApplicationsView() {
   const [applications, setApplications] = useState<Application[]>([]);
   const params = useParams(); //take id url
   const jobId = params?.id as string;
+  const { mutateAsync: mutateSendNotification } = useSendNotification();
   //feedback
   const [showFeedbackPopup, setShowFeedbackPopup] = useState(false);
+  const user = useSelector((state: RootState) => state.auth.user);
   const [feedbackTarget, setFeedbackTarget] = useState<{
     applicationId: string;
     newStatus: Application["status"];
@@ -159,15 +164,40 @@ export default function JobApplicationsView() {
     feedback: string,
     applicationName: string
   ) => {
-    setApplications((prev) =>
-      prev.map((app) =>
-        app.id === applicationId ? { ...app, status: newStatus, feedback } : app
-      )
-    );
-    const applicationRef = doc(db, "applications", applicationId);
-    await updateDoc(applicationRef, { status: newStatus, feedback });
-    toast.success(`Changed "${applicationName}" to ${newStatus}`);
+    try {
+      const app = applications.find((a) => a.id === applicationId);
+      if (!app) return;
+
+      setApplications((prev) =>
+        prev.map((app) =>
+          app.id === applicationId
+            ? { ...app, status: newStatus, feedback }
+            : app
+        )
+      );
+      const applicationRef = doc(db, "applications", applicationId);
+      Promise.all([
+        updateDoc(applicationRef, { status: newStatus, feedback }),
+        newStatus === APPLICATION_STATUS.INTERVIEW
+          ? mutateSendNotification({
+              receiverId: Number(app.candidateId),
+              url: `${process.env.NEXT_PUBLIC_APP_URL}/video-call`,
+              message: feedback,
+              type: "SCHEDULE_INTERVIEW",
+            })
+          : mutateSendNotification({
+              receiverId: Number(app.candidateId),
+              url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/applied-job`,
+              message: `Job you applied from Company: ${user?.name} has been updated to ${newStatus} ${feedback ? `with feedback: ${feedback}` : ""}`,
+              type: "APPLICATION_STATUS_UPDATE",
+            }),
+      ]);
+      await toast.success(`Changed "${applicationName}" to ${newStatus}`);
+    } catch (e: any) {
+      await toast.error(e);
+    }
   };
+
 
   const handleDownloadCV = (resumeUrl?: string) => {
     if (resumeUrl) {

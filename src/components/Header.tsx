@@ -19,6 +19,9 @@ export default function Header() {
         <NavLink href={Paths.SUGGEST_JOBS} activeBasePath={Paths.SUGGEST_JOBS}>
           Jobs For You
         </NavLink>
+        <NavLink href={Paths.VIDEO_CALL} activeBasePath={Paths.VIDEO_CALL}>
+          Join Interview
+        </NavLink>
       </div>
 
       {/* Right contact */}
@@ -30,7 +33,7 @@ export default function Header() {
             width={20}
             height={20}
           />
-          <div>+1-202-555-0178</div>
+          <div>+84-943-622-jqk</div>
         </div>
       </div>
     </div>

@@ -10,6 +10,7 @@ import searchReducer from "./slices/searchSlice";
 import jobReducer from "./slices/jobSlice";
 import filterReducer from "./slices/filterSlice";
 import authReducer from "./slices/authSlice"; // file bạn paste ở trên
+import notificationReducer from "./slices/notificationSlice";
 
 // GỘP reducer bình thường
 const rootReducer = combineReducers({
@@ -19,6 +20,7 @@ const rootReducer = combineReducers({
   jobs: jobReducer,
   filter: filterReducer,
   auth: authReducer,
+  notification: notificationReducer,
 });
 
 // CONFIG persist

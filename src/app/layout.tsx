@@ -21,20 +21,22 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <Providers>
-          <NProgressHandler />
-          {children}
-          <ToastContainer
-            position="top-right"
-            autoClose={3000}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-            theme="colored"
-          />
+          {/* <WSProvider> */}
+            <NProgressHandler />
+            {children}
+            <ToastContainer
+              position="top-right"
+              autoClose={3000}
+              hideProgressBar={false}
+              newestOnTop={false}
+              closeOnClick
+              rtl={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+              theme="colored"
+            />
+          {/* </WSProvider> */}
         </Providers>
       </body>
     </html>

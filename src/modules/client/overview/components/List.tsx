@@ -11,9 +11,8 @@ import {
   getDoc,
   updateDoc,
 } from "firebase/firestore";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { db } from "@services/firebase/firebase";
-import { Application, Job, ApplicationWithJob } from "../../../../types/db";
+import {  Job, ApplicationWithJob } from "../../../../types/db";
 import JobBoxCandidate from "@component/ui/JobBoxCandidate";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
@@ -21,10 +20,13 @@ import { toast } from "react-toastify";
 import Paths from "@/constants/paths";
 import { BsArrowRight } from "react-icons/bs";
 import Link from "next/link";
+import { RootState } from "@redux/store";
+import { useSelector } from "react-redux";
 
 export default function List() {
   const [applications, setApplications] = useState<ApplicationWithJob[]>([]);
   const MySwal = withReactContent(Swal);
+  const user = useSelector((state: RootState) => state.auth.user);
 
   const handleDelete = async (applicationId: string) => {
     MySwal.fire({
@@ -59,46 +61,63 @@ export default function List() {
       }
     });
   };
+  const fetchJobById = async (jobId: string) => {
+    try {
+      const jobRef = doc(db, "jobs", jobId);
+      const jobSnap = await getDoc(jobRef);
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(getAuth(), async (user) => {
-      if (!user) return;
-
+      if (jobSnap.exists()) {
+        return jobSnap.data();
+      } else {
+        console.warn(`Job with ID ${jobId} does not exist.`);
+        return null;
+      }
+    } catch (error) {
+      console.error("Error fetching job:", error);
+      return null;
+    }
+  };
+  const fetchApplication = async (id: number) => {
+    if (!id) return; // <-- guard: nếu chưa có id thì không fetch
+    try {
       const q = query(
         collection(db, "applications"),
-        where("candidateId", "==", user.uid),
+        where("candidateId", "==", `${id}`),
         where("showCandidate", "==", true),
         orderBy("appliedAt", "desc")
       );
+      const querySnapshot = await getDocs(q);
 
-      const snapshot = await getDocs(q);
-
-      const results: ApplicationWithJob[] = await Promise.all(
-        snapshot.docs.map(async (docSnap) => {
-          const data = docSnap.data() as Application;
-
-          const jobSnap = await getDoc(doc(db, "jobs", data.jobId));
-          const jobData = jobSnap.exists()
-            ? (jobSnap.data() as Job)
-            : undefined;
-
+      const jobApplications = await Promise.all(
+        querySnapshot.docs.map(async (docSnap) => {
+          const data = docSnap.data();
+          const jobData = await fetchJobById(data.jobId);
           return {
-            ...data,
             id: docSnap.id,
-            appliedAt:
-              data.appliedAt instanceof Date
-                ? data.appliedAt
-                : data.appliedAt.toDate(),
-            job: jobData,
-          };
+            jobId: data.jobId,
+            note: data.note,
+            resumeUrl: data.resumeUrl,
+            showCandidate: data.showCandidate,
+            showEmployer: data.showEmployer,
+            status: data.status,
+            feedback: data.feedback,
+            appliedAt: data.appliedAt?.toDate ? data.appliedAt.toDate() : null,
+            candidateId: data.candidateId,
+            job: jobData ? (jobData as Job) : undefined,
+          } as ApplicationWithJob;
         })
       );
 
-      setApplications(results);
-    });
-
-    return () => unsubscribe();
-  }, []);
+      setApplications(jobApplications);
+    } catch (error) {
+      console.error("Error in fetchApplication:", error);
+    }
+  };
+  useEffect(() => {
+    if (user?.id) {
+      fetchApplication(user.id);
+    }
+  }, [user?.id]);
 
   return (
     <div className="mt-6">

@@ -16,6 +16,7 @@ export const Paths = {
   SIGN_UP: "/sign-up",
   FAVORITE_JOB: "/dashboard/favorite-job",
   CV: "/cv",
-  SUGGEST_JOBS:'/suggest-jobs'
+  SUGGEST_JOBS:'/suggest-jobs',
+  VIDEO_CALL: '/video-call'
 };
 export default Paths;

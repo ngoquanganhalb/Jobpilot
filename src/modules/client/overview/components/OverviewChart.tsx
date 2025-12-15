@@ -3,9 +3,10 @@
 import { useEffect, useState } from "react";
 import { BarChart, Bar, CartesianGrid, XAxis, Cell } from "recharts";
 import { collection, getDocs, query, where } from "firebase/firestore";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { TrendingUp } from "lucide-react";
+import { useSelector } from "react-redux";
+
 import { db } from "@services/firebase/firebase";
+import { RootState } from "@redux/store";
 
 import {
   Card,
@@ -20,12 +21,17 @@ import {
   ChartTooltipContent,
 } from "@component/ui/chart";
 
+interface ChartData {
+  status: string;
+  count: number;
+}
+
 const STATUS_COLORS: Record<string, string> = {
-  pending: "blue",
-  reviewed: "purple",
-  interview: "yellow",
-  rejected: "red",
-  hired: "green",
+  pending: "#3b82f6", // blue
+  reviewed: "#8b5cf6", // purple
+  interview: "#eab308", // yellow
+  rejected: "#ef4444", // red
+  hired: "#22c55e", // green
 };
 
 const defaultStatuses: ChartData[] = [
@@ -36,23 +42,21 @@ const defaultStatuses: ChartData[] = [
   { status: "hired", count: 0 },
 ];
 
-interface ChartData {
-  status: string;
-  count: number;
-}
-
 export function OverviewChart() {
   const [chartData, setChartData] = useState<ChartData[]>(defaultStatuses);
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(getAuth(), async (user) => {
-      if (!user) return;
+  const user = useSelector((state: RootState) => state.auth.user);
 
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const fetchData = async () => {
       const q = query(
         collection(db, "applications"),
-        where("candidateId", "==", user.uid),
+        where("candidateId", "==", `${user.id}`),
         where("showCandidate", "==", true)
       );
+
       const snapshot = await getDocs(q);
 
       const statusCount: Record<string, number> = {
@@ -63,9 +67,9 @@ export function OverviewChart() {
         hired: 0,
       };
 
-      snapshot.docs.forEach((doc) => {
-        const status = doc.data().status || "pending";
-        if (statusCount.hasOwnProperty(status)) {
+      snapshot.forEach((doc) => {
+        const status = doc.data().status ?? "pending";
+        if (status in statusCount) {
           statusCount[status]++;
         }
       });
@@ -76,10 +80,10 @@ export function OverviewChart() {
       }));
 
       setChartData(formatted);
-    });
+    };
 
-    return () => unsubscribe();
-  }, []);
+    fetchData();
+  }, [user?.id]);
 
   const totalApplications = chartData.reduce(
     (total, item) => total + item.count,
@@ -94,6 +98,7 @@ export function OverviewChart() {
           Your applications: {totalApplications}
         </CardDescription>
       </CardHeader>
+
       <CardContent>
         <ChartContainer config={{}}>
           <BarChart
@@ -114,11 +119,10 @@ export function OverviewChart() {
               content={<ChartTooltipContent hideLabel />}
             />
             <Bar dataKey="count" radius={6} barSize={30}>
-              {" "}
               {chartData.map((entry) => (
                 <Cell
-                  key={`cell-${entry.status}`}
-                  fill={STATUS_COLORS[entry.status] || "#a3a3a3"}
+                  key={entry.status}
+                  fill={STATUS_COLORS[entry.status] ?? "#a3a3a3"}
                 />
               ))}
             </Bar>

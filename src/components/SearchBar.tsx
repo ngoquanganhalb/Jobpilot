@@ -19,6 +19,7 @@ import Input from "./ui/InputCustom";
 import AvatarMenu from "./ui/AvatarMenu";
 import { useSelector } from "react-redux";
 import { RootState } from "@redux/store";
+import NotificationBell from "./NotificationBell";
 
 export default function SearchBar() {
   const [mounted, setMounted] = useState(false);
@@ -99,6 +100,8 @@ export default function SearchBar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+
+
   return (
     <div className="flex flex-col gap-2 xl:flex-row justify-between items-center py-5 md:px-[150px] bg-white border">
       <div
@@ -154,6 +157,8 @@ export default function SearchBar() {
           )}
         </div>
       </div>
+
+      <NotificationBell />
 
       <div className="flex gap-3 mt-4 xl:mt-0">
         {!mounted ? (
