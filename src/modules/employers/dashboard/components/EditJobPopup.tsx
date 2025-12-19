@@ -35,6 +35,7 @@ import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
 import { updateJob } from "@redux/slices/jobSlice";
 import { Upload } from "lucide-react";
+import { JOB_STATUS } from "@/common/enum";
 type Props = {
   open: boolean;
   onClose: () => void;
@@ -70,7 +71,7 @@ export default function EditJobPopup({ open, onClose, job }: Props) {
           : formData.expirationDate.toDate()
         : null;
 
-      const status = expiration && expiration >= now ? "Active" : "Expire";
+      const status = expiration && expiration >= now ? JOB_STATUS.ACTIVE :JOB_STATUS.EXPIRED;
       await updateDoc(doc(db, "jobs", formData.jobId), {
         jobTitle: formData.jobTitle ?? "",
         description: formData.description ?? "",

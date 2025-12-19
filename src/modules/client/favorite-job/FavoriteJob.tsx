@@ -12,6 +12,7 @@ import { Button } from "@component/ui/Button";
 import ArrowIcon from "@component/icons/ArrowIcon";
 import Link from "next/link";
 import Paths from "@/constants/paths";
+import { JOB_STATUS } from "@/common/enum";
 
 const FavoriteJob: React.FC = () => {
   const limit = 10;
@@ -201,7 +202,7 @@ const FavoriteJob: React.FC = () => {
                     </span>
                     <span>
                       🗓️{" "}
-                      {job.expirationDate && job.status === "Active" ? (
+                      {job.expirationDate && job.status === JOB_STATUS.ACTIVE ? (
                         (() => {
                           const now = new Date();
                           now.setHours(0, 0, 0, 0);
@@ -249,7 +250,7 @@ const FavoriteJob: React.FC = () => {
                     }
                   />
                 </button>
-                {job.status === "Active" &&
+                {job.status === JOB_STATUS.ACTIVE &&
                 job.expirationDate &&
                 job.expirationDate > today ? (
                   <Link href={`${Paths.FIND_JOB}/${job.jobId}`}>

@@ -22,10 +22,11 @@ export default function AvatarMenu({ user }: { user: User | null }) {
       toast.error("Failed to sign out");
     }
   };
+  console.log("header user avatar", user?.avatar);
   return (
     <Menu as="div" className="relative">
       <Menu.Button className="w-12 h-12 rounded-full overflow-hidden cursor-pointer transition-transform duration-200 hover:scale-110">
-        <Image
+        <img
           src={user?.avatar || "/images/default-avatar.png"}
           alt="avatar"
           width={48}

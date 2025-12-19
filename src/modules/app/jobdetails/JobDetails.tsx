@@ -4,7 +4,6 @@ import { useParams, useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import { RootState } from "@redux/store";
 import { db, firestore } from "@services/firebase/firebase";
-import Image from "next/image";
 import { Timestamp } from "firebase/firestore";
 import {
   doc,
@@ -185,7 +184,7 @@ export default function JobDetails() {
               <div className="flex items-center gap-4 mb-4">
                 <div className=" w-16 h-16 rounded-full flex items-center justify-center">
                   {job.avatarCompany ? (
-                    <Image
+                    <img
                       src={job.avatarCompany}
                       alt={"Company Avatar"}
                       width={64}
@@ -193,7 +192,7 @@ export default function JobDetails() {
                       className="rounded-full object-cover w-16 h-16"
                     />
                   ) : (
-                    <Image
+                    <img
                       src="/images/EmployersLogo.svg"
                       alt="Default Logo"
                       width={40}

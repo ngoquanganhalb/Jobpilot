@@ -189,7 +189,7 @@ export default function PostAJob() {
               Company Avatar
             </label>
             {user?.avatar && (
-              <Image
+              <img
                 src={user?.avatar}
                 alt="Company Avatar Preview"
                 width={80}
