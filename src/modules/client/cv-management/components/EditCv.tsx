@@ -54,7 +54,6 @@ export const EditCv = ({ formData, handlers }: Prop) => {
   useEffect(() => {
     setPreview(formData?.image || null);
   }, [formData?.image]);
-
   return (
     <>
       <form className="space-y-4" onSubmit={handleSubmit}>
@@ -76,7 +75,7 @@ export const EditCv = ({ formData, handlers }: Prop) => {
 
           {/* Use native input file to be safe */}
           <Input
-            ref={fileInputRef }
+            ref={fileInputRef}
             type="file"
             accept="image/*"
             onChange={async (e: React.ChangeEvent<HTMLInputElement>) => {

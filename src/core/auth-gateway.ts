@@ -1,4 +1,7 @@
-// /lib/auth-gateway.ts
+
+// ============================================
+// 1. auth-gateway.ts - FIXED VERSION
+// ============================================
 "use client";
 
 import { clearAuth, setUser } from "@redux/slices/authSlice";
@@ -12,10 +15,10 @@ import { ProfileUser } from "@/dtos/auth/profile-user.dto";
 import axios from "axios";
 import { ENV } from "@/config/env";
 
-// THAY ĐỔI 1: Thêm queue để tránh multiple refresh
 let isRefreshing = false;
+let authDisabled = false; // ← THÊM flag này
 let queue: Array<{
-  resolve: (v?: unknown) => void;
+  resolve: (v?: string | PromiseLike<string | undefined>) => void;
   reject: (r?: unknown) => void;
 }> = [];
 
@@ -24,8 +27,16 @@ function wakeQueue(err: any, token?: string) {
   queue = [];
 }
 
+let refreshFailCount = 0;
+const MAX_REFRESH_RETRY = 3;
+
 export const AuthGateway = {
   async getSession() {
+    // ✅ FIX 1: Check authDisabled trước khi request
+    if (authDisabled) {
+      throw new Error("Auth disabled - please sign in");
+    }
+
     try {
       const me = await authorizedAxiosInstance.get<ProfileUser>(
         "/users/profile",
@@ -41,28 +52,34 @@ export const AuthGateway = {
       throw err;
     }
   },
-  // THAY ĐỔI 2: Fix refresh để gửi đúng cookie
-  async refresh(): Promise<void> {
-    if (isRefreshing) {
-      await new Promise((resolve, reject) => queue.push({ resolve, reject }));
-      return;
+
+  async refresh(): Promise<string | undefined> {
+    // ✅ FIX 2: Check counter và authDisabled NGAY ĐẦU
+    if (authDisabled || refreshFailCount >= MAX_REFRESH_RETRY) {
+      if (!authDisabled) {
+        this.performGlobalLogout({ redirectTo: "/sign-in" });
+      }
+      throw new Error("Max refresh attempts exceeded");
     }
+
+    // Queue logic
+    if (isRefreshing) {
+      return new Promise<string | undefined>((resolve, reject) => {
+        queue.push({ resolve, reject });
+      });
+    }
+
     isRefreshing = true;
+
+    // Plain axios để tránh interceptor loop
     const plainAxios = axios.create({
       baseURL: ENV.API_BASE_URL,
       withCredentials: true,
     });
+
     try {
-      // QUAN TRỌNG: withCredentials: true để gửi cookie refresh_token
-      // const res = await authorizedAxiosInstance.post(
-      //   "/auth/refresh-session",
-      //   {}, // body rỗng
-      //   {
-      //     headers: { "X-Skip-Loading": "1" },
-      //     withCredentials: true, // GỬI COOKIE
-      //   }
-      // );
-      // const res = await authService.refreshSession();
+      console.log("🔄 Refreshing token...");
+      
       const res = await plainAxios.post(
         "/auth/refresh-session",
         {},
@@ -71,13 +88,30 @@ export const AuthGateway = {
           withCredentials: true,
         }
       );
+
       const newAccessToken: string | undefined = res.data.data.accessToken;
+      
       if (newAccessToken) {
         tokenManager.setAccessToken(newAccessToken);
+        console.log("✅ Token refreshed successfully");
       }
+
+      // Reset counter on success
+      refreshFailCount = 0;
       wakeQueue(null, newAccessToken);
+      return newAccessToken;
     } catch (e) {
+      refreshFailCount++;
+      console.warn(`❌ Refresh failed (${refreshFailCount}/${MAX_REFRESH_RETRY})`);
+
       wakeQueue(e);
+
+      // ✅ FIX 3: Logout ngay khi đạt max
+      if (refreshFailCount >= MAX_REFRESH_RETRY) {
+        console.warn("🚫 Max retries reached - logging out");
+        this.performGlobalLogout({ redirectTo: "/sign-in" });
+      }
+
       throw e;
     } finally {
       isRefreshing = false;
@@ -85,24 +119,44 @@ export const AuthGateway = {
   },
 
   async performGlobalLogout(opts?: { redirectTo?: string }) {
+    // ✅ FIX 4: Prevent multiple logout calls
+    if (authDisabled) {
+      return;
+    }
+
+    console.log("🚪 Logging out...");
+    authDisabled = true; // Set flag TRƯỚC khi logout
+
     try {
-      console.log("logout");
-      // THAY ĐỔI 3: Gửi withCredentials để BE xóa cookie
       await publicAxiosInstance.post(
         "/auth/logout",
         {},
         {
           headers: { "X-Skip-Loading": "1" },
-          withCredentials: true, // Quan trọng
+          withCredentials: true,
         }
       );
-    } catch {}
+    } catch (err) {
+      console.warn("Logout API failed (ignoring):", err);
+    }
 
+    // Reset state
+    refreshFailCount = 0;
     tokenManager.clear();
     store.dispatch(clearAuth());
 
+    // Redirect
     if (opts?.redirectTo && typeof window !== "undefined") {
       window.location.href = opts.redirectTo;
     }
+  },
+
+  // ✅ FIX 5: Reset state sau khi login thành công
+  resetAuthState() {
+    authDisabled = false;
+    refreshFailCount = 0;
+    isRefreshing = false;
+    queue = [];
+    console.log("🔓 Auth state reset");
   },
 };

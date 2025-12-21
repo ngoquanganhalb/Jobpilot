@@ -82,6 +82,7 @@ function handleResponse(response: AxiosResponse) {
   return response.data;
 }
 
+
 async function handleError(error: AxiosError) {
   loadingEventEmitter.emit(EMIT_KEY.LOADING, false);
 
@@ -90,20 +91,21 @@ async function handleError(error: AxiosError) {
     | undefined;
   const status = error.response?.status;
 
-  // Nếu là request refresh hoặc logout => không retry để tránh loop
   const url = originalRequest?.url ?? "";
-  const isAuthEndpoint = url.includes("/auth/logout");
+  
+  const isAuthEndpoint =
+    url.includes("/auth/logout") ||
+    url.includes("/auth/refresh-session") ||
+    url.includes("/auth/login");
 
   if (status === HTTP_UNAUTHORIZED && !isAuthEndpoint) {
     if (originalRequest && !originalRequest._retry) {
       originalRequest._retry = true;
 
       try {
-        // Lazy import tránh circular
         const { AuthGateway } = await import("@/core/auth-gateway");
         await AuthGateway.refresh();
 
-        // Cập nhật token
         const newToken = tokenManager.getAccessToken();
         if (newToken && originalRequest.headers) {
           originalRequest.headers.Authorization = `Bearer ${newToken}`;
@@ -111,6 +113,7 @@ async function handleError(error: AxiosError) {
 
         return authorizedAxiosInstance(originalRequest);
       } catch (e: any) {
+        // Don't retry again, just reject
         return Promise.reject(e);
       }
     }

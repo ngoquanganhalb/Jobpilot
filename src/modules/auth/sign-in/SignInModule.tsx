@@ -179,6 +179,27 @@ const SignInModule: React.FC = () => {
             <span className="text-sm">Sign up with Google</span>
           </button>
         </div>
+        <div className="mt-6 rounded-lg border border-blue-100 bg-blue-50 p-4 text-sm text-gray-700">
+          <p className="mb-2 font-semibold text-blue-700">Demo Accounts</p>
+
+          <div className="space-y-2">
+            <div className="flex justify-between">
+              <span className="font-medium">Candidate</span>
+              <span>
+                <span className="font-semibold">username:</span> candidate ·{" "}
+                <span className="font-semibold">password:</span> 1
+              </span>
+            </div>
+
+            <div className="flex justify-between">
+              <span className="font-medium">Employer</span>
+              <span>
+                <span className="font-semibold">username:</span> employer ·{" "}
+                <span className="font-semibold">password:</span> 1
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Right Side - img */}

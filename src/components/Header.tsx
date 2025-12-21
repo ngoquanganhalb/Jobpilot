@@ -2,8 +2,16 @@
 import Image from "next/image";
 import NavLink from "./ui/NavLink";
 import { Paths } from "@/constants/paths";
+// import { usePermission } from "@/permission/UsePermission";
+// import { PERMISSIONS } from "@/permission/Permission.const";
 
 export default function Header() {
+  // const { hasPermission: hasActiveAI } = usePermission([
+  //   PERMISSIONS.CV.FIND_SIMILAR_JOB,
+  // ]);
+  // const { hasPermission: hasCvPermission } = usePermission([
+  //   PERMISSIONS.CV.LIST,
+  // ]);
   return (
     <div className="bg-gray-200 flex flex-col md:flex-row md:justify-between items-center px-6 md:px-[150px] py-4 gap-4 md:gap-0 2xl:max-h-12">
       {/* Left nav */}
@@ -13,10 +21,19 @@ export default function Header() {
         <NavLink href={Paths.DASHBOARD_OVERVIEW} activeBasePath="/dashboard">
           Dashboard
         </NavLink>
-        <NavLink href={Paths.CV} activeBasePath="/cv">
+
+        <NavLink
+          href={Paths.CV}
+          activeBasePath="/cv"
+          // disabled={!hasCvPermission}
+        >
           Resume Management
         </NavLink>
-        <NavLink href={Paths.SUGGEST_JOBS} activeBasePath={Paths.SUGGEST_JOBS}>
+        <NavLink
+          href={Paths.SUGGEST_JOBS}
+          activeBasePath={Paths.SUGGEST_JOBS}
+          // disabled={!hasActiveAI}
+        >
           Jobs For You
         </NavLink>
         <NavLink href={Paths.VIDEO_CALL} activeBasePath={Paths.VIDEO_CALL}>

@@ -12,6 +12,9 @@ import { useGetUserCv } from "@hooks/cv/useGetUserCv";
 import { useUpdateCv } from "@hooks/cv/useUpdateCv";
 import { useCreateCv } from "@hooks/cv/useCreateCv";
 import { useDeleteCv } from "@hooks/cv/useDeleteCv";
+import { PERMISSIONS } from "@/permission/Permission.const";
+import { PermissionGate } from "@/permission/PermissionGate";
+import { usePermission } from "@/permission/UsePermission";
 
 const emptyExperience = (): Experience => ({
   company: "",
@@ -53,12 +56,22 @@ const CvManagement: React.FC = () => {
   };
 
   const [formData, setFormData] = useState<any>({ ...blankForm });
-
   const resetForm = () => {
     setFormData({ ...blankForm, userId: user?.id });
     setCurrentCv(undefined);
   };
-
+  const { hasPermission: hasUpdateCvPermission } = usePermission([
+    PERMISSIONS.CV.UPDATE,
+  ]);
+  const { hasPermission: hasDeleteCvPermission } = usePermission([
+    PERMISSIONS.CV.DELTE,
+  ]);
+  const { hasPermission: hasCreateCvPermission } = usePermission([
+    PERMISSIONS.CV.CREATE,
+  ]);
+  const { hasPermission: hasActiveAI } = usePermission([
+    PERMISSIONS.CV.FIND_SIMILAR_JOB,
+  ]);
   const handleOpenModal = (cv?: Cv) => {
     if (cv && cv.id) {
       setCurrentCv(cv);
@@ -191,7 +204,10 @@ const CvManagement: React.FC = () => {
             </div>
           </div>
           <div className=" flex justify-end">
-            <Button onClick={() => handleOpenModal(undefined)}>
+            <Button
+              onClick={() => handleOpenModal(undefined)}
+              hidden={!hasCreateCvPermission}
+            >
               <Plus className="w-5 h-5 mr-2" />
               Create CV
             </Button>
@@ -219,6 +235,7 @@ const CvManagement: React.FC = () => {
                 <div className="opacity-0 group-hover:opacity-100 transition-opacity pointer-events-auto flex gap-2 z-20">
                   <button
                     onClick={() => toggleActive(cv.id, !cv.isActive)}
+                    hidden={!hasActiveAI}
                     className={`px-3 py-1 text-sm font-medium border shadow-sm transition-colors ${
                       cv.isActive
                         ? "bg-green-50 border-green-300 text-green-700 hover:bg-green-100"
@@ -235,6 +252,7 @@ const CvManagement: React.FC = () => {
 
                   <button
                     onClick={() => handleOpenModal(cv)}
+                    hidden={!hasUpdateCvPermission}
                     className="px-2 py-1 text-xs font-medium bg-blue-800 text-white shadow-sm hover:bg-blue-600 transition-colors flex items-center gap-1"
                     title="Edit CV"
                   >
@@ -244,6 +262,7 @@ const CvManagement: React.FC = () => {
 
                   <button
                     onClick={() => handleDelete(cv.id!)}
+                    hidden={!hasDeleteCvPermission}
                     className="px-2 py-1 text-xs font-medium bg-red-700 text-white shadow-sm hover:bg-red-600 transition-colors flex items-center gap-1"
                     title="Delete CV"
                   >
@@ -342,4 +361,14 @@ const CvManagement: React.FC = () => {
   );
 };
 
-export default CvManagement;
+const CvManagementPage: React.FC = () => {
+  return (
+    <PermissionGate scopes={[PERMISSIONS.CV.LIST, PERMISSIONS.CV.VIEW]}>
+      <CvManagement />
+    </PermissionGate>
+  );
+};
+
+CvManagementPage.displayName = "CvManagementPage";
+
+export default CvManagementPage;

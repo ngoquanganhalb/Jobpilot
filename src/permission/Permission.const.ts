@@ -1,0 +1,10 @@
+export const PERMISSIONS = {
+  CV: {
+    CREATE: "CV_CREATE",
+    UPDATE: "CV_UPDATE",
+    LIST: "CV_LIST_MY",
+    DELTE: "CV_DELETE",
+    VIEW: "CV_DETAIL",
+    FIND_SIMILAR_JOB: "CV_SET_DEFAULT",
+  },
+};

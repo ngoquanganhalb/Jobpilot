@@ -6,11 +6,13 @@ import { Job } from "../../../types/db";
 import { useGetSuggestJob } from "@hooks/cv/useGetSuggestJob";
 import Spinner from "@component/ui/Spinner";
 import { useGetUserCv } from "@hooks/cv/useGetUserCv";
+import { PermissionGate } from "@/permission/PermissionGate";
+import { PERMISSIONS } from "@/permission/Permission.const";
 type SuggesJobResponse = {
   job: Job;
   similarity: number;
 }[];
-const SuggestJob: React.FC = () => {
+const SuggestJobPage: React.FC = () => {
   // make payload stable so effect deps are predictable
   const { data: cv = [], isLoading } = useGetUserCv();
   const cvActive = cv?.filter((i) => i.isActive === true)[0];
@@ -67,5 +69,14 @@ const SuggestJob: React.FC = () => {
 
   return <List values={jobsList} />;
 };
+
+const SuggestJob: React.FC = () => {
+  return (
+    <PermissionGate scopes={[PERMISSIONS.CV.FIND_SIMILAR_JOB]}>
+      <SuggestJobPage />
+    </PermissionGate>
+  );
+};
+SuggestJob.displayName = "SuggestJob";
 
 export default SuggestJob;
