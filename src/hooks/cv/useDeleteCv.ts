@@ -4,6 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 export const useDeleteCv = () => {
   const mutation = useMutation({
     mutationFn: (id: number) => cvService.deleteCv(id),
+
   });
 
   const deleteCvMutation = async (id: number) => {

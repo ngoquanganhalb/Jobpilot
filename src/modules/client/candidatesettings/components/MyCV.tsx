@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@component/ui/Button";
 import { Input } from "@component/ui/Input";
 import {
@@ -12,69 +12,68 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  FileIcon,
-  UploadIcon,
-  MoreVertical,
-  Trash2,
-  Eye,
-} from "lucide-react";
+import { FileIcon, UploadIcon, MoreVertical, Trash2, Eye } from "lucide-react";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { doc, updateDoc, arrayUnion, getDoc } from "firebase/firestore";
 
 // Import the upload function
 import { uploadToCloudinary } from "@utils/uploadToCloundinary";
-import { db } from "@services/firebase/firebase";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { useSelector } from "react-redux";
+import { RootState } from "@redux/store";
+import { useCreateCv } from "@hooks/cv/useCreateCv";
+import { useDeleteCv } from "@hooks/cv/useDeleteCv";
+import { useGetUserCv } from "@hooks/cv/useGetUserCv";
+import { toast } from "react-toastify";
 
-interface CV {
-  id: string;
+const buildEmptyCvPayload = ({
+  name,
+  fileUrl,
+  userId,
+}: {
   name: string;
-  url: string;
-  size: number;
-  fileType: string;
-  uploadDate: Date;
-}
+  fileUrl: string;
+  userId: number;
+}) => {
+  return {
+    userId,
+    name,
+
+    // mock / empty fields
+    image: "",
+    title: "",
+    fullName: "",
+    email: "",
+    phone: "",
+    address: "",
+    summary: "",
+
+    skills: [],
+    experience: [],
+    education: [],
+
+    isActive: false,
+    theme: 1,
+
+    fileUrl,
+    rawText: null,
+  };
+};
 
 export default function MyCV() {
   const [isOpen, setIsOpen] = useState(false);
   const [cvName, setCvName] = useState("");
   const [isUploading, setIsUploading] = useState(false);
-  const [cvs, setCvs] = useState<CV[]>([]);
   const [dragActive, setDragActive] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [user, setUser] = useState<any | null>(null);
-  const auth = getAuth();
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-      setUser(firebaseUser);
-    });
-
-    return () => unsubscribe(); // cleanup
-  }, []);
-
-  useEffect(() => {
-    // Fetch  CVs
-    const fetchCVs = async () => {
-      if (!user?.uid) return;
-
-      const userRef = doc(db, "users", user.uid);
-      const userDoc = await getDoc(userRef);
-
-      if (userDoc.exists() && userDoc.data().cvs) {
-        setCvs(userDoc.data().cvs);
-      }
-    };
-
-    fetchCVs();
-  }, [user]);
-
+  const { createCvMutation } = useCreateCv();
+  const { deleteCvMutation } = useDeleteCv();
+  const { data: cvs, refetch } = useGetUserCv();
+  const user = useSelector((state: RootState) => state.auth.user);
+  console.log("cvName", cvName);
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -101,8 +100,8 @@ export default function MyCV() {
     if (file.type === "application/pdf" && file.size <= 12 * 1024 * 1024) {
       setSelectedFile(file);
       // Auto-set name from filename without extension
-      const fileName = file.name.replace(/\.[^/.]+$/, "");
-      setCvName(fileName);
+      // const fileName = file.name.replace(/\.[^/.]+$/, "");
+      // setCvName(fileName);
     } else {
       alert("Please upload a PDF file less than 12MB");
     }
@@ -113,34 +112,25 @@ export default function MyCV() {
   };
 
   const handleSubmit = async () => {
-    if (!selectedFile || !user?.uid || !cvName) return;
+    if (!selectedFile || !user || !cvName) return;
 
     try {
       setIsUploading(true);
 
       const url = await uploadToCloudinary(selectedFile);
 
-      // Create new CV object
-      const newCV: CV = {
-        id: Date.now().toString(),
+      const payload = buildEmptyCvPayload({
         name: cvName,
-        url,
-        size: selectedFile.size,
-        fileType: selectedFile.type,
-        uploadDate: new Date(),
-      };
-
-      // Update db
-      const userRef = doc(db, "users", user.uid);
-      await updateDoc(userRef, {
-        cvs: arrayUnion(newCV),
+        fileUrl: url,
+        userId: user.id,
       });
 
-      setCvs((prevCvs) => [...prevCvs, newCV]);
+      await createCvMutation(payload);
 
       setSelectedFile(null);
       setCvName("");
       setIsOpen(false);
+      refetch();
     } catch (error) {
       console.error("Error uploading CV:", error);
       alert("Failed to upload CV. Please try again.");
@@ -149,39 +139,28 @@ export default function MyCV() {
     }
   };
 
-  const handleDelete = async (cvId: string) => {
-    if (!user?.uid) return;
-
-    try {
-      const filteredCvs = cvs.filter((cv) => cv.id !== cvId);
-
-      const userRef = doc(db, "users", user.uid);
-      await updateDoc(userRef, {
-        cvs: filteredCvs,
-      });
-
-      setCvs(filteredCvs);
-    } catch (error) {
-      console.error("Error deleting CV:", error);
-      alert("Failed to delete CV. Please try again.");
-    }
+  const handleDelete = async (cvId: number) => {
+    if (!user) return;
+    await deleteCvMutation(cvId);
+    refetch();
+    toast.success("Deleted successful");
   };
 
   // Format file size to readable format
-  const formatFileSize = (bytes: number): string => {
-    if (bytes === 0) return "0 Bytes";
-    const k = 1024;
-    const sizes = ["Bytes", "KB", "MB", "GB"];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
-  };
+  // const formatFileSize = (bytes: number): string => {
+  //   if (bytes === 0) return "0 Bytes";
+  //   const k = 1024;
+  //   const sizes = ["Bytes", "KB", "MB", "GB"];
+  //   const i = Math.floor(Math.log(bytes) / Math.log(k));
+  //   return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
+  // };
 
   return (
     <div className="w-full">
       <h2 className="text-lg font-semibold mb-4">Your CV/Resume</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {cvs.map((cv) => (
+        {cvs?.map((cv) => (
           <Card key={cv.id} className="bg-gray-50">
             <CardContent className="p-4 flex items-center">
               <div className="mr-2">
@@ -189,9 +168,9 @@ export default function MyCV() {
               </div>
               <div className="flex-grow">
                 <p className="font-medium text-sm truncate">{cv.name}</p>
-                <p className="text-xs text-gray-500">
+                {/* <p className="text-xs text-gray-500">
                   {formatFileSize(cv.size)}
-                </p>
+                </p> */}
               </div>
               <Popover>
                 <PopoverTrigger asChild>
@@ -206,7 +185,7 @@ export default function MyCV() {
 
                 <PopoverContent className="w-48 p-1 space-y-1 cursor-pointer">
                   <a
-                    href={cv.url}
+                    href={cv.fileUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-full flex items-center px-3 py-2 text-sm hover:bg-gray-100 rounded-md"
@@ -218,7 +197,7 @@ export default function MyCV() {
                     variant="ghost"
                     size="sm"
                     className="w-full flex justify-start text-red-500 hover:text-red-600 hover:bg-red-50 cursor-pointer"
-                    onClick={() => handleDelete(cv.id)}
+                    onClick={() => handleDelete(cv.id!)}
                   >
                     <Trash2 className="mr-2 h-4 w-4" />
                     Delete

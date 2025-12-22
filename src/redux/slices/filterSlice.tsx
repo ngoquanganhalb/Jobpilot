@@ -14,8 +14,8 @@ const initialState: FilterState = {
   location: "",
   tags: [],
   jobTypes: [],
-  minSalary: null,
-  maxSalary: null,
+  minSalary: 0,
+  maxSalary: 200000,
   isRemote: null,
 };
 

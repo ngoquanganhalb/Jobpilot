@@ -12,4 +12,5 @@ export type User = {
   client: string;
   roleId: number;
   avatar: any;
+  favoriteJobs: string[];
 };

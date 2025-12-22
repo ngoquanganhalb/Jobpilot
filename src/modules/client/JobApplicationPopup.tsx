@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { Upload, ArrowRight } from "lucide-react";
 import {
   collection,
@@ -10,7 +10,6 @@ import {
   doc,
   arrayUnion,
   getDocs,
-  getDoc,
 } from "firebase/firestore";
 import { firestore } from "@/services/firebase/firebase";
 import { uploadToCloudinary } from "@utils/uploadToCloundinary";
@@ -37,6 +36,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@component/ui/select";
+import { useGetUserCv } from "@hooks/cv/useGetUserCv";
 
 interface JobApplicationFormProps {
   jobTitle: string;
@@ -70,32 +70,19 @@ export default function JobApplicationPopup({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [cvOptions, setCvOptions] = useState<any[]>([]);
   const [selectedCVUrl, setSelectedCVUrl] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchCVs = async () => {
-      try {
-        const userId = candidateId; // hoặc auth.currentUser?.uid
-        const userDoc = await getDoc(doc(firestore, "users", userId));
-        if (userDoc.exists()) {
-          const data = userDoc.data();
-          setCvOptions(data.cvs || []);
-        }
-      } catch (error) {
-        console.error("Error fetching CVs:", error);
-      }
-    };
-
-    if (isOpen) fetchCVs();
-  }, [isOpen, candidateId]);
-
+  const { data: cvOptions } = useGetUserCv();
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+
+      setSelectedCVUrl(null); // 🔥 quan trọng
+
       setFormData({
         ...formData,
-        resume: e.target.files[0],
-        resumeName: e.target.files[0].name,
+        resume: file,
+        resumeName: file.name, // chỉ để hiển thị
       });
     }
   };
@@ -125,7 +112,6 @@ export default function JobApplicationPopup({
         setIsSubmitting(false);
         return;
       }
-
       const resumeUrl = selectedCVUrl
         ? selectedCVUrl
         : await uploadToCloudinary(formData.resume!);
@@ -223,7 +209,7 @@ export default function JobApplicationPopup({
                   </p>
                 </div>
 
-                {cvOptions.length > 0 && (
+                {cvOptions?.length > 0 && (
                   <div className="mb-4">
                     <label className="block text-sm font-medium mb-1">
                       (Or Choose Existing Resume)
@@ -231,17 +217,17 @@ export default function JobApplicationPopup({
                     <Select
                       onValueChange={(selectedId) => {
                         const selected = cvOptions.find(
-                          (cv) => cv.id === selectedId
+                          (cv) => cv.id === Number(selectedId)
                         );
-                        if (selected) {
-                          setFormData({
-                            ...formData,
-                            resume: null, // vì đang dùng URL chứ không phải File
-                            resumeName: selected.name,
-                          });
-                          // Save URL để dùng submit
-                          setSelectedCVUrl(selected.url);
-                        }
+                        if (!selected) return;
+
+                        setFormData({
+                          ...formData,
+                          resume: null, // 🔥 clear file
+                          resumeName: selected.name,
+                        });
+
+                        setSelectedCVUrl(selected.fileUrl || null);
                       }}
                     >
                       <SelectTrigger className="w-full cursor-pointer">
@@ -249,7 +235,7 @@ export default function JobApplicationPopup({
                       </SelectTrigger>
                       <SelectContent>
                         {cvOptions.map((cv) => (
-                          <SelectItem key={cv.id} value={cv.id}>
+                          <SelectItem key={cv.id} value={String(cv.id)}>
                             {cv.name}
                           </SelectItem>
                         ))}

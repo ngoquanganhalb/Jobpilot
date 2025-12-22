@@ -1,12 +1,13 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { JOB_TYPE_OPTIONS, JOB_TAG_OPTIONS } from "../../../../types/db";
 import { useForm } from "react-hook-form";
 import { FaFilter } from "react-icons/fa";
 import { GoDotFill } from "react-icons/go";
 import { setFilters, resetFilters } from "@redux/slices/filterSlice";
 import { FilterFormValues } from "@types";
+import { RootState } from "@redux/store";
 import {
   Accordion,
   AccordionContent,
@@ -30,7 +31,11 @@ import { JOB_TYPE } from "@/common/enum";
 export default function FilterSideBar() {
   const [tagSearch, setTagSearch] = useState("");
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const { watch, setValue, handleSubmit, reset } = useForm<FilterFormValues>({
+
+  const filterState = useSelector((state: RootState) => state.filter);
+  const dispatch = useDispatch();
+
+  const { watch, setValue, handleSubmit, reset, getValues } = useForm<FilterFormValues>({
     defaultValues: {
       location: "",
       tags: [],
@@ -41,27 +46,67 @@ export default function FilterSideBar() {
     },
   });
 
+  // --- LOGIC 1: Sync REDUX -> FORM ---
+  // Khi Redux thay đổi (do URL), cập nhật Form
+  useEffect(() => {
+    // Chuẩn hóa dữ liệu từ Redux để khớp với cấu trúc Form
+    const formValuesFromRedux = {
+      location: filterState.location || "",
+      tags: filterState.tags || [],
+      jobTypes: filterState.jobTypes || [],
+      minSalary: filterState.minSalary ?? 0,
+      maxSalary: filterState.maxSalary ?? 200000,
+      isRemote: filterState.isRemote ?? false,
+    };
+
+    // Kiểm tra xem dữ liệu mới có khác dữ liệu hiện tại trong form không
+    // Nếu giống hệt nhau thì KHÔNG reset (để tránh kích hoạt useEffect bên dưới)
+    if (JSON.stringify(formValuesFromRedux) !== JSON.stringify(getValues())) {
+      reset(formValuesFromRedux);
+    }
+  }, [filterState, reset, getValues]);
+
   const watchAll = watch();
 
-  const dispatch = useDispatch();
+  // --- LOGIC 2: Sync FORM -> REDUX ---
+  // Khi người dùng thao tác Form, cập nhật Redux
   useEffect(() => {
-    dispatch(setFilters(watchAll)); // Automatically dispatch filters whenever any form value changes
-  }, [watchAll, dispatch]);
+    const timeoutId = setTimeout(() => {
+      // QUAN TRỌNG: So sánh deep equality
+      // Chỉ dispatch nếu giá trị Form thực sự KHÁC giá trị trong Redux
+      // Điều này ngăn chặn vòng lặp khi bước reset() ở trên chạy
+      
+      // Chuẩn hóa redux state để so sánh công bằng
+      const currentReduxState = {
+        location: filterState.location || "",
+        tags: filterState.tags || [],
+        jobTypes: filterState.jobTypes || [],
+        minSalary: filterState.minSalary ?? 0,
+        maxSalary: filterState.maxSalary ?? 200000,
+        isRemote: filterState.isRemote ?? false,
+      };
+
+      if (JSON.stringify(watchAll) !== JSON.stringify(currentReduxState)) {
+        dispatch(setFilters(watchAll));
+      }
+    }, 300); 
+
+    return () => clearTimeout(timeoutId);
+  }, [watchAll, filterState, dispatch]);
 
   const onSubmit = (data: FilterFormValues) => {
     dispatch(setFilters(data));
     setIsSheetOpen(false);
   };
+
   const clearAllFilters = () => {
-    reset();
-    // setTagSearch("");
     dispatch(resetFilters());
+    // Không cần gọi reset() thủ công ở đây nữa,
+    // vì dispatch resetFilters sẽ kích hoạt useEffect (Logic 1) và tự reset form.
   };
 
   const removeTag = (tag: string) => {
-    console.log("Removing tag:", tag);
     const newTags = watchAll.tags.filter((t) => t !== tag);
-
     setValue("tags", newTags);
   };
 
@@ -78,7 +123,8 @@ export default function FilterSideBar() {
   };
 
   const renderActiveFilters = () => {
-    const filters = [];
+     // (Giữ nguyên logic render của bạn)
+     const filters = [];
 
     if (watchAll.location) {
       filters.push(
@@ -183,6 +229,7 @@ export default function FilterSideBar() {
 
     return filters;
   };
+
   const isFiltering = () => {
     return (
       watchAll.location !== "" ||
@@ -233,7 +280,8 @@ export default function FilterSideBar() {
           )}
 
           <form onSubmit={handleSubmit(onSubmit)}>
-            <Accordion
+            {/* Phần Accordion giữ nguyên như cũ */}
+             <Accordion
               type="multiple"
               defaultValue={["location", "jobTags", "jobTypes", "salary"]}
             >
@@ -349,7 +397,7 @@ export default function FilterSideBar() {
                         className="w-1/2"
                       />
                     </div>
-
+                    
                     <div className="grid grid-cols-2 gap-2 mt-4">
                       <Button
                         variant="outline"

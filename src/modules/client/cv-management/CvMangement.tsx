@@ -53,6 +53,8 @@ const CvManagement: React.FC = () => {
     userId: user?.id,
     image: "",
     theme: null,
+    fileUrl:
+      "https://res.cloudinary.com/davkp2wja/raw/upload/v1766315338/cv/eufsrcuyzxmhe5bt52z6.pdf",
   };
 
   const [formData, setFormData] = useState<any>({ ...blankForm });
@@ -234,7 +236,7 @@ const CvManagement: React.FC = () => {
 
                 <div className="opacity-0 group-hover:opacity-100 transition-opacity pointer-events-auto flex gap-2 z-20">
                   <button
-                    onClick={() => toggleActive(cv.id, !cv.isActive)}
+                    onClick={() => toggleActive(cv.id!, !cv.isActive)}
                     hidden={!hasActiveAI}
                     className={`px-3 py-1 text-sm font-medium border shadow-sm transition-colors ${
                       cv.isActive

@@ -6,10 +6,11 @@ import { useEffect, useState } from "react";
 import { Badge } from "@component/ui/badge";
 import Paths from "@/constants/paths";
 import Link from "next/link";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { firestore } from "@services/firebase/firebase";
 import { toast } from "react-toastify";
-import { getAuth } from "firebase/auth";
+import { useSelector } from "react-redux";
+import { RootState } from "@redux/store";
+import { useEditUser } from "@hooks/user/useEditUser";
+import { useGetUserProfile } from "@hooks/business/useGetUserProfile";
 
 export default function JobBox({
   id,
@@ -23,54 +24,52 @@ export default function JobBox({
   className = "",
   ...props
 }: JobBoxType) {
+  const user = useSelector((state: RootState) => state.auth.user);
+
+  const { data, refetch } = useGetUserProfile();
+  const favoriteJobs: string[] = data?.user?.favoriteJobs || [];
+
+  const { editMutation } = useEditUser();
+
   const [isBookmarked, setIsBookmarked] = useState(false);
 
-  const auth = getAuth();
-  const currentUser = auth.currentUser;
-
+  // ✅ sync profile → UI
   useEffect(() => {
-    const fetchBookmarkStatus = async () => {
-      if (!currentUser) return;
-      const userRef = doc(firestore, "users", currentUser.uid);
-      const userSnap = await getDoc(userRef);
-      const savedJobs: string[] = userSnap.data()?.savedJobs || [];
-      setIsBookmarked(id ? savedJobs.includes(id) : false);
-    };
-
-    fetchBookmarkStatus();
-  }, [id, currentUser]);
+    if (!id) return;
+    setIsBookmarked(favoriteJobs.includes(id));
+  }, [favoriteJobs, id]);
 
   const handleToggleBookmark = async (
     e: React.MouseEvent<HTMLButtonElement>
   ) => {
     e.stopPropagation();
-    e.preventDefault(); //prevent click to link
+    e.preventDefault();
 
-    if (!currentUser) {
+    if (!user || !id) {
       toast.info("Please log in to save jobs");
       return;
     }
 
+    const nextValue = !isBookmarked;
+
+    // 🟢 optimistic UI
+    setIsBookmarked(nextValue);
+
+    const updatedFavorites: string[] = nextValue
+      ? [...favoriteJobs, id]
+      : favoriteJobs.filter((jobId) => jobId !== id);
+
     try {
-      const userRef = doc(firestore, "users", currentUser.uid);
-      const userSnap = await getDoc(userRef);
-      const savedJobs: string[] = userSnap.data()?.savedJobs || [];
+      await editMutation({
+        favoriteJobs: updatedFavorites,
+      });
 
-      let updatedSavedJobs;
-      if (id && savedJobs.includes(id)) {
-        updatedSavedJobs = savedJobs.filter((jobId) => jobId !== id);
-        toast.info("Removed from favorites");
-        setIsBookmarked(false);
-      } else {
-        updatedSavedJobs = [...savedJobs, id];
-        toast.success("Saved to favorites");
-        setIsBookmarked(true);
-      }
-
-      await updateDoc(userRef, { savedJobs: updatedSavedJobs });
-    } catch (error) {
-      console.error("Error updating saved jobs:", error);
-      toast.error("Something went wrong");
+      // ✅ đồng bộ lại profile
+      await refetch();
+    } catch {
+      // 🔴 rollback UI
+      setIsBookmarked(!nextValue);
+      toast.error("Failed to update favorites");
     }
   };
 
@@ -98,13 +97,13 @@ export default function JobBox({
       className={`relative flex flex-col w-[385px] p-[24px] border-3 border-[#E4E5E8] shadow-md rounded-[8px] hover:scale-105 transition-all duration-100 cursor-pointer ${variantStyles} ${className}`}
       {...props}
     >
-      {/* Bookmark button outside Link */}
+      {/* Bookmark */}
       <button
         onClick={handleToggleBookmark}
         className="absolute top-4 right-4 z-10"
       >
         {isBookmarked ? (
-          <FaBookmark className="text-amber-400 hover:scale-110 transition-transform duration-200 cursor-pointer" />
+          <FaBookmark className="text-amber-400 hover:scale-110 transition-transform duration-200" />
         ) : (
           <FaRegBookmark className="text-gray-500 hover:text-amber-400 hover:scale-110 transition-all duration-200" />
         )}
@@ -122,9 +121,7 @@ export default function JobBox({
             >
               {type}
             </Badge>
-            <div className="text-[14px] font-normal leading-5 text-gray-500">
-              {salary}
-            </div>
+            <div className="text-[14px] text-gray-500">{salary}</div>
           </div>
 
           <div className="flex flex-row gap-3 items-center pt-4">
@@ -133,23 +130,19 @@ export default function JobBox({
               alt="Company Logo"
               width={40}
               height={40}
-              className="rounded-md object-fill w-[40px] h-[40px]"
+              className="rounded-md object-fill"
               unoptimized
             />
             <div className="flex flex-col flex-1">
-              <div className="text-[16px] font-semibold leading-6">
-                {company}
-              </div>
-              <div className="flex flex-row items-center gap-1">
+              <div className="text-[16px] font-semibold">{company}</div>
+              <div className="flex items-center gap-1">
                 <Image
                   src="/images/AddressIconBox.svg"
                   width={14}
                   height={14}
                   alt="icon"
                 />
-                <div className="text-[14px] font-normal leading-5 text-gray-500">
-                  {location}
-                </div>
+                <div className="text-[14px] text-gray-500">{location}</div>
               </div>
             </div>
           </div>

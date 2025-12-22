@@ -36,7 +36,7 @@ import Spinner from "@component/ui/Spinner";
 import Link from "next/link";
 import Paths from "@/constants/paths";
 
-import { USER_ROLE } from "@/common/enum";
+import { JOB_STATUS, USER_ROLE } from "@/common/enum";
 
 export default function JobDetails() {
   const params = useParams(); //take id url
@@ -52,7 +52,11 @@ export default function JobDetails() {
   const handlePopupForm = () => {
     setIsModalOpen(false);
   };
-
+  const isExpired = job?.expirationDate
+    ? (job.expirationDate instanceof Timestamp
+        ? job.expirationDate.toDate()
+        : job.expirationDate) < new Date()
+    : false;
   useEffect(() => {
     if (!jobId) return;
 
@@ -96,7 +100,7 @@ export default function JobDetails() {
         const relatedQuery = query(
           collection(db, "jobs"),
           where("tags", "array-contains-any", tags),
-          where("status", "==", "Active"),
+          where("status", "==", JOB_STATUS.ACTIVE),
           where("expirationDate", ">=", today)
         );
 
@@ -226,9 +230,16 @@ export default function JobDetails() {
                 </div>
               </div>
               {user?.client === USER_ROLE.USER ? (
-                checkApplied ? (
+                isExpired || job.status !== JOB_STATUS.ACTIVE ? (
                   <Button
-                    className="text-lg font-semibold px-6 py-6 bg-[#0A65CC] cursor-pointer"
+                    disabled
+                    className="text-lg font-semibold px-6 py-6 bg-red-200 text-red-600 cursor-not-allowed"
+                  >
+                    This job is not availabled
+                  </Button>
+                ) : checkApplied ? (
+                  <Button
+                    className="text-lg font-semibold px-6 py-6 bg-[#0A65CC]"
                     onClick={() => {
                       if (!user) {
                         router.push("/sign-in");

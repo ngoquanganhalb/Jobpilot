@@ -2,10 +2,9 @@
 import JobBox from "@component/ui/JobBox";
 import { useEffect, useState } from "react";
 import StepPagination from "@component/ui/StepPagination";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@redux/store";
 import { resetFilters, setFilters } from "@redux/slices/filterSlice";
-import { useDispatch } from "react-redux";
 import { useSearchParams } from "next/navigation";
 import Spinner from "@component/ui/Spinner";
 import {
@@ -15,63 +14,56 @@ import {
 import { usePagination } from "@hooks/common-hooks/usePagination";
 import { useFilterJobs } from "@hooks/common-hooks/useFilterJobs";
 import { Job } from "../../../../types/db";
+
 type Props = {
   values: Job[];
 };
 
 export default function List({ values: jobs }: Props) {
-  console.log("first", jobs);
   const keyword = useSelector((state: RootState) => state.search.keyword);
   const location = useSelector((state: RootState) => state.search.location);
   const filter = useSelector((state: RootState) => state.filter);
+
   const dispatch = useDispatch();
-  // const { jobs } = useFetchJobBox();
-
-  const [isMounted, setIsMounted] = useState(false);
   const searchParams = useSearchParams();
-  const [queryTag, setQueryTag] = useState<string | undefined>();
+  // const [isMounted, setIsMounted] = useState(false);
 
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
+  // // 1. Chỉ giữ lại isMounted để tránh Hydration Error
+  // useEffect(() => {
+  //   setIsMounted(true);
+  // }, []);
 
+  // 2. GỘP TOÀN BỘ LOGIC SYNC URL -> REDUX VÀO ĐÂY
   useEffect(() => {
-    if (isMounted) {
-      const tag = searchParams.get("tag");
-      if (tag) {
-        setQueryTag(tag);
-      }
-    }
-  }, [isMounted, searchParams]);
+    // if (!isMounted) return;
 
-  // safely use queryTag
-  useEffect(() => {
-    if (queryTag) {
-      dispatch(
-        setFilters({
-          tags: [queryTag],
-          jobTypes: [],
-          minSalary: 0,
-          maxSalary: 0,
-          isRemote: null,
-        })
-      );
-    }
-  }, [queryTag]);
-
-  useEffect(() => {
+    // Lấy params trực tiếp
+    const tag = searchParams.get("tag");
     const kw = searchParams.get("keyword") || "";
     const loc = searchParams.get("location") || "";
 
+    // Sync Search Keyword & Location
     dispatch(setKeywordRedux(kw));
     dispatch(setLocationRedux(loc));
-  }, [searchParams, dispatch]);
 
-  useEffect(() => {
-    dispatch(resetFilters());
-  }, []);
+    // Sync Filter Tag: Logic quan trọng để fix lỗi reset
+    if (tag) {
+      // Nếu URL CÓ tag: Force set filter theo tag đó ngay lập tức
+      dispatch(
+        setFilters({
+          tags: [tag],
+        })
+      );
+    } else {
+      // Nếu URL KHÔNG CÓ tag: Lúc này mới được phép Reset
+      // Điều này thay thế hoàn toàn cho cái useEffect resetFilters chạy lúc mount
+      dispatch(resetFilters());
+    }
+  }, [searchParams, dispatch]);
+  // Dependency là searchParams: Bất cứ khi nào URL đổi, Redux sẽ cập nhật theo đúng trạng thái URL
 
   const filteredJobs = useFilterJobs({ jobs, keyword, location, filter });
+
   const {
     page,
     totalPages,
@@ -81,9 +73,9 @@ export default function List({ values: jobs }: Props) {
     setPage,
   } = usePagination(filteredJobs, 12);
 
-  if (!isMounted) {
-    return <Spinner />;
-  }
+  // if (!isMounted) {
+  //   return <Spinner />;
+  // }
 
   return (
     <div className="flex flex-col gap-[50px] md:px-[100px] md:py-[50px] lg:px-[150px] ">
@@ -105,7 +97,7 @@ export default function List({ values: jobs }: Props) {
                     ? `$${job.minSalary} - $${job.maxSalary}`
                     : "Negotiate"
                 }
-                urgent={job.isRemote} // fix sau
+                urgent={job.isRemote}
                 logo={job.avatarCompany}
               />
             ))}

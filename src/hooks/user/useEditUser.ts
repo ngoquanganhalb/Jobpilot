@@ -12,7 +12,7 @@ export const useEditUser = () => {
     mutationFn: (data: Partial<UpdateUserDto>) => {
       return userService.editUser(data);
     },
-    onSuccess: () => toast.success("Saved!"),
+    onSuccess: () => toast.success("Success!"),
     onError: (e: any) => toast.error(e?.message || "Update failed"),
   });
   const editMutation = async (body: Partial<UpdateUserDto>) => {

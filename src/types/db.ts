@@ -108,7 +108,7 @@ export type ApplicationWithJob = Application & {
 };
 
 export interface Cv {
-  id: number;
+  id?: number;
   userId?: number;
   image: string;
   title: string;
@@ -124,6 +124,7 @@ export interface Cv {
   isActive: boolean;
   rawText?: any;
   theme: number;
+  fileUrl?: string;
 }
 
 export interface Experience {

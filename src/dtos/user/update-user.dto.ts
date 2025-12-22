@@ -7,6 +7,7 @@ export type UpdateUserDto = {
   client: string;
   profileDetails: ProfileDetails | any;
   avatar: string;
+  favoriteJobs: string[];
 };
 
 export type ProfileDetails = {
