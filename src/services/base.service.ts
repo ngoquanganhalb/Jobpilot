@@ -1,4 +1,7 @@
-import { authorizedAxiosInstance } from "@/core/axios-custom.helpers";
+import {
+  authorizedAxiosInstance,
+  publicAxiosInstance,
+} from "@/core/axios-custom.helpers";
 import { AxiosRequestConfig, AxiosResponse } from "axios";
 // interface  {
 //   message: string;
@@ -87,7 +90,7 @@ export abstract class BaseService {
     config?: CustomAxiosRequestConfig
   ): Promise<T> {
     const url = config?.ignoreBaseURL ? endpoint : `${this.baseURL}${endpoint}`;
-    const response = await authorizedAxiosInstance.post<T>(url, data, config);
+    const response = await publicAxiosInstance.post<T>(url, data, config);
     const dataResponse: any = response;
 
     return dataResponse;
@@ -99,7 +102,7 @@ export abstract class BaseService {
     config?: CustomAxiosRequestConfig
   ): Promise<T> {
     const url = config?.ignoreBaseURL ? endpoint : `${this.baseURL}${endpoint}`;
-    const response = await authorizedAxiosInstance.put<T>(url, data, config);
+    const response = await publicAxiosInstance.put<T>(url, data, config);
     const dataResponse: any = response;
 
     return dataResponse;
@@ -110,7 +113,7 @@ export abstract class BaseService {
     config?: CustomAxiosRequestConfig
   ): Promise<T> {
     const url = config?.ignoreBaseURL ? endpoint : `${this.baseURL}${endpoint}`;
-    const response = await authorizedAxiosInstance.get<T>(url, config);
+    const response = await publicAxiosInstance.get<T>(url, config);
     const dataResponse: any = response;
 
     return dataResponse;

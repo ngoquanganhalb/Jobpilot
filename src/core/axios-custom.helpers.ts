@@ -43,7 +43,7 @@ export const authorizedAxiosInstance: AxiosInstance = axios.create({
 
 export const publicAxiosInstance: AxiosInstance = axios.create({
   baseURL: ENV.API_BASE_URL,
-  withCredentials: true,
+  withCredentials: false,
 });
 
 // Request interceptors
@@ -82,7 +82,6 @@ function handleResponse(response: AxiosResponse) {
   return response.data;
 }
 
-
 async function handleError(error: AxiosError) {
   loadingEventEmitter.emit(EMIT_KEY.LOADING, false);
 
@@ -92,7 +91,7 @@ async function handleError(error: AxiosError) {
   const status = error.response?.status;
 
   const url = originalRequest?.url ?? "";
-  
+
   const isAuthEndpoint =
     url.includes("/auth/logout") ||
     url.includes("/auth/refresh-session") ||

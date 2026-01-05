@@ -24,6 +24,7 @@ export const useNotificationSocket = (userId?: number) => {
     const client = new Client({
       webSocketFactory: () => socket,
       reconnectDelay: 5000,
+      connectHeaders: {},
     });
 
     client.onConnect = () => {
