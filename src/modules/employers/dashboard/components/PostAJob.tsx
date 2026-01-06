@@ -22,7 +22,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import Image from "next/image";
 import { Job, JOB_TAG_OPTIONS } from "../../../../types/db";
 import { useRouter } from "next/navigation";
 import LocationSelector from "@component/ui/LocationSelector";
