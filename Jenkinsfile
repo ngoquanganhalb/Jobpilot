@@ -31,7 +31,7 @@ pipeline {
             steps {
                 // Lúc này trong thư mục đã có .env.production
                 // Dockerfile sẽ COPY nó vào image -> Build thành công
-                sh 'docker build -f Dockerfile.production -t $IMAGE_NAME:latest .'
+                sh 'docker build --no-cache -f Dockerfile.production -t $IMAGE_NAME:latest .'
             }
         }
 
