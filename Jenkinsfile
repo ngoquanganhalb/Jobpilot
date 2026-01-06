@@ -41,30 +41,20 @@ pipeline {
 
         stage('Build New Image') {
             steps {
-                withCredentials([
-                string(credentialsId: 'FIREBASE_API_KEY', variable: 'NEXT_PUBLIC_FIREBASE_API_KEY'),
-                string(credentialsId: 'FIREBASE_AUTH_DOMAIN', variable: 'NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN'),
-                string(credentialsId: 'FIREBASE_PROJECT_ID', variable: 'NEXT_PUBLIC_FIREBASE_PROJECT_ID'),
-                string(credentialsId: 'FIREBASE_STORAGE_BUCKET', variable: 'NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET'),
-                string(credentialsId: 'FIREBASE_MESSAGING_SENDER_ID', variable: 'NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID'),
-                string(credentialsId: 'FIREBASE_APP_ID', variable: 'NEXT_PUBLIC_FIREBASE_APP_ID')
-                ]) {
                 sh """
                     docker build --no-cache \
-                    -f Dockerfile.production \
-                    -t jobpilot-fe:latest \
-                    --build-arg NEXT_PUBLIC_FIREBASE_API_KEY=$NEXT_PUBLIC_FIREBASE_API_KEY \
-                    --build-arg NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=$NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN \
-                    --build-arg NEXT_PUBLIC_FIREBASE_PROJECT_ID=$NEXT_PUBLIC_FIREBASE_PROJECT_ID \
-                    --build-arg NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=$NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET \
-                    --build-arg NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=$NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID \
-                    --build-arg NEXT_PUBLIC_FIREBASE_APP_ID=$NEXT_PUBLIC_FIREBASE_APP_ID \
-                    .
+                        -f Dockerfile.production \
+                        -t ${IMAGE_NAME}:latest \
+                        --build-arg NEXT_PUBLIC_FIREBASE_API_KEY=AIzaSyCCX4A1LA0seSgsjv8J3NbPOGgXIhoKTOg \
+                        --build-arg NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=jobpilot-432f1.firebaseapp.com \
+                        --build-arg NEXT_PUBLIC_FIREBASE_PROJECT_ID=jobpilot-432f1 \
+                        --build-arg NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=jobpilot-432f1.firebasestorage.app \
+                        --build-arg NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=605788664856 \
+                        --build-arg NEXT_PUBLIC_FIREBASE_APP_ID=1:605788664856:web:2d1a741c7ce30d65963f6d \
+                        .
                 """
-                }
             }
         }
-
 
         stage('Start New Container') {
             steps {
