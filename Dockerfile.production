@@ -5,14 +5,17 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 
-# Copy toàn bộ code
 COPY . .
 
-# 🔥 QUAN TRỌNG: Copy file .env.production vào để Next.js tự đọc khi build
-# Lưu ý: File này phải nằm cùng thư mục với Dockerfile trên máy host
-COPY .env.production .env.production
+# 👇 Nhận env từ Jenkins
+ARG NEXT_PUBLIC_FIREBASE_API_KEY
+ARG NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+ARG NEXT_PUBLIC_FIREBASE_PROJECT_ID
 
-# Lúc này npm run build sẽ tự nhặt biến môi trường trong .env.production
+ENV NEXT_PUBLIC_FIREBASE_API_KEY=$NEXT_PUBLIC_FIREBASE_API_KEY
+ENV NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=$NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+ENV NEXT_PUBLIC_FIREBASE_PROJECT_ID=$NEXT_PUBLIC_FIREBASE_PROJECT_ID
+
 RUN npm run build
 
 # ---------- RUN STAGE ----------
@@ -26,9 +29,6 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/next.config.* ./
-
-# Copy file env sang cả runner để lúc chạy server (runtime) nó đọc các biến Server-side (như NEXTAUTH_SECRET)
-COPY --from=builder /app/.env.production ./.env.production
 
 EXPOSE 3000
 CMD ["npm", "start"]
