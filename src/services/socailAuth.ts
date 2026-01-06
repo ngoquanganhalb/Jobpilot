@@ -1,9 +1,9 @@
+import { auth } from "@lib/firebase.client";
 import {
   GoogleAuthProvider,
   FacebookAuthProvider,
   signInWithPopup,
 } from "firebase/auth";
-import { auth } from "./firebase/firebase";
 
 const googleProvider = new GoogleAuthProvider();
 const facebookProvider = new FacebookAuthProvider();
