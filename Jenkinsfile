@@ -45,6 +45,9 @@ pipeline {
                     docker build --no-cache \
                         -f Dockerfile.production \
                         -t ${IMAGE_NAME}:latest \
+                        --build-arg NEXT_PUBLIC_FIREBASE_API_KEY=\$NEXT_PUBLIC_FIREBASE_API_KEY \
+                        --build-arg NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=\$NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN \
+                        --build-arg NEXT_PUBLIC_FIREBASE_PROJECT_ID=\$NEXT_PUBLIC_FIREBASE_PROJECT_ID \
                         .
                 """
             }
