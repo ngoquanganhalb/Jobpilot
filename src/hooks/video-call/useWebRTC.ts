@@ -7,6 +7,42 @@ interface PeerConnection {
   stream?: MediaStream;
 }
 
+// Hàm helper để lấy ICE Servers (đặt bên ngoài hook để tái sử dụng nếu cần)
+const getIceServers = async () => {
+  const apiKey = "9830c7157f23f3842961f618ee4ba71f2c7a";
+  const domain = "jobpilot.metered.live";
+
+  // Mặc định luôn có Google STUN (dùng cho local hoặc fallback)
+  const defaultIceServers = [
+    { urls: "stun:stun.l.google.com:19302" },
+    { urls: "stun:stun1.l.google.com:19302" },
+  ];
+
+  if (!apiKey) {
+    console.warn(
+      "⚠️ Thiếu API Key Metered, chỉ sử dụng Google STUN (Local mode)"
+    );
+    return defaultIceServers;
+  }
+
+  try {
+    const response = await fetch(
+      `https://${domain}/api/v1/turn/credentials?apiKey=${apiKey}`
+    );
+
+    if (!response.ok) throw new Error("Failed to fetch TURN credentials");
+
+    const meteredServers = await response.json();
+    console.log("✅ Đã lấy được danh sách TURN Server từ Metered");
+
+    // Gộp cả Google STUN + Metered TURN
+    return [...meteredServers, ...defaultIceServers];
+  } catch (error) {
+    console.error("❌ Lỗi lấy TURN server:", error);
+    return defaultIceServers; // Fallback về Google STUN
+  }
+};
+
 export function useWebRTC({
   stompClient,
   roomId,
@@ -28,13 +64,47 @@ export function useWebRTC({
     new Map()
   );
   const joinedRef = useRef(false);
-
-  const configuration: RTCConfiguration = {
+  const [rtcConfig, setRtcConfig] = useState<RTCConfiguration>({
     iceServers: [
-      { urls: "stun:stun.l.google.com:19302" },
-      { urls: "stun:stun1.l.google.com:19302" },
+      { urls: "stun:stun.l.google.com:19302" }, // Init tạm bằng Google
     ],
-  };
+  });
+  console.log("RTC Config:", rtcConfig);
+  
+  /* ------------------ INIT LOCAL STREAM & RTC CONFIG ------------------ */
+  useEffect(() => {
+    const init = async () => {
+      try {
+        // A. Lấy cấu hình ICE Servers (TURN/STUN)
+        const servers = await getIceServers();
+        setRtcConfig({ iceServers: servers });
+
+        // B. Lấy Camera & Mic
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: true,
+        });
+
+        // Lưu ý: Thường khi vào phòng ta nên để mặc định là BẬT (enabled = true)
+        // Nếu bạn muốn mặc định tắt, hãy giữ nguyên logic cũ. Ở đây mình để true cho trải nghiệm chuẩn.
+        setMicOn(true);
+        setCameraOn(true);
+
+        console.log("✅ Local stream initialized");
+        setLocalStream(stream);
+      } catch (error) {
+        console.error("❌ Error initializing:", error);
+      }
+    };
+
+    init();
+
+    return () => {
+      // Cleanup stream khi unmount
+      localStream?.getTracks().forEach((t) => t.stop());
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Chỉ chạy 1 lần khi mount
 
   /* ------------------ LOCAL MEDIA ------------------ */
   useEffect(() => {
@@ -71,7 +141,7 @@ export function useWebRTC({
       throw new Error("Local stream not ready");
     }
 
-    const pc = new RTCPeerConnection(configuration);
+    const pc = new RTCPeerConnection(rtcConfig);
 
     // Add local tracks
     localStream.getTracks().forEach((t) => {
