@@ -12,7 +12,6 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { collection, Timestamp, doc, setDoc } from "firebase/firestore";
-import { db } from "@services/firebase/firebase";
 import { toast } from "react-toastify";
 import { Calendar } from "@/components/ui/calendar";
 import { format, isToday, isBefore } from "date-fns";
@@ -33,6 +32,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useSelector } from "react-redux";
 import { RootState } from "@redux/store";
 import { JOB_STATUS, JOB_TYPE } from "@/common/enum";
+import { db } from "@lib/firebase.client";
 
 // Define schema with zod
 const jobFormSchema = z

@@ -11,7 +11,6 @@ import {
   arrayUnion,
   getDocs,
 } from "firebase/firestore";
-import { firestore } from "@/services/firebase/firebase";
 import { uploadToCloudinary } from "@utils/uploadToCloundinary";
 import { toast } from "react-toastify";
 import { Button } from "@component/ui/Button";
@@ -37,6 +36,7 @@ import {
   SelectValue,
 } from "@component/ui/select";
 import { useGetUserCv } from "@hooks/cv/useGetUserCv";
+import { firestore } from "@lib/firebase.client";
 
 interface JobApplicationFormProps {
   jobTitle: string;

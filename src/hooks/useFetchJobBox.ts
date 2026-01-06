@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useState } from "react";
-import { firestore } from "../services/firebase/firebase";
 import {
   collection,
   query,
@@ -11,6 +10,7 @@ import {
 } from "firebase/firestore";
 import { Job } from "../types/db";
 import { JOB_STATUS } from "@/common/enum";
+import { firestore } from "@lib/firebase.client";
 
 export function useFetchJobBox(limit: number = 10000) {
   const [jobs, setJobs] = useState<Job[]>([]);

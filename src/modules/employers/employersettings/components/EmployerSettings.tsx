@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import { Building2, Loader2 } from "lucide-react";
 import { doc, getDoc, updateDoc, setDoc } from "firebase/firestore";
-import { firestore } from "@services/firebase/firebase";
 import { Button } from "@component/ui/Button";
 import { Input } from "@component/ui/Input";
 import { Textarea } from "@/components/ui/textarea";
@@ -15,6 +14,7 @@ import { ProfileEmployerFireBaseDto } from "@/dtos/user/profile-employer-firebas
 import Spinner from "@component/ui/Spinner";
 import { useEditUser } from "@hooks/user/useEditUser";
 import { uploadPhotoAndGetUrl } from "@utils/uploadPhotoAndGetUrl";
+import { firestore } from "@lib/firebase.client";
 type Form = ProfileEmployerFireBaseDto & {
   avatarUrl: string;
   companyName: string;

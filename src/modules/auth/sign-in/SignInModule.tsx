@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { setCookie } from "cookies-next";
 import { getIdToken } from "firebase/auth";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth, db } from "../../../services/firebase/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { useDispatch } from "react-redux";
 import { setUser } from "../../../redux/slices/userSlice";

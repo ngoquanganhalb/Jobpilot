@@ -9,7 +9,6 @@ import SearchIcon from "@component/icons/SearchIcon";
 import Button from "@component/ui/ButtonCustom";
 import CountBox from "@component/ui/CountBox";
 import Input from "@component/ui/InputCustom";
-import { db } from "@services/firebase/firebase";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import Image from "next/image";
 import { useEffect, useState } from "react";
@@ -19,6 +18,7 @@ import {
   setKeyword as setKeywordRedux,
   setLocation as setLocationRedux,
 } from "@redux/slices/searchSlice";
+import { db } from "@lib/firebase.client";
 
 export default function Banner() {
   const [jobCount, setJobCount] = useState(0);

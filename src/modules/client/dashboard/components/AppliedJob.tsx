@@ -11,7 +11,6 @@ import {
 } from "firebase/firestore";
 import {  ApplicationWithJob, Job } from "../../../../types/db";
 import React, { useEffect, useState } from "react";
-import { db } from "@services/firebase/firebase";
 import StepPagination from "@component/ui/StepPagination";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
@@ -33,6 +32,7 @@ import Paths from "@/constants/paths";
 import Link from "next/link";
 import { useSelector } from "react-redux";
 import { RootState } from "@redux/store";
+import { db } from "@lib/firebase.client";
 
 const AppliedJob: React.FC = () => {
   const user = useSelector((state: RootState) => state.auth.user);

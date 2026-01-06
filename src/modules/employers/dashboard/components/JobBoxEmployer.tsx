@@ -8,7 +8,6 @@ import {
   collection,
   query,
 } from "firebase/firestore";
-import { db } from "@/services/firebase/firebase";
 import { toast } from "react-toastify";
 import { useState } from "react";
 import { BiCheckCircle, BiXCircle } from "react-icons/bi";
@@ -35,6 +34,7 @@ import { useRouter } from "next/navigation";
 import Paths from "@/constants/paths";
 import Link from "next/link";
 import { APPLICATION_STATUS, JOB_STATUS } from "@/common/enum";
+import { db } from "@lib/firebase.client";
 
 type JobItemProps = {
   job: Job;

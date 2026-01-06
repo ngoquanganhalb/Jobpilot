@@ -23,7 +23,6 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { doc, updateDoc } from "firebase/firestore";
-import { db } from "@/services/firebase/firebase";
 import { Job, JOB_TAG_OPTIONS } from "../../../../types/db";
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
@@ -36,6 +35,7 @@ import { useDispatch } from "react-redux";
 import { updateJob } from "@redux/slices/jobSlice";
 import { Upload } from "lucide-react";
 import { JOB_STATUS } from "@/common/enum";
+import { db } from "@lib/firebase.client";
 type Props = {
   open: boolean;
   onClose: () => void;

@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import { doc, getDoc, Timestamp } from "firebase/firestore";
-import { db } from "@services/firebase/firebase";
 import { useSelector } from "react-redux";
 import { RootState } from "@redux/store";
 import { useEditUser } from "@hooks/user/useEditUser";
@@ -15,6 +14,7 @@ import Link from "next/link";
 import Paths from "@/constants/paths";
 import { JOB_STATUS } from "@/common/enum";
 import { Job } from "../../../types/db";
+import { db } from "@lib/firebase.client";
 
 const LIMIT = 10;
 

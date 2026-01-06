@@ -1,7 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { firestore } from "@services/firebase/firebase";
 import { Button } from "@component/ui/Button";
 import { Input } from "@component/ui/Input";
 import { Textarea } from "@/components/ui/textarea";
@@ -19,6 +18,7 @@ import { toast } from "react-toastify";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { toBase64 } from "@lib/convertBase64";
 import AvatarDropzone from "@component/ui/AvatarDropZone";
+import { firestore } from "@lib/firebase.client";
 
 export default function CandidateSettings() {
   const [userData, setUserData] = useState<UserModel | null>(null);

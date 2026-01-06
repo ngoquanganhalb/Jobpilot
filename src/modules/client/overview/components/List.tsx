@@ -11,7 +11,6 @@ import {
   getDoc,
   updateDoc,
 } from "firebase/firestore";
-import { db } from "@services/firebase/firebase";
 import {  Job, ApplicationWithJob } from "../../../../types/db";
 import JobBoxCandidate from "@component/ui/JobBoxCandidate";
 import Swal from "sweetalert2";
@@ -22,6 +21,7 @@ import { BsArrowRight } from "react-icons/bs";
 import Link from "next/link";
 import { RootState } from "@redux/store";
 import { useSelector } from "react-redux";
+import { db } from "@lib/firebase.client";
 
 export default function List() {
   const [applications, setApplications] = useState<ApplicationWithJob[]>([]);

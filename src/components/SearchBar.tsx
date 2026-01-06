@@ -7,7 +7,6 @@ import {
   where,
   Timestamp,
 } from "firebase/firestore";
-import { db } from "@/services/firebase/firebase";
 import { useRouter } from "next/navigation";
 import { debounce } from "lodash";
 import Link from "next/link";
@@ -20,6 +19,7 @@ import AvatarMenu from "./ui/AvatarMenu";
 import { useSelector } from "react-redux";
 import { RootState } from "@redux/store";
 import NotificationBell from "./NotificationBell";
+import { db } from "@lib/firebase.client";
 
 export default function SearchBar() {
   const [mounted, setMounted] = useState(false);

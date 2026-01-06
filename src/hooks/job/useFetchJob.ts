@@ -1,9 +1,9 @@
 import { RootState } from "@redux/store";
-import { db } from "@services/firebase/firebase";
 import { Job } from "../../types/db";
 import { collection, getDocs, orderBy, query, where } from "firebase/firestore";
 import { useSelector } from "react-redux";
 import { useQuery } from "@tanstack/react-query";
+import { db } from "@lib/firebase.client";
 
 const fetchJobs = async (userId: number) => {
   const q = query(

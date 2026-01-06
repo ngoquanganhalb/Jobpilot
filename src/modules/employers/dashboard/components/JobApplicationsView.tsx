@@ -1,7 +1,6 @@
 "use client";
 import { useState, useEffect, type FC } from "react";
 import { useParams } from "next/navigation";
-import { db } from "@services/firebase/firebase";
 import { doc, updateDoc } from "firebase/firestore";
 import { toast } from "react-toastify";
 import {
@@ -46,6 +45,7 @@ import { useFetchApplication } from "@hooks/applications/useFetchApplication";
 import { useSendNotification } from "@hooks/notification/useSendNotification";
 import { RootState } from "@redux/store";
 import { useSelector } from "react-redux";
+import { db } from "@lib/firebase.client";
 
 export default function JobApplicationsView() {
   const [sortDialogOpen, setSortDialogOpen] = useState(false);

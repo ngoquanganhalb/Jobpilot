@@ -5,7 +5,6 @@ import { BarChart, Bar, CartesianGrid, XAxis, Cell } from "recharts";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { useSelector } from "react-redux";
 
-import { db } from "@services/firebase/firebase";
 import { RootState } from "@redux/store";
 
 import {
@@ -20,6 +19,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@component/ui/chart";
+import { db } from "@lib/firebase.client";
 
 interface ChartData {
   status: string;

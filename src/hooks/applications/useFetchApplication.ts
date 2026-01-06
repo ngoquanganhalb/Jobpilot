@@ -1,7 +1,7 @@
-import { db } from "@services/firebase/firebase";
 import { Application } from "../../types/db";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { useQuery } from "@tanstack/react-query";
+import { db } from "@lib/firebase.client";
 
 const fetchApplications = async (jobId: string) => {
   const applicationsRef = collection(db, "applications");

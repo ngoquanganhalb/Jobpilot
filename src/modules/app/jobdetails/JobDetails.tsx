@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import { RootState } from "@redux/store";
-import { db, firestore } from "@services/firebase/firebase";
 import { Timestamp } from "firebase/firestore";
 import {
   doc,
@@ -37,6 +36,7 @@ import Link from "next/link";
 import Paths from "@/constants/paths";
 
 import { JOB_STATUS, USER_ROLE } from "@/common/enum";
+import { db, firestore } from "@lib/firebase.client";
 
 export default function JobDetails() {
   const params = useParams(); //take id url
