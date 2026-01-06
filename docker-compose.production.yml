@@ -4,10 +4,9 @@ services:
   jobpilot-fe:
     container_name: jobpilot-fe
     # Build từ Dockerfile hiện tại
-    # ❌ BỎ phần build đi (vì đã build ở Jenkins stage)
-    # build:
-    #   context: .
-    #   dockerfile: Dockerfile.production
+    build:
+      context: .
+      dockerfile: Dockerfile.production
     ports:
       - "3000:3000"
     restart: unless-stopped

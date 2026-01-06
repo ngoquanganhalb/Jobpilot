@@ -3,8 +3,8 @@ pipeline {
 
     environment {
         IMAGE_NAME = "jobpilot-fe"
-        // ID của secret file bạn đã tạo trong Jenkins
-        ENV_CREDENTIAL_ID = "jobpilot-env-frontend-production" 
+        CONTAINER_NAME = "jobpilot-fe"
+        ENV_CREDENTIAL_ID = "jobpilot-env-frontend-production"
     }
 
     stages {
@@ -14,42 +14,87 @@ pipeline {
             }
         }
 
-        // 🔥 BƯỚC MỚI: Lấy file .env từ Jenkins ném vào workspace
         stage('Prepare Environment') {
             steps {
                 script {
-                    // Lấy file secret ra biến tạm 'MY_ENV_FILE'
                     withCredentials([file(credentialsId: ENV_CREDENTIAL_ID, variable: 'MY_ENV_FILE')]) {
-                        // Copy và đổi tên thành .env.production để Dockerfile nhìn thấy
                         sh 'cp $MY_ENV_FILE .env.production'
                     }
                 }
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Stop & Remove Old Container') {
             steps {
-                // Lúc này trong thư mục đã có .env.production
-                // Dockerfile sẽ COPY nó vào image -> Build thành công
-                sh 'docker build --no-cache -f Dockerfile.production -t $IMAGE_NAME:latest .'
+                script {
+                    sh """
+                        # Stop và remove container cũ
+                        docker stop ${CONTAINER_NAME} || true
+                        docker rm ${CONTAINER_NAME} || true
+                        
+                        # Remove image cũ (QUAN TRỌNG!)
+                        docker rmi ${IMAGE_NAME}:latest || true
+                    """
+                }
             }
         }
 
-        stage('Deploy') {
+        stage('Build New Image') {
             steps {
-                // Restart container bằng Docker Compose
-                sh '''
-                docker compose -f docker-compose.production.yml down || true
-                docker compose -f docker-compose.production.yml up -d
-                '''
+                sh """
+                    docker build --no-cache \
+                        -f Dockerfile.production \
+                        -t ${IMAGE_NAME}:latest \
+                        .
+                """
+            }
+        }
+
+        stage('Start New Container') {
+            steps {
+                sh """
+                    docker run -d \
+                        --name ${CONTAINER_NAME} \
+                        -p 3000:3000 \
+                        --restart unless-stopped \
+                        --env-file .env.production \
+                        ${IMAGE_NAME}:latest
+                """
+            }
+        }
+
+        stage('Verify Deployment') {
+            steps {
+                script {
+                    sh """
+                        # Đợi container khởi động
+                        sleep 5
+                        
+                        # Kiểm tra container đang chạy
+                        docker ps | grep ${CONTAINER_NAME}
+                        
+                        # Kiểm tra logs
+                        docker logs ${CONTAINER_NAME} --tail 20
+                        
+                        # Test health check (optional)
+                        # curl -f http://localhost:3000 || exit 1
+                    """
+                }
             }
         }
     }
     
-    // Dọn dẹp file .env sau khi build xong để bảo mật (Optional)
     post {
         always {
             sh 'rm -f .env.production'
+        }
+        success {
+            echo "✅ Deployment successful!"
+            sh 'docker ps -a | grep ${CONTAINER_NAME}'
+        }
+        failure {
+            echo "❌ Deployment failed!"
+            sh 'docker logs ${CONTAINER_NAME} --tail 50 || true'
         }
     }
 }
