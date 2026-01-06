@@ -6,6 +6,7 @@ COPY package*.json ./
 RUN npm ci
 
 COPY . .
+COPY .env.production .env.production
 
 # 👇 Nhận env từ Jenkins
 ARG NEXT_PUBLIC_FIREBASE_API_KEY
