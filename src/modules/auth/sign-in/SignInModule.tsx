@@ -12,7 +12,6 @@ import { setUser } from "../../../redux/slices/userSlice";
 import Head from "next/head";
 import Link from "next/link";
 import { toast } from "react-toastify";
-import { useSocialAuth } from "@hooks/useSocialAuth";
 
 import { FaFacebookF, FaEye, FaEyeSlash } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
@@ -163,6 +162,7 @@ const SignInModule: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <button
             type="button"
+            disabled={true}
             onClick={() => signIn("facebook")}
             className="w-full flex items-center justify-center py-3 px-4 border border-gray-300 rounded-md hover:bg-gray-300"
           >

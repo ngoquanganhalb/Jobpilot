@@ -30,7 +30,7 @@ export const authOptions: NextAuthOptions = {
               ? (profile as any)?.picture
               : (profile as any)?.picture?.data?.url,
           providerAccessToken: (account as any)?.access_token,
-          client: USER_ROLE.ADMIN,
+          client: USER_ROLE.USER,
         };
 
         const res = await authService.loginSocial(payload);
