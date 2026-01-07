@@ -1,6 +1,5 @@
 "use client";
 import { Menu } from "@headlessui/react";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";

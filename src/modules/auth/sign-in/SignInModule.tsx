@@ -40,6 +40,7 @@ const SignInModule: React.FC = () => {
     e.preventDefault(); // tránh reload trang khi bam submit
     try {
       await loginMutation(form);
+      router.refresh();// Làm mới router để Next.js nhận biết cookie mới cập nhật
       router.push("/");
     } catch {}
   };
