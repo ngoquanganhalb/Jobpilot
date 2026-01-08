@@ -46,10 +46,11 @@ export async function middleware(req: NextRequest) {
     const { payload } = await jose.jwtVerify(accessToken, secret, {
       algorithms: ["HS256"],
     });
+    console.log("Token verified, payload:", payload);
 
     const role: string | undefined =
       (payload as any)?.role ?? (payload as any)?.client;
-
+    console.log("User role from token:", role);
     // Check role-based access
     if (pathname.startsWith("/employer") && role !== USER_ROLE.EMPLOYER) {
       url.pathname = "/unauthorized";
