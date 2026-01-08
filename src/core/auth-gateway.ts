@@ -1,4 +1,3 @@
-
 // ============================================
 // 1. auth-gateway.ts - FIXED VERSION
 // ============================================
@@ -42,11 +41,14 @@ export const AuthGateway = {
         "/users/profile",
         {
           headers: { "X-Skip-Loading": "1" },
+          withCredentials: true,
         }
       );
       store.dispatch(
         setUser({ user: me.data.user, permissions: me.data?.permissions ?? [] })
       );
+      this.resetAuthState();
+
       return me.data;
     } catch (err: any) {
       throw err;
@@ -79,7 +81,7 @@ export const AuthGateway = {
 
     try {
       console.log("🔄 Refreshing token...");
-      
+
       const res = await plainAxios.post(
         "/auth/refresh-session",
         {},
@@ -90,7 +92,7 @@ export const AuthGateway = {
       );
 
       const newAccessToken: string | undefined = res.data.data.accessToken;
-      
+
       if (newAccessToken) {
         tokenManager.setAccessToken(newAccessToken);
         console.log("✅ Token refreshed successfully");
@@ -102,7 +104,9 @@ export const AuthGateway = {
       return newAccessToken;
     } catch (e) {
       refreshFailCount++;
-      console.warn(`❌ Refresh failed (${refreshFailCount}/${MAX_REFRESH_RETRY})`);
+      console.warn(
+        `❌ Refresh failed (${refreshFailCount}/${MAX_REFRESH_RETRY})`
+      );
 
       wakeQueue(e);
 
