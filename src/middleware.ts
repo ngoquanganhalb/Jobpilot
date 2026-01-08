@@ -25,11 +25,11 @@ export async function middleware(req: NextRequest) {
   }
 
   const accessToken = req.cookies.get(ACCESS_TOKEN_COOKIE)?.value || "";
-  console.log("PATH:", pathname);
-  console.log("COOKIES:", req.cookies.get(ACCESS_TOKEN_COOKIE)?.value);
-  console.log("JWT_SECRET:", process.env.JWT_SECRET);
-  console.log("cookies:", req.cookies.getAll());
-  console.log("➡️ Middleware path:", pathname);
+  // console.log("PATH:", pathname);
+  // console.log("COOKIES:", req.cookies.get(ACCESS_TOKEN_COOKIE)?.value);
+  // console.log("JWT_SECRET:", process.env.JWT_SECRET);
+  // console.log("cookies:", req.cookies.getAll());
+  // console.log("➡️ Middleware path:", pathname);
 
 
 
