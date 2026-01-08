@@ -7,6 +7,7 @@ const ACCESS_TOKEN_COOKIE = "access_token";
 
 const PUBLIC_PATHS = [
   "/sign-in",
+  "/api/auth",
   "/_next",
   "/favicon.ico",
   "/robots.txt",
@@ -26,6 +27,8 @@ export async function middleware(req: NextRequest) {
   console.log("PATH:", pathname);
   console.log("COOKIES:", req.cookies.get(ACCESS_TOKEN_COOKIE)?.value);
   console.log("JWT_SECRET:", process.env.JWT_SECRET);
+  console.log("cookies:", req.cookies.getAll());
+
 
   // ✅ FIX 1: Không có token → redirect ngay về sign-in
   // KHÔNG để client tự xử lý vì sẽ gây loop
