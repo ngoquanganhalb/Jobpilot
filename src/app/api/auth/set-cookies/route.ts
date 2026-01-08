@@ -75,7 +75,9 @@ export async function GET(req: NextRequest) {
 
     // Redirect về homepage hoặc returnTo
     const returnTo = searchParams.get("returnTo") || "/";
-    return NextResponse.redirect(new URL(returnTo, req.url));
+    const origin = req.nextUrl.origin;
+
+    return NextResponse.redirect(new URL(returnTo, origin));
   } catch (error) {
     console.error("❌ Error setting cookies:", error);
     return NextResponse.redirect(
