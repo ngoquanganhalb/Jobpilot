@@ -12,6 +12,7 @@ const PUBLIC_PATHS = [
   "/favicon.ico",
   "/robots.txt",
   "/sitemap.xml",
+  "/unauthorized"
 ];
 
 export async function middleware(req: NextRequest) {
@@ -28,6 +29,8 @@ export async function middleware(req: NextRequest) {
   console.log("COOKIES:", req.cookies.get(ACCESS_TOKEN_COOKIE)?.value);
   console.log("JWT_SECRET:", process.env.JWT_SECRET);
   console.log("cookies:", req.cookies.getAll());
+  console.log("➡️ Middleware path:", pathname);
+
 
 
   // ✅ FIX 1: Không có token → redirect ngay về sign-in
