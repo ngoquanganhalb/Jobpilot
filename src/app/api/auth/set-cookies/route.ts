@@ -73,11 +73,12 @@ export async function GET(req: NextRequest) {
     console.log("   - SameSite:", isProd ? "none" : "lax");
     console.log("   - Secure:", isProd);
 
-    // Redirect về homepage hoặc returnTo
     const returnTo = searchParams.get("returnTo") || "/";
-    const origin = req.nextUrl.origin;
 
-    return NextResponse.redirect(new URL(returnTo, origin));
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    const redirectUrl = new URL(returnTo, baseUrl);
+
+    return NextResponse.redirect(redirectUrl);
   } catch (error) {
     console.error("❌ Error setting cookies:", error);
     return NextResponse.redirect(
