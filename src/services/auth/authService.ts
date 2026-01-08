@@ -76,6 +76,7 @@ class AuthService extends BaseService {
           // "x-internal-key": process.env.INTERNAL_API_KEY ?? "",
         },
         body: JSON.stringify(payload),
+        credentials: "include",
       }
     );
     return res.json();
