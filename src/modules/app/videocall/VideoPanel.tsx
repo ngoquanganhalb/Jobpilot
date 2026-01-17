@@ -1,7 +1,7 @@
 "use client";
 
 import { useWebRTC } from "@hooks/video-call/useWebRTC";
-import { Mic, MicOff, ScreenShare, Video, VideoOff } from "lucide-react";
+import { Mic, MicOff, ScreenShare, Video, VideoOff, Phone } from "lucide-react";
 import { useRef, useEffect, useState } from "react";
 
 export default function VideoPanel({
@@ -14,8 +14,31 @@ export default function VideoPanel({
   const localFocusedRef = useRef<HTMLVideoElement>(null);
   const localThumbnailRef = useRef<HTMLVideoElement>(null);
   const [focusedParticipant, setFocusedParticipant] = useState<string | null>(
-    null
+    null,
   );
+
+  const handleLeaveRoom = () => {
+    // Xác nhận trước khi rời phòng
+    if (window.confirm("Are you sure you want to leave the room?")) {
+      // Đóng tất cả kết nối WebRTC
+      peers.forEach((peer) => {
+        peer.pc.close();
+      });
+
+      // Dừng local stream
+      if (localStream) {
+        localStream.getTracks().forEach((track) => track.stop());
+      }
+
+      // Ngắt kết nối STOMP nếu có
+      if (stompClient && stompClient.connected) {
+        stompClient.disconnect();
+      }
+
+      // Chuyển hướng về trang trước hoặc trang chủ
+      window.history.back();
+    }
+  };
 
   const {
     localStream,
@@ -133,7 +156,7 @@ export default function VideoPanel({
                       peer={peer}
                       onClose={() => setFocusedParticipant(null)}
                     />
-                  ) : null
+                  ) : null,
                 )
               )}
             </div>
@@ -176,7 +199,7 @@ export default function VideoPanel({
                       peer={peer}
                       onClick={() => handleParticipantClick(peerId)}
                     />
-                  ) : null
+                  ) : null,
                 )}
               </div>
             </div>
@@ -256,6 +279,14 @@ export default function VideoPanel({
             title="Share screen"
           >
             <ScreenShare size={24} />
+          </button>
+
+          <button
+            onClick={handleLeaveRoom}
+            className="p-4 rounded-full bg-red-600 hover:bg-red-700 text-white transition"
+            title="Leave Call"
+          >
+            <Phone size={24} />
           </button>
         </div>
       </div>
