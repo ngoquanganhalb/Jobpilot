@@ -46,8 +46,8 @@ export default function SearchBar() {
         const today = Timestamp.fromDate(new Date());
         const q = query(
           collection(db, "jobs"),
-          where("status", "==", "Active"),
-          where("expirationDate", ">=", today)
+          where("status", "==", "active"),
+          where("expirationDate", ">=", today),
         );
         const snapshot = await getDocs(q);
         const allJobs = snapshot.docs.map((doc) => {
@@ -67,7 +67,7 @@ export default function SearchBar() {
           const titleMatch = job.jobTitle.toLowerCase().includes(lower);
           const companyMatch = job.companyName.toLowerCase().includes(lower);
           const tagMatch = job.tags.some((tag: string) =>
-            tag.toLowerCase().includes(lower)
+            tag.toLowerCase().includes(lower),
           );
 
           return titleMatch || companyMatch || tagMatch;
@@ -80,7 +80,7 @@ export default function SearchBar() {
         setSuggestions([]);
       }
     }, 300),
-    []
+    [],
   );
 
   useEffect(() => {
@@ -99,8 +99,6 @@ export default function SearchBar() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
-
 
   return (
     <div className="flex flex-col gap-2 xl:flex-row justify-between items-center py-5 md:px-[150px] bg-white border">

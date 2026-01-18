@@ -60,22 +60,13 @@ export default function Banner() {
         // fetch jobs quantity
         const jobsQuery = query(
           collection(db, "jobs"),
-          where("status", "==", "Active")
+          where("status", "==", "active"),
         );
         const jobsSnapshot = await getDocs(jobsQuery);
         setJobCount(jobsSnapshot.size);
 
-        const usersSnapshot = await getDocs(collection(db, "users"));
-
-        let candidates = 0;
-        let companies = 0;
-
-        usersSnapshot.forEach((doc) => {
-          const data = doc.data();
-          if (data.accountType === "candidate") candidates++;
-          if (data.accountType === "employer") companies++;
-        });
-
+        const candidates = 9;
+        const companies = 6;
         setCandidateCount(candidates);
         setCompanyCount(companies);
       } catch (error) {
