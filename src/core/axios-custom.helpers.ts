@@ -9,6 +9,7 @@ import axios, {
 } from "axios";
 import { ENV } from "@/config/env";
 import { tokenManager } from "@/core/tokenManager";
+import Paths from "@/constants/paths";
 
 class Emitter {
   private map = new Map<string, Set<(payload: any) => void>>();
@@ -61,7 +62,7 @@ authorizedAxiosInstance.interceptors.request.use(
   (error) => {
     loadingEventEmitter.emit(EMIT_KEY.LOADING, false);
     return Promise.reject(error);
-  }
+  },
 );
 
 publicAxiosInstance.interceptors.request.use(
@@ -74,7 +75,7 @@ publicAxiosInstance.interceptors.request.use(
   (error) => {
     loadingEventEmitter.emit(EMIT_KEY.LOADING, false);
     return Promise.reject(error);
-  }
+  },
 );
 
 function handleResponse(response: AxiosResponse) {
@@ -91,13 +92,16 @@ async function handleError(error: AxiosError) {
   const status = error.response?.status;
 
   const url = originalRequest?.url ?? "";
-
+  console.log("handleError");
   const isAuthEndpoint =
     url.includes("/auth/logout") ||
     url.includes("/auth/refresh-session") ||
     url.includes("/auth/login");
+  const isPrivateEndpoint = url.includes(
+    Paths.DASHBOARD || Paths.SETTINGS || Paths.DASHBOARD_OVERVIEW,
+  );
 
-  if (status === HTTP_UNAUTHORIZED && !isAuthEndpoint) {
+  if (status === HTTP_UNAUTHORIZED && !isAuthEndpoint && isPrivateEndpoint) {
     if (originalRequest && !originalRequest._retry) {
       originalRequest._retry = true;
 

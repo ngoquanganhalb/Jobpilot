@@ -13,7 +13,7 @@ const Page403 = () => {
           </div>
 
           <p className="mt-4 text-sm text-gray-600">
-            You don’t have permission
+            You don’t have permission, please login with an authorized account.
           </p>
         </CardContent>
       </Card>
