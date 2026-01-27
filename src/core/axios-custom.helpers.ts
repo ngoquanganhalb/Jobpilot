@@ -100,9 +100,11 @@ async function handleError(error: AxiosError) {
   const isPrivateEndpoint = url.includes(
     Paths.DASHBOARD || Paths.SETTINGS || Paths.DASHBOARD_OVERVIEW,
   );
+  console.log("isPrivateEndpoint:", isPrivateEndpoint);
 
   if (status === HTTP_UNAUTHORIZED && !isAuthEndpoint && isPrivateEndpoint) {
     if (originalRequest && !originalRequest._retry) {
+      console.log('retry after 401')
       originalRequest._retry = true;
 
       try {

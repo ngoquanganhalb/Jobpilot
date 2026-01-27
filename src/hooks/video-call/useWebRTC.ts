@@ -140,16 +140,16 @@ export function useWebRTC({
       console.error("❌ Local stream not ready");
       throw new Error("Local stream not ready");
     }
-
+    // Tạo PeerConnection mới
     const pc = new RTCPeerConnection(rtcConfig);
 
-    // Add local tracks
+    // Add local tracks để gửi sang peer khác
     localStream.getTracks().forEach((t) => {
       console.log("➕ Adding track:", t.kind, "to", peerId);
       pc.addTrack(t, localStream);
     });
 
-    // ICE candidate
+    // ICE candidate : gửi thông tin mạng của mình cho peer khác
     pc.onicecandidate = (e) => {
       if (e.candidate && stompClient.current?.connected) {
         console.log("📤 Sending ICE candidate to:", peerId);
@@ -158,13 +158,13 @@ export function useWebRTC({
           body: JSON.stringify({
             type: "candidate",
             sender: name,
-            payload: { target: peerId, candidate: e.candidate },
+            payload: { target: peerId, candidate: e.candidate }, //ip , port, protocol
           }),
         });
       }
     };
 
-    // Receive remote track
+    // Receive remote video/audio track from peer (nghe người khác nói)
     pc.ontrack = (e) => {
       console.log("📹 Received track from", peerId, "- type:", e.track.kind);
       const remoteStream = e.streams[0];

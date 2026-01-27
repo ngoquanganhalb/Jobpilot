@@ -1,12 +1,11 @@
 "use client";
 import JobBox from "@component/ui/JobBox";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import StepPagination from "@component/ui/StepPagination";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@redux/store";
 import { resetFilters, setFilters } from "@redux/slices/filterSlice";
 import { useSearchParams } from "next/navigation";
-import Spinner from "@component/ui/Spinner";
 import {
   setKeyword as setKeywordRedux,
   setLocation as setLocationRedux,
@@ -26,41 +25,27 @@ export default function List({ values: jobs }: Props) {
 
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
-  // const [isMounted, setIsMounted] = useState(false);
 
-  // // 1. Chỉ giữ lại isMounted để tránh Hydration Error
-  // useEffect(() => {
-  //   setIsMounted(true);
-  // }, []);
-
-  // 2. GỘP TOÀN BỘ LOGIC SYNC URL -> REDUX VÀO ĐÂY
   useEffect(() => {
-    // if (!isMounted) return;
 
-    // Lấy params trực tiếp
     const tag = searchParams.get("tag");
     const kw = searchParams.get("keyword") || "";
     const loc = searchParams.get("location") || "";
 
-    // Sync Search Keyword & Location
     dispatch(setKeywordRedux(kw));
     dispatch(setLocationRedux(loc));
 
-    // Sync Filter Tag: Logic quan trọng để fix lỗi reset
     if (tag) {
-      // Nếu URL CÓ tag: Force set filter theo tag đó ngay lập tức
       dispatch(
         setFilters({
           tags: [tag],
         })
       );
     } else {
-      // Nếu URL KHÔNG CÓ tag: Lúc này mới được phép Reset
-      // Điều này thay thế hoàn toàn cho cái useEffect resetFilters chạy lúc mount
+
       dispatch(resetFilters());
     }
   }, [searchParams, dispatch]);
-  // Dependency là searchParams: Bất cứ khi nào URL đổi, Redux sẽ cập nhật theo đúng trạng thái URL
 
   const filteredJobs = useFilterJobs({ jobs, keyword, location, filter });
 

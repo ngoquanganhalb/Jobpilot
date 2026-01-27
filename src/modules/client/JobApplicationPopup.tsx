@@ -77,12 +77,12 @@ export default function JobApplicationPopup({
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
 
-      setSelectedCVUrl(null); // 🔥 quan trọng
+      setSelectedCVUrl(null); 
 
       setFormData({
         ...formData,
         resume: file,
-        resumeName: file.name, // chỉ để hiển thị
+        resumeName: file.name,
       });
     }
   };
@@ -223,7 +223,7 @@ export default function JobApplicationPopup({
 
                         setFormData({
                           ...formData,
-                          resume: null, // 🔥 clear file
+                          resume: null, 
                           resumeName: selected.name,
                         });
 

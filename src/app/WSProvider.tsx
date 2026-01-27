@@ -17,7 +17,7 @@ export default function WSProvider({
   const user = useSelector((state: RootState) => state.auth.user);
   useEffect(() => {
     const client = createStompClient(() => {
-      // ✅ SUBSCRIBE NOTIFICATION Ở ĐÂY
+      //  SUBSCRIBE NOTIFICATION Ở ĐÂY
       client.subscribe("/topic/notification", (message) => {
         const payload = JSON.parse(message.body) as WsNotificationRequest;
         console.log("Received notification:", payload);

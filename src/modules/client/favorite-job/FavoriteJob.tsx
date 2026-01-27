@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { doc, getDoc, Timestamp } from "firebase/firestore";
 import { useSelector } from "react-redux";
 import { RootState } from "@redux/store";
@@ -19,22 +19,21 @@ import { db } from "@lib/firebase.client";
 const LIMIT = 10;
 
 const FavoriteJob: React.FC = () => {
-  // 🔹 Redux user (source of truth)
   const user = useSelector((state: RootState) => state.auth.user);
-  const favoriteJobs: string[] = user?.favoriteJobs || [];
+  const favoriteJobs: string[] = useMemo(
+    () => user?.favoriteJobs ?? [],
+    [user?.favoriteJobs],
+  );
 
   const { editMutation } = useEditUser();
 
-  // 🔹 Job detail state
   const [savedJobs, setSavedJobs] = useState<Job[]>([]);
   const [currentStep, setCurrentStep] = useState(1);
 
   const today = Timestamp.fromDate(new Date());
   const totalSteps = Math.ceil(savedJobs.length / LIMIT);
   console.log("savedJob", savedJobs);
-  // =========================
-  // Fetch job detail
-  // =========================
+
   const fetchJob = async (jobId: string): Promise<Job | null> => {
     try {
       const snap = await getDoc(doc(db, "jobs", jobId));
@@ -49,28 +48,20 @@ const FavoriteJob: React.FC = () => {
       return null;
     }
   };
+  const fetchFavoriteJobs = async () => {
+    const jobs = await Promise.all(favoriteJobs.map((id) => fetchJob(id)));
+    setSavedJobs(jobs.filter((j): j is Job => j !== null));
+  };
 
-  // =========================
-  // Sync job list when redux favoriteJobs changes
-  // =========================
   useEffect(() => {
     if (!favoriteJobs.length) {
       setSavedJobs([]);
       return;
     }
 
-    const fetchJobs = async () => {
-      const jobs = await Promise.all(favoriteJobs.map((id) => fetchJob(id)));
-
-      setSavedJobs(jobs.filter((j): j is Job => j !== null));
-    };
-
-    fetchJobs();
+    fetchFavoriteJobs();
   }, [favoriteJobs]);
 
-  // =========================
-  // Toggle bookmark (REALTIME)
-  // =========================
   const handleToggleBookmark = async (jobId: string) => {
     if (!user) {
       toast.info("Please log in to manage favorites");
@@ -83,13 +74,12 @@ const FavoriteJob: React.FC = () => {
       ? favoriteJobs.filter((id) => id !== jobId)
       : [...favoriteJobs, jobId];
 
-    // ✅ Optimistic UI (local job list)
     setSavedJobs((prev) =>
-      isSaved ? prev.filter((job) => job.jobId !== jobId) : prev
+      isSaved ? prev.filter((job) => job.jobId !== jobId) : prev,
     );
 
     try {
-      // ✅ Update user via hook (API → Redux)
+      //  Update user via hook (API → Redux)
       await editMutation({
         favoriteJobs: updatedFavoriteJobs,
       });
@@ -98,17 +88,11 @@ const FavoriteJob: React.FC = () => {
     }
   };
 
-  // =========================
-  // Pagination
-  // =========================
   const paginatedJobs = savedJobs.slice(
     (currentStep - 1) * LIMIT,
-    currentStep * LIMIT
+    currentStep * LIMIT,
   );
 
-  // =========================
-  // Helpers
-  // =========================
   const renderJobTypeBadge = (jobType: string) => {
     const map: Record<string, string> = {
       "full-time": "bg-blue-100 text-blue-800",
@@ -154,9 +138,6 @@ const FavoriteJob: React.FC = () => {
     );
   };
 
-  // =========================
-  // RENDER
-  // =========================
   return (
     <div className="w-full max-w-6xl mx-auto px-4 py-6">
       <h1 className="text-2xl font-bold mb-6">
