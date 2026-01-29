@@ -1,4 +1,3 @@
-// /find-job/[id]/page.tsx
 "use client";
 import React from "react";
 import Header from "@component/Header";

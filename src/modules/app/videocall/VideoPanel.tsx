@@ -59,7 +59,7 @@ export default function VideoPanel({
   useEffect(() => {
     if (localVideoRef.current && localStream) {
       localVideoRef.current.srcObject = localStream;
-      console.log("✅ Local video (grid) attached", localStream);
+      console.log(" Local video (grid) attached", localStream);
     }
   }, [localStream, focusedParticipant]);
 
@@ -71,7 +71,7 @@ export default function VideoPanel({
       focusedParticipant === "local"
     ) {
       localFocusedRef.current.srcObject = localStream;
-      console.log("✅ Local video (focused) attached", localStream);
+      console.log(" Local video (focused) attached", localStream);
     }
   }, [localStream, focusedParticipant]);
 
@@ -84,7 +84,7 @@ export default function VideoPanel({
       focusedParticipant !== "local"
     ) {
       localThumbnailRef.current.srcObject = localStream;
-      console.log("✅ Local video (thumbnail) attached", localStream);
+      console.log(" Local video (thumbnail) attached", localStream);
     }
   }, [localStream, focusedParticipant]);
 

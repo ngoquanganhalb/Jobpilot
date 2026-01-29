@@ -224,13 +224,12 @@ const CvManagement: React.FC = () => {
               className={`group relative rounded-lg border p-4 overflow-hidden transition-shadow
     ${
       cv.isActive
-        ? "bg-green-50 border-green-500 shadow-md" // CV active nổi bật
+        ? "bg-green-50 border-green-500 shadow-md" 
         : "bg-white border-gray-200 hover:shadow-lg"
     } 
   `}
               style={{ minHeight: 160 }}
             >
-              {/* overlay buttons: hidden until hover */}
               <div className="absolute inset-0 z-10 flex justify-center items-center p-3 pointer-events-none">
                 <div className="absolute inset-0 bg-opacity-0 group-hover:bg-opacity-80 transition-all pointer-events-none rounded-lg"></div>
 

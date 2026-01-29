@@ -1,4 +1,3 @@
-// /middleware.ts
 import { NextRequest, NextResponse } from "next/server";
 import * as jose from "jose";
 import { USER_ROLE } from "./common/enum";
@@ -19,7 +18,6 @@ export async function middleware(req: NextRequest) {
   const url = req.nextUrl.clone();
   const { pathname, search } = url;
 
-  // Bỏ qua public paths
   if (PUBLIC_PATHS.some((p) => pathname.startsWith(p))) {
     return NextResponse.next();
   }
@@ -29,14 +27,10 @@ export async function middleware(req: NextRequest) {
   // console.log("COOKIES:", req.cookies.get(ACCESS_TOKEN_COOKIE)?.value);
   // console.log("JWT_SECRET:", process.env.JWT_SECRET);
   // console.log("cookies:", req.cookies.getAll());
-  // console.log("➡️ Middleware path:", pathname);
+  // console.log(" Middleware path:", pathname);
 
 
-
-  // ✅ FIX 1: Không có token → redirect ngay về sign-in
-  // KHÔNG để client tự xử lý vì sẽ gây loop
   if (!accessToken) {
-    console.log("⚠️ No access token, redirecting to sign-in");
     const signInUrl = url.clone();
     signInUrl.pathname = "/sign-in";
     signInUrl.searchParams.set("returnTo", pathname + search);
@@ -65,13 +59,11 @@ export async function middleware(req: NextRequest) {
       return NextResponse.redirect(url);
     }
 
-    // ✅ Token valid → cho phép truy cập
     return NextResponse.next();
   } catch (error) {
-    console.log("⚠️ Token verification failed:", error);
+    console.log(" Token verification failed:", error);
 
-    // ✅ FIX 2: Token expired/invalid → redirect về sign-in
-    // KHÔNG để client tự refresh vì middleware chạy trước client
+
     const signInUrl = url.clone();
     signInUrl.pathname = "/sign-in";
     signInUrl.searchParams.set("returnTo", pathname + search);

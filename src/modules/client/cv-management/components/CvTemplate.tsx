@@ -7,7 +7,7 @@ interface CVTemplateProps {
   isEdit?: boolean;
   isCreate?: boolean;
   compact?: boolean;
-  embedded?: boolean; // new: full two-column preview for list (smaller sizes)
+  embedded?: boolean;
 }
 
 const SectionTitle: React.FC<{
@@ -240,7 +240,6 @@ const CVTemplate: React.FC<CVTemplateProps> = ({
           </div>
         </div>
 
-        {/* Right column (smaller padding / font) */}
         <div className="flex-1 p-3">
           <div className="mb-3">
             <SectionTitle embedded> Career goal </SectionTitle>
@@ -281,7 +280,6 @@ const CVTemplate: React.FC<CVTemplateProps> = ({
     );
   }
 
-  // Default full template (modal large). Note: changed to flexible height and print-friendly rules.
   return (
     <div className="w-full flex justify-center">
       <div

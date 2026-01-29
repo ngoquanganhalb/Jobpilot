@@ -21,7 +21,6 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <Providers>
-          {/* <WSProvider> */}
             <NProgressHandler />
             {children}
             <ToastContainer
@@ -36,7 +35,6 @@ export default function RootLayout({
               pauseOnHover
               theme="colored"
             />
-          {/* </WSProvider> */}
         </Providers>
       </body>
     </html>

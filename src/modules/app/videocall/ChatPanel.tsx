@@ -50,12 +50,10 @@ export default function ChatPanel({
     const client = stompClient.current;
     if (!client) return;
 
-    // console.log("📡 Setting up chat subscriptions for room:", roomId);
 
     const chatSub = client.subscribe(
       `/topic/room/${roomId}/chat`,
       (message: any) => {
-        // console.log("💬 Chat message received:", message.body);
         const data = JSON.parse(message.body);
         setMessages((prev) => [
           ...prev,
@@ -71,7 +69,6 @@ export default function ChatPanel({
     const systemSub = client.subscribe(
       `/topic/room/${roomId}/system`,
       (message: any) => {
-        // console.log("🔔 System message received:", message.body);
         setMessages((prev) => [
           ...prev,
           {
@@ -83,10 +80,9 @@ export default function ChatPanel({
       }
     );
 
-    // console.log("✅ Chat subscriptions active");
 
     return () => {
-      // console.log("🔌 Unsubscribing from chat");
+      // console.log(" Unsubscribing from chat");
       chatSub?.unsubscribe();
       systemSub?.unsubscribe();
     };

@@ -3,11 +3,7 @@ import {
   publicAxiosInstance,
 } from "@/core/axios-custom.helpers";
 import { AxiosRequestConfig, AxiosResponse } from "axios";
-// interface  {
-//   message: string;
-//   statusCode: number;
-//   data: T;
-// }
+
 type CustomAxiosRequestConfig = Partial<AxiosRequestConfig> & {
   ignoreBaseURL?: boolean;
 };

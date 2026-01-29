@@ -49,10 +49,8 @@ export default function DashboardLayout(props: LayoutProps) {
         </Head>
 
         <div className="container flex flex-col md:flex-row gap-0">
-          {/* Render sidebar cho employer hoặc candidate */}
           {renderSidebar()}
 
-          {/* Render nội dung chính */}
           <div className="flex-1">
             {user?.client === USER_ROLE.EMPLOYER && employer}
             {user?.client === USER_ROLE.USER && candidate}

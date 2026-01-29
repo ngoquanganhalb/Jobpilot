@@ -17,7 +17,6 @@ export default function DebugPanel({ stompClient, roomId, name, connected }: Deb
 
     const client = stompClient.current;
 
-    // Subscribe to ALL room topics to debug
     const signalSub = client.subscribe(`/topic/room/${roomId}/signal`, (msg: any) => {
       setMessages(prev => [...prev.slice(-20), `[SIGNAL] ${msg.body}`]);
     });
@@ -39,7 +38,7 @@ export default function DebugPanel({ stompClient, roomId, name, connected }: Deb
 
   const testJoin = () => {
     if (!connected) return;
-    console.log('🧪 Testing join...');
+    console.log(' Testing join...');
     stompClient.current.publish({
       destination: `/app/room/${roomId}/join`,
       body: JSON.stringify({
@@ -73,7 +72,7 @@ export default function DebugPanel({ stompClient, roomId, name, connected }: Deb
         <div className="flex items-center gap-2 text-sm">
           <span className="font-semibold">Connection:</span>
           <span className={connected ? 'text-green-600 font-semibold' : 'text-red-600'}>
-            {connected ? '✅ Connected' : '❌ Disconnected'}
+            {connected ? ' Connected' : ' Disconnected'}
           </span>
         </div>
         <div className="flex items-center gap-2 text-sm">

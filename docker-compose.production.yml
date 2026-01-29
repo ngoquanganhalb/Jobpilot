@@ -3,7 +3,6 @@ version: "3.8"
 services:
   jobpilot-fe:
     container_name: jobpilot-fe
-    # Build từ Dockerfile hiện tại
     build:
       context: .
       dockerfile: Dockerfile.production
